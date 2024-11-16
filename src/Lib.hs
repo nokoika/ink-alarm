@@ -1,11 +1,8 @@
 module Lib (generateICalEvents, someFunc) where
 
--- prelude
-
-import Prelude (Bool (False), Eq, IO, Int, Maybe (Just), Show, String, ($), (++), (.))
-import qualified Prelude as P (putStrLn, return, concatMap)
-import qualified Data.Maybe as Maybe (fromMaybe)
-import qualified Data.List as List (intercalate)
+import qualified ICal (ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTimeUnit (..), ReminderTrigger (..), buildICalText)
+import Prelude (Bool (False), Eq, IO, Int, Maybe (Just), Show, String, ($))
+import qualified Prelude as P (putStrLn, return)
 
 -- SplatoonStageScheduleQueryを表すデータ型
 data SplatoonStageScheduleQuery = SplatoonStageScheduleQuery
@@ -47,86 +44,49 @@ newtype NotificationSetting = NotificationSetting
   }
   deriving (Show, Eq)
 
--- ICalEventデータ型
-data ICalEvent = ICalEvent
-  { summary :: String,
-    description :: String,
-    start :: String, -- ISO 8601
-    end :: String, -- ISO 8601
-    url :: Maybe String,
-    reminders :: [Reminder]
-  }
-  deriving (Show, Eq)
-
--- 通知情報
-newtype Reminder = Reminder
-  { trigger :: String -- e.g., "-PT15M"
-  }
-  deriving (Show, Eq)
-
 -- 入力クエリを受け取り、HTTPリクエストを行い、ICalEventのリストを返す
 generateICalEvents ::
   SplatoonStageScheduleQuery -> -- 入力クエリ
-  IO [ICalEvent] -- HTTPリクエストを行い、ICalEventのリストを返す
+  IO [ICal.ICalEvent] -- HTTPリクエストを行い、ICalEventのリストを返す
 generateICalEvents query = do
   -- ここにHTTPリクエストを行う処理を書く
   -- 仮にダミーのデータを返す
   P.return
-    [ ICalEvent
+    [ ICal.ICalEvent
         { summary = "スプラトゥーン2 レギュラーマッチ",
           description = "スプラトゥーン2のレギュラーマッチが開催されます。",
           start = "2020-01-01T00:00:00Z",
           end = "2020-01-01T01:00:00Z",
           url = Just "https://example.com",
           reminders =
-            [ Reminder {trigger = "-PT15M"},
-              Reminder {trigger = "-PT1H"}
+            [ ICal.Reminder
+                { trigger = ICal.ReminderTrigger {time = 15, unit = ICal.Minute},
+                  action = ICal.Display
+                },
+              ICal.Reminder
+                { trigger = ICal.ReminderTrigger {time = 1, unit = ICal.Hour},
+                  action = ICal.Email
+                }
             ]
         },
-      ICalEvent
+      ICal.ICalEvent
         { summary = "スプラトゥーン2 ガチエリア",
           description = "スプラトゥーン2のガチエリアが開催されます。",
           start = "2020-01-01T01:00:00Z",
           end = "2020-01-01T02:00:00Z",
           url = Just "https://example.com",
           reminders =
-            [ Reminder {trigger = "-PT15M"},
-              Reminder {trigger = "-PT1H"}
+            [ ICal.Reminder
+                { trigger = ICal.ReminderTrigger {time = 10, unit = ICal.Minute},
+                  action = ICal.Display
+                },
+              ICal.Reminder
+                { trigger = ICal.ReminderTrigger {time = 30, unit = ICal.Minute},
+                  action = ICal.Display
+                }
             ]
         }
     ]
-
-generateIcs :: [ICalEvent] -> String -> String
-generateIcs events language =
-  List.intercalate "\n"
-    [ "BEGIN:VCALENDAR",
-      "PRODID:-//Splatoon3//" ++ language,
-      "VERSION:2.0",
-      aggregate
-        ( \ICalEvent {summary, description, start, end, url, reminders} ->
-            [ "BEGIN:VEVENT",
-              "SUMMARY:" ++ summary,
-              "DESCRIPTION:" ++ description,
-              "DTSTART:" ++ start,
-              "DTEND:" ++ end,
-              "URL:" ++ Maybe.fromMaybe "" url,
-              aggregate
-                ( \Reminder {trigger} ->
-                    [ "BEGIN:VALARM",
-                      "TRIGGER:" ++ trigger,
-                      "END:VALARM"
-                    ]
-                )
-                reminders,
-              "END:VEVENT"
-            ]
-        )
-        events,
-      "END:VCALENDAR"
-    ]
-  where
-    aggregate :: (a -> [String]) -> [a] -> String
-    aggregate f = List.intercalate "\n" . P.concatMap f
 
 someFunc :: IO ()
 someFunc = do
@@ -144,4 +104,4 @@ someFunc = do
               ]
           }
   events <- generateICalEvents query
-  P.putStrLn $ generateIcs events (language query)
+  P.putStrLn $ ICal.buildICalText events (language query)

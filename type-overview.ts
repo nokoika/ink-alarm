@@ -141,10 +141,6 @@ ACTION:DISPLAY
 DESCRIPTION:Reminder
 END:VALARM
 END:VEVENT
-END:VCALENDAR`,
-  `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Splatoon 3//JA
 BEGIN:VEVENT
 SUMMARY:イベントマッチ - タラポートショッピングパーク
 DESCRIPTION:イベント名: 新シーズン開幕記念カップ\nステージ: タラポートショッピングパーク
