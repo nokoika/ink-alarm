@@ -1,0 +1,88 @@
+name: spla-ical
+version: 0.1.0.0
+github: "githubuser/spla-ical"
+license: BSD-3-Clause
+author: "Author name here"
+maintainer: "example@example.com"
+copyright: "2024 Author name here"
+
+extra-source-files:
+  - README.md
+  - CHANGELOG.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description: Please see the README on GitHub at <https://github.com/githubuser/spla-ical#readme>
+
+dependencies:
+  - base >= 4.7 && < 5
+  - text
+  - time
+  - hspec
+
+ghc-options:
+  - -Wall
+  - -Wcompat
+  - -Widentities
+  - -Wincomplete-record-updates
+  - -Wincomplete-uni-patterns
+  - -Wmissing-export-lists
+  - -Wmissing-home-modules
+  - -Wpartial-fields
+  - -Wredundant-constraints
+
+library:
+  source-dirs: src
+  default-extensions:
+    - NoImplicitPrelude # Preludeを自動importしない。独自のPreludeを使いたいときに有効。
+    - StrictData # データ型のフィールドを、`!` を使わずとも正確評価させる
+    - ScopedTypeVariables # 型変数のスコープを広げ、型注釈をモジュール内で再利用可能に。
+    - FlexibleContexts # 型制約（コンテキスト）をより自由に書けるように。
+    - FlexibleInstances # インスタンスの定義を柔軟にし、より多様な型での定義が可能に。
+    - MultiParamTypeClasses # 複数の型パラメータを持つ型クラスを定義可能に。
+    - BangPatterns # パターンマッチで強制的に正格評価を行い、パフォーマンス改善に寄与。
+    - LambdaCase # \case 構文を利用して、ラムダ関数とcase式を簡潔に書けるように。
+    - ViewPatterns # パターンマッチ時に関数を使ってマッチングを柔軟に。
+    - PatternSynonyms # 複雑なパターンマッチをシンプルにするためのパターンシノニムを定義可能に。
+    - DuplicateRecordFields # 同じフィールド名を持つ複数のレコードを定義できるようにする。
+    - NamedFieldPuns # レコードのフィールド名をそのまま変数として利用できるように。
+    - RecordWildCards # レコードの全フィールドを{..}で展開可能にし、コードの簡潔化に寄与。
+    - TypeOperators # 型演算子（例：:+: など）を定義して使用可能にする。
+    - KindSignatures # 型の種類（kind）を明示的に指定できるようにする。
+    - GADTs # 一般化代数的データ型を使って強力で表現力のあるデータ型を定義。
+    - DataKinds # 型を値として扱えるようにし、型レベルプログラミングを強化。
+    - DeriveFunctor # Functorのインスタンスを自動生成。
+    - DeriveFoldable # Foldableのインスタンスを自動生成。
+    - DeriveTraversable # Traversableのインスタンスを自動生成。
+    - GeneralizedNewtypeDeriving # newtypeでラップした型のインスタンスを自動生成し、コードの重複を減らす。
+    - TupleSections # タプルの部分適用を簡単に記述できるようにする。
+    - OverloadedStrings # 文字列リテラルを様々な型（Textなど）で扱えるようにする。
+    - Arrows # Arrowプロセスの記述を簡潔にするためのproc構文を利用可能に。
+    - RecursiveDo # 再帰的なdoブロック（mdo）を許可し、相互依存する変数を簡単に扱えるように。
+
+executables:
+  spla-ical-exe:
+    main: Main.hs
+    source-dirs: app
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - spla-ical
+
+tests:
+  spla-ical-test:
+    main: Spec.hs
+    source-dirs: test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - spla-ical
