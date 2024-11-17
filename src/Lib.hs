@@ -8,10 +8,14 @@ import qualified Data.Text.Encoding as TE (decodeUtf8', encodeUtf8)
 import qualified Data.Text.Lazy as TL (fromStrict)
 import qualified ICal (ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTimeUnit (..), ReminderTrigger (..), buildICalText)
 import qualified Web.Scotty as S (ActionM, get, queryParam, scotty, text)
-import Prelude (Bool (False), Either (Left, Right), Eq, IO, Int, Maybe (Just, Nothing), Show, String, ($), (.), (<>), (>>=))
+import Prelude (Bool (False), Either (Left, Right), Eq, IO, Int, Maybe (Just, Nothing), Show, String, ($), (.), (<>), (>>=), (++))
 import qualified Prelude as P (putStrLn, return, show, print)
 import Data.Aeson (FromJSON, decode)
 import GHC.Generics (Generic)
+
+import Network.HTTP.Conduit (simpleHttp)
+import qualified Data.ByteString.Lazy.Char8 as L8
+import Control.Exception (try, SomeException)
 
 
 -- SplatoonStageScheduleQueryを表すデータ型
@@ -138,7 +142,7 @@ data Person = Person
   deriving (Show, Generic)
 instance FromJSON Person
 
-someFunc = do
+piyo = do
   let jsonString :: T.Text
       jsonString = "{\"name\":\"Charlie\",\"age\":28}"
 
@@ -147,3 +151,10 @@ someFunc = do
   case person of
     Just p  -> P.print p
     Nothing -> P.putStrLn "Failed to parse JSON"
+
+someFunc = do
+  let url = "https://spla3.yuu26.com/api/schedule"
+  response <- try (simpleHttp url) :: IO (Either SomeException L8.ByteString)
+  case response of
+    Left err -> P.putStrLn $ "Error: " ++ P.show err
+    Right json -> L8.putStrLn json

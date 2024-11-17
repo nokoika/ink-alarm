@@ -67,6 +67,7 @@ library
     , base64-bytestring
     , bytestring
     , hspec
+    , http-conduit
     , scotty
     , text
     , time
@@ -114,6 +115,7 @@ executable spla-ical-exe
     , base64-bytestring
     , bytestring
     , hspec
+    , http-conduit
     , scotty
     , spla-ical
     , text
@@ -165,6 +167,7 @@ test-suite spla-ical-test
     , base64-bytestring
     , bytestring
     , hspec
+    , http-conduit
     , scotty
     , spla-ical
     , text
