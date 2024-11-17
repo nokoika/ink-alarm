@@ -29,6 +29,7 @@ dependencies:
   - base64-bytestring
   - bytestring
   - http-conduit
+  - cache
 
 ghc-options:
   - -Wall
