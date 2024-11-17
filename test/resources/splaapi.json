@@ -1,0 +1,121 @@
+{
+  "result": {
+    "regular": [
+      {
+        "start_time": "2024-11-17T21:00:00+09:00",
+        "end_time": "2024-11-17T23:00:00+09:00",
+        "rule": {
+          "key": "TURF_WAR",
+          "name": "ナワバリバトル"
+        },
+        "stages": [
+          {
+            "id": 22,
+            "name": "ネギトロ炭鉱",
+            "image": "https://example.com"
+          }
+        ],
+        "is_fest": false
+      }
+    ],
+    "bankara_open": [
+      {
+        "start_time": "2024-11-17T21:00:00+09:00",
+        "end_time": "2024-11-17T23:00:00+09:00",
+        "rule": {
+          "key": "AREA",
+          "name": "ガチエリア"
+        },
+        "stages": [
+          {
+            "id": 9,
+            "name": "ヒラメが丘団地",
+            "image": "https://example.com"
+          }
+        ],
+        "is_fest": false
+      }
+    ],
+    "bankara_challenge": [
+      {
+        "start_time": "2024-11-17T21:00:00+09:00",
+        "end_time": "2024-11-17T23:00:00+09:00",
+        "rule": {
+          "key": "GOAL",
+          "name": "ガチホコバトル"
+        },
+        "stages": [
+          {
+            "id": 10,
+            "name": "マサバ海峡大橋",
+            "image": "https://example.com"
+          }
+        ],
+        "is_fest": false
+      }
+    ],
+    "event": [
+      {
+        "start_time": "2024-11-20T11:00:00+09:00",
+        "end_time": "2024-11-20T13:00:00+09:00",
+        "rule": {
+          "key": "AREA",
+          "name": "ガチエリア"
+        },
+        "stages": [
+          {
+            "id": 10,
+            "name": "マサバ海峡大橋",
+            "image": "https://example.com"
+          }
+        ],
+        "event": {
+          "id": "FastMove",
+          "name": "イカダッシュバトル",
+          "desc": "イカダッシュ速度アップ！ イカやタコでステージを泳ぎ回れ！"
+        },
+        "is_fest": false
+      }
+    ],
+    "fest": [
+      {
+        "start_time": "2024-11-17T21:00:00+09:00",
+        "end_time": "2024-11-17T23:00:00+09:00",
+        "rule": null,
+        "stages": null,
+        "is_fest": false,
+        "is_tricolor": false,
+        "tricolor_stages": null
+      }
+    ],
+    "fest_challenge": [
+      {
+        "start_time": "2024-11-17T21:00:00+09:00",
+        "end_time": "2024-11-17T23:00:00+09:00",
+        "rule": null,
+        "stages": null,
+        "is_fest": false,
+        "is_tricolor": false,
+        "tricolor_stages": null
+      }
+    ],
+    "x": [
+      {
+        "start_time": "2024-11-17T21:00:00+09:00",
+        "end_time": "2024-11-17T23:00:00+09:00",
+        "rule": {
+          "key": "CLAM",
+          "name": "ガチアサリ"
+        },
+        "stages": [
+          {
+            "id": 23,
+            "name": "カジキ空港",
+            "image": "https://example.com"
+          }
+        ],
+        "is_fest": false
+      }
+    ]
+  }
+}
