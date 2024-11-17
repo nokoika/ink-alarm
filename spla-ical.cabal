@@ -59,6 +59,7 @@ library
       OverloadedStrings
       Arrows
       RecursiveDo
+      DeriveGeneric
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       aeson
@@ -105,6 +106,7 @@ executable spla-ical-exe
       OverloadedStrings
       Arrows
       RecursiveDo
+      DeriveGeneric
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -155,6 +157,7 @@ test-suite spla-ical-test
       OverloadedStrings
       Arrows
       RecursiveDo
+      DeriveGeneric
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson

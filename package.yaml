@@ -66,6 +66,7 @@ default-extensions:
   - OverloadedStrings # 文字列リテラルを様々な型（Textなど）で扱えるようにする。
   - Arrows # Arrowプロセスの記述を簡潔にするためのproc構文を利用可能に。
   - RecursiveDo # 再帰的なdoブロック（mdo）を許可し、相互依存する変数を簡単に扱えるように。
+  - DeriveGeneric # Aesonのため
 
 library:
   source-dirs: src
