@@ -4,9 +4,9 @@ import qualified Data.ByteString as BS
 import qualified Data.ByteString.Base64.URL as B64U (decode)
 import qualified Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as TE (decodeUtf8', encodeUtf8)
-import qualified Data.Text.Lazy as TL (fromStrict, pack, toStrict)
+import qualified Data.Text.Lazy as TL (fromStrict)
 import qualified ICal (ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTimeUnit (..), ReminderTrigger (..), buildICalText)
-import Web.Scotty (ActionM, get, queryParam, scotty, text)
+import qualified Web.Scotty as S (ActionM, get, queryParam, scotty, text)
 import Prelude (Bool (False), Either (Left, Right), Eq, IO, Int, Maybe (Just, Nothing), Show, String, ($), (.), (<>), (>>=))
 import qualified Prelude as P (putStrLn, return, show)
 
@@ -121,8 +121,8 @@ decodeBase64UriToJson base64Uri = case B64U.decode base64Uri of
     Right decodedText -> Right decodedText
 
 someFunc =
-  scotty 3000 $
-    get "/decode" $
-      (queryParam "data" :: ActionM T.Text) >>= \base64Uri -> case decodeBase64UriToJson $ TE.encodeUtf8 base64Uri of
-        Left err -> text $ TL.fromStrict $ T.pack err
-        Right decodedText -> text $ TL.fromStrict decodedText
+  S.scotty 3000 $
+    S.get "/decode" $
+      (S.queryParam "data" :: S.ActionM T.Text) >>= \base64Uri -> S.text $ case decodeBase64UriToJson $ TE.encodeUtf8 base64Uri of
+        Left err -> TL.fromStrict $ T.pack err
+        Right decodedText -> TL.fromStrict decodedText
