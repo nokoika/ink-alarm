@@ -28,6 +28,7 @@ library
       Cache
       ICal
       Lib
+      Query
       SplaApi
   other-modules:
       Paths_spla_ical
@@ -132,6 +133,7 @@ test-suite spla-ical-test
   other-modules:
       ICalTest
       LibTest
+      QueryTest
       SplaApiTest
       Paths_spla_ical
   autogen-modules:
