@@ -61,8 +61,12 @@ library
       RecursiveDo
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , base64-bytestring
+    , bytestring
     , hspec
+    , scotty
     , text
     , time
   default-language: Haskell2010
@@ -103,8 +107,12 @@ executable spla-ical-exe
       RecursiveDo
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , base64-bytestring
+    , bytestring
     , hspec
+    , scotty
     , spla-ical
     , text
     , time
@@ -149,8 +157,12 @@ test-suite spla-ical-test
       RecursiveDo
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , base64-bytestring
+    , bytestring
     , hspec
+    , scotty
     , spla-ical
     , text
     , time

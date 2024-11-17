@@ -24,6 +24,10 @@ dependencies:
   - text
   - time
   - hspec
+  - scotty
+  - aeson
+  - base64-bytestring
+  - bytestring
 
 ghc-options:
   - -Wall

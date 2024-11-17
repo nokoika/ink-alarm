@@ -1,8 +1,14 @@
 module Lib (generateICalEvents, someFunc) where
 
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Base64.URL as B64U (decode)
+import qualified Data.Text as T (Text, pack)
+import qualified Data.Text.Encoding as TE (decodeUtf8', encodeUtf8)
+import qualified Data.Text.Lazy as TL (fromStrict, pack, toStrict)
 import qualified ICal (ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTimeUnit (..), ReminderTrigger (..), buildICalText)
-import Prelude (Bool (False), Eq, IO, Int, Maybe (Just), Show, String, ($))
-import qualified Prelude as P (putStrLn, return)
+import Web.Scotty (ActionM, get, queryParam, scotty, text)
+import Prelude (Bool (False), Either (Left, Right), Eq, IO, Int, Maybe (Just, Nothing), Show, String, ($), (.), (<>), (>>=))
+import qualified Prelude as P (putStrLn, return, show)
 
 -- SplatoonStageScheduleQueryを表すデータ型
 data SplatoonStageScheduleQuery = SplatoonStageScheduleQuery
@@ -89,7 +95,8 @@ generateICalEvents query = do
     ]
 
 someFunc :: IO ()
-someFunc = do
+
+hoge = do
   let query =
         SplatoonStageScheduleQuery
           { language = "ja",
@@ -105,3 +112,17 @@ someFunc = do
           }
   events <- generateICalEvents query
   P.putStrLn $ ICal.buildICalText events (language query)
+
+decodeBase64UriToJson :: BS.ByteString -> Either String T.Text
+decodeBase64UriToJson base64Uri = case B64U.decode base64Uri of
+  Left err -> Left $ P.show err
+  Right decoded -> case TE.decodeUtf8' decoded of
+    Left err -> Left $ P.show err
+    Right decodedText -> Right decodedText
+
+someFunc =
+  scotty 3000 $
+    get "/decode" $
+      (queryParam "data" :: ActionM T.Text) >>= \base64Uri -> case decodeBase64UriToJson $ TE.encodeUtf8 base64Uri of
+        Left err -> text $ TL.fromStrict $ T.pack err
+        Right decodedText -> text $ TL.fromStrict decodedText
