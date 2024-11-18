@@ -22,8 +22,8 @@ type FilterCondition =
     };
 
 type TimeSlot = {
-  start: string; // ISO 8601形式で時間指定（例: '2022-09-14T13:00:00+09:00'）
-  end: string; // ISO 8601形式で時間指定（例: '2022-09-14T15:00:00+09:00'）
+  start: string;
+  end: string;
 };
 
 type NotificationSetting = {

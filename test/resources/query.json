@@ -1,0 +1,28 @@
+{
+  "// 注意事項": "このファイルをbase64URLエンコードしたものがquery-base64url.txtになります。cat query.json | basenc --base64url -w 0 > query-base64url.txt",
+  "$schema": "../../query-schema.json",
+  "language": "ja",
+  "utcOffset": "+09:00",
+  "filters": [
+    {
+      "matchType": "bankara_open",
+      "stages": {
+        "stageIds": [22],
+        "matchBothStages": true
+      },
+      "rules": ["TURF_WAR"],
+      "timeSlots": [
+        {
+          "start": "00:00",
+          "end": "06:00",
+          "dayOfWeek": "sun"
+        }
+      ],
+      "notifications": [
+        {
+          "minutesBefore": 90
+        }
+      ]
+    }
+  ]
+}

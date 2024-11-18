@@ -1,4 +1,4 @@
-module ICal (ICalEvent (..), Reminder (..), ReminderTrigger (..), ReminderAction (..), ReminderTimeUnit (..), buildICalText) where
+module ICal (ICalEvent (..), Reminder (..), ReminderTrigger (..), ReminderAction (..), buildICalText) where
 
 import qualified Data.List as List (intercalate)
 import qualified Data.Maybe as Maybe (fromMaybe)
@@ -22,20 +22,14 @@ instance Show ReminderAction where
   show Display = "DISPLAY"
   show Email = "EMAIL"
 
-data ReminderTimeUnit = Minute | Hour deriving (Eq, Enum)
-
-instance Show ReminderTimeUnit where
-  show Minute = "M"
-  show Hour = "H"
-
-data ReminderTrigger = ReminderTrigger
-  { time :: Int,
-    unit :: ReminderTimeUnit
+-- TODO: 絶対時刻も指定できるようにする
+newtype ReminderTrigger = ReminderTrigger
+  { time :: Int
   }
   deriving (Eq)
 
 instance Show ReminderTrigger where
-  show ReminderTrigger {time, unit} = "-PT" ++ P.show time ++ P.show unit
+  show ReminderTrigger {time} = "-PT" ++ P.show time ++ "M"
 
 data Reminder = Reminder
   { trigger :: ReminderTrigger,

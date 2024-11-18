@@ -10,7 +10,7 @@ import qualified Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as TE (decodeUtf8', encodeUtf8)
 import qualified Data.Text.Lazy as TL (fromStrict)
 import GHC.Generics (Generic)
-import qualified ICal (ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTimeUnit (..), ReminderTrigger (..), buildICalText)
+import qualified ICal (ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTrigger (..), buildICalText)
 import Network.HTTP.Conduit (simpleHttp)
 import Query (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..))
 import qualified Web.Scotty as S (ActionM, get, queryParam, scotty, text)
@@ -33,11 +33,11 @@ generateICalEvents query = do
           url = Just "https://example.com",
           reminders =
             [ ICal.Reminder
-                { trigger = ICal.ReminderTrigger {time = 15, unit = ICal.Minute},
+                { trigger = ICal.ReminderTrigger {time = 15},
                   action = ICal.Display
                 },
               ICal.Reminder
-                { trigger = ICal.ReminderTrigger {time = 1, unit = ICal.Hour},
+                { trigger = ICal.ReminderTrigger {time = 1},
                   action = ICal.Email
                 }
             ]
@@ -50,11 +50,11 @@ generateICalEvents query = do
           url = Just "https://example.com",
           reminders =
             [ ICal.Reminder
-                { trigger = ICal.ReminderTrigger {time = 10, unit = ICal.Minute},
+                { trigger = ICal.ReminderTrigger {time = 10},
                   action = ICal.Display
                 },
               ICal.Reminder
-                { trigger = ICal.ReminderTrigger {time = 30, unit = ICal.Minute},
+                { trigger = ICal.ReminderTrigger {time = 30},
                   action = ICal.Display
                 }
             ]
@@ -67,12 +67,13 @@ hoge = do
   let query =
         QueryRoot
           { language = "ja",
+            utcOffset = "+09:00", 
             filters =
               [ FilterCondition
                   { matchType = "regular",
                     stages = Just $ StageFilter {matchBothStages = False, stageIds = [1, 2]},
                     rules = Just ["TURF_WAR"],
-                    timeSlots = Just [TimeSlot {start = "00:00", end = "01:00", utcOffset = Just "+09:00", dayOfWeek = Just "Monday"}],
+                    timeSlots = Just [TimeSlot {start = "00:00", end = "01:00", dayOfWeek = Just "Monday"}],
                     notifications = Just [NotificationSetting {minutesBefore = 15}]
                   }
               ]

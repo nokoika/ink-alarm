@@ -13,11 +13,14 @@ import qualified Prelude as P (show)
 
 data QueryRoot = QueryRoot
   { language :: String, -- "ja" | "en"
+    utcOffset :: String, -- e.g., "+09:00"
     filters :: [FilterCondition]
   }
   deriving (Show, Eq, Generic)
 
 instance A.FromJSON QueryRoot
+
+-- TODO: matchType とかを enum にする
 
 -- フィルタ条件
 data FilterCondition
@@ -45,7 +48,6 @@ instance A.FromJSON StageFilter
 data TimeSlot = TimeSlot
   { start :: String, -- HH:mm
     end :: String, -- HH:mm
-    utcOffset :: Maybe String, -- e.g., "+09:00"
     dayOfWeek :: Maybe String -- e.g., "Monday"
   }
   deriving (Show, Eq, Generic)
@@ -55,6 +57,7 @@ instance A.FromJSON TimeSlot
 -- 通知設定
 newtype NotificationSetting = NotificationSetting
   { minutesBefore :: Int
+  -- TODO: 毎日何時、みたいな設定もできるようにする
   }
   deriving (Show, Eq, Generic)
 

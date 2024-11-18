@@ -30,3 +30,5 @@ example = do
   case maybeValueAfterDelete of
     Just value -> P.putStrLn $ "Found after delete: " ++ value
     Nothing -> P.putStrLn "Not found after delete"
+
+

@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "NotificationSetting": {
+      "type": "object",
+      "properties": {
+        "minutesBefore": {
+          "type": "integer"
+        }
+      },
+      "required": ["minutesBefore"]
+    },
+    "TimeSlot": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string",
+          "pattern": "^\\d{2}:\\d{2}$"
+        },
+        "end": {
+          "type": "string",
+          "pattern": "^\\d{2}:\\d{2}$"
+        },
+        "dayOfWeek": {
+          "type": "string",
+          "enum": ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
+        }
+      },
+      "required": ["start", "end"]
+    },
+    "StageFilter": {
+      "type": "object",
+      "properties": {
+        "matchBothStages": {
+          "type": "boolean"
+        },
+        "stageIds": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "required": ["matchBothStages", "stageIds"]
+    },
+    "FilterCondition": {
+      "type": "object",
+      "properties": {
+        "matchType": {
+          "type": "string",
+          "enum": ["bankara_open", "bankara_challenge", "x", "regular", "event"]
+        },
+        "stages": {
+          "$ref": "#/definitions/StageFilter"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["TURF_WAR", "AREA", "LOFT", "GOAL", "CLAM"]
+          }
+        },
+        "timeSlots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TimeSlot"
+          }
+        },
+        "notifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NotificationSetting"
+          }
+        }
+      },
+      "required": ["matchType"]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "language": {
+      "type": "string",
+      "enum": ["ja", "en"]
+    },
+    "utcOffset": {
+      "type": "string",
+      "pattern": "^([+-]\\d{2}:\\d{2})$"
+    },
+    "filters": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/FilterCondition"
+      }
+    }
+  },
+  "required": ["language", "filters"]
+}

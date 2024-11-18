@@ -1,7 +1,7 @@
 module ICalTest (test) where
 
 import Data.List (intercalate)
-import qualified ICal (ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTimeUnit (Minute, Hour), ReminderTrigger (..), buildICalText)
+import qualified ICal (ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTrigger (..), buildICalText)
 import Test.Hspec (describe, hspec, it, shouldBe)
 import Prelude (IO, Maybe (Just), ($))
 
@@ -18,11 +18,11 @@ test = hspec $ do
                   url = Just "https://example.com",
                   reminders =
                     [ ICal.Reminder
-                        { trigger = ICal.ReminderTrigger {time = 10, unit = ICal.Minute},
+                        { trigger = ICal.ReminderTrigger {time = 10},
                           action = ICal.Display
                         },
                       ICal.Reminder
-                        { trigger = ICal.ReminderTrigger {time = 30, unit = ICal.Minute},
+                        { trigger = ICal.ReminderTrigger {time = 30},
                           action = ICal.Display
                         }
                     ]
@@ -35,11 +35,11 @@ test = hspec $ do
                   url = Just "https://example.com",
                   reminders =
                     [ ICal.Reminder
-                        { trigger = ICal.ReminderTrigger {time = 5, unit = ICal.Minute},
+                        { trigger = ICal.ReminderTrigger {time = 5},
                           action = ICal.Display
                         },
                       ICal.Reminder
-                        { trigger = ICal.ReminderTrigger {time = 1, unit = ICal.Hour},
+                        { trigger = ICal.ReminderTrigger {time = 60},
                           action = ICal.Email
                         }
                     ]
@@ -79,7 +79,7 @@ test = hspec $ do
                 "ACTION:DISPLAY",
                 "END:VALARM",
                 "BEGIN:VALARM",
-                "TRIGGER:-PT1H",
+                "TRIGGER:-PT60M",
                 "ACTION:EMAIL",
                 "END:VALARM",
                 "END:VEVENT",
