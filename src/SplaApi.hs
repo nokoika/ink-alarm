@@ -6,13 +6,18 @@ module SplaApi
     Stage (..),
     EventMatch (..),
     EventSummary (..),
+    fetchSchedule,
   )
 where
 
+import Control.Exception (SomeException, try)
 import Data.Aeson ((.:), (.:?))
-import qualified Data.Aeson as A (FromJSON (..), withObject)
+import qualified Data.Aeson as A (FromJSON (..), eitherDecode, withObject)
+import qualified Data.ByteString.Lazy.Char8 as L8 (ByteString)
 import GHC.Generics (Generic)
-import Prelude as P (Bool, Eq, Int, Maybe, Show, String, ($), (<$>), (<*>))
+import Network.HTTP.Conduit (simpleHttp)
+import Prelude (Bool, Either (..), Eq, IO, Int, Maybe, Show, String, ($), (<$>), (<*>))
+import qualified Prelude as P (show, return)
 
 newtype Root = Root
   { result :: Result
@@ -144,3 +149,11 @@ instance A.FromJSON EventSummary where
         .: "name"
       <*> v
         .: "desc"
+
+fetchSchedule :: IO (Either String Root)
+fetchSchedule = do
+  let url = "https://spla3.yuu26.com/api/schedule"
+  response <- try (simpleHttp url) :: IO (Either SomeException L8.ByteString)
+  case response of
+    Left err -> P.return $ Left $ P.show err
+    Right body -> P.return $ A.eitherDecode body
