@@ -69,12 +69,6 @@ inStage apiStages Q.StageFilter {matchBothStages, stageIds} =
 inRules :: S.Rule -> [P.String] -> P.Bool
 inRules S.Rule {key = apiRuleKey} rules = apiRuleKey `P.elem` rules
 
--- | スケジュール単体とquery条件を渡して、マッチするかどうかを返す
--- | 最初は雑に書いてあとでリファクタリングする
-filterMultipleDefaultSchedule :: Q.QueryRoot -> S.DefaultSchedule -> P.String -> P.Bool
-filterMultipleDefaultSchedule Q.QueryRoot {filters, utcOffset} defaultSchedule apiMatchType =
-  P.or [filterDefaultSchedule filter defaultSchedule utcOffset apiMatchType | filter <- filters]
-
 filterDefaultSchedule :: Q.FilterCondition -> S.DefaultSchedule -> P.String -> P.String -> P.Bool
 filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.DefaultSchedule {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset apiMatchType =
   P.and
@@ -89,22 +83,6 @@ filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.
     inMaybeStages apiStages' selectedStages = maybeTrue (`inStage` selectedStages) apiStages'
     inMaybeRules :: P.Maybe S.Rule -> [P.String] -> P.Bool
     inMaybeRules apiRule' selectedRules = maybeTrue (`inRules` selectedRules) apiRule'
-
--- filterMultipleEventMatch :: Q.QueryRoot -> S.EventMatch -> P.Bool
--- filterMultipleEventMatch Q.QueryRoot {filters, utcOffset} S.EventMatch {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} =
---   P.or -- どれかのquery条件にマッチするかどうか
---     [ P.and
---         [ P.not apiIsFest, -- フェスの場合にイベントマッチが来ることはない
---           maybeTrue (inTimeSlots apiStartTime apiEndTime utcOffset) timeSlots, -- 時間帯が通知設定にかぶっているか。未指定の場合は任意の時間でマッチ
---           maybeTrue (inStage apiStages) stages, -- 選んだステージがスケジュールに含まれているか。未指定の場合は任意のステージでマッチ
---           maybeTrue (inRules apiRule) rules -- ルールが指定したものに含まれるか。未指定の場合は任意のルールでマッチ
---         ]
---       | Q.FilterCondition {stages, rules, timeSlots} <- filters
---     ]
-
-filterMultipleEventMatch :: Q.QueryRoot -> S.EventMatch -> P.Bool
-filterMultipleEventMatch Q.QueryRoot {filters, utcOffset} eventMatch =
-  P.or [filterEventMatch filter eventMatch utcOffset | filter <- filters]
 
 filterEventMatch :: Q.FilterCondition -> S.EventMatch -> P.String -> P.Bool
 filterEventMatch Q.FilterCondition {stages, rules, timeSlots} S.EventMatch {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset =
@@ -161,7 +139,6 @@ createICalEventsFromEventMatches queryRoot eventMatches =
       filterEventMatch filter eventMatch utcOffset
   ]
 
--- q: このhogeって関数名じゃなくて、具体的にどういう名前にするといいですか？
 createIcalInput :: Q.QueryRoot -> S.Result -> I.ICalInput
 createIcalInput queryRoot result =
   I.ICalInput
