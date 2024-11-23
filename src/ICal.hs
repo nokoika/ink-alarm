@@ -1,17 +1,20 @@
-module ICal (ICalEvent (..), Reminder (..), ReminderTrigger (..), ReminderAction (..), buildICalText) where
+module ICal (ICalInput (..), ICalEvent (..), Reminder (..), ReminderTrigger (..), ReminderAction (..), buildICalText) where
 
 import qualified Data.List as List (intercalate)
-import qualified Data.Maybe as Maybe (fromMaybe)
-import Prelude (Enum, Eq, Int, Maybe, Show, String, (++), (.))
+import Prelude (Enum, Eq, Int, Show, String, (++), (.))
 import qualified Prelude as P (Show (show), concatMap)
 
--- ICalEventデータ型
+data ICalInput = ICalInput
+  { language :: String, -- "JA" | "EN"
+    events :: [ICalEvent]
+  }
+  deriving (Show, Eq)
+
 data ICalEvent = ICalEvent
   { summary :: String,
     description :: String,
     start :: String, -- ISO 8601
     end :: String, -- ISO 8601
-    url :: Maybe String,
     reminders :: [Reminder]
   }
   deriving (Show, Eq)
@@ -37,21 +40,20 @@ data Reminder = Reminder
   }
   deriving (Show, Eq)
 
-buildICalText :: [ICalEvent] -> String -> String
-buildICalText events language =
+buildICalText :: ICalInput -> String
+buildICalText ICalInput {language, events} =
   List.intercalate
     "\n"
     [ "BEGIN:VCALENDAR",
       "VERSION:2.0",
       "PRODID:-//Splatoon 3//" ++ language,
       aggregate
-        ( \ICalEvent {summary, description, start, end, url, reminders} ->
+        ( \ICalEvent {summary, description, start, end, reminders} ->
             [ "BEGIN:VEVENT",
               "SUMMARY:" ++ summary,
               "DESCRIPTION:" ++ description,
               "DTSTART:" ++ start,
               "DTEND:" ++ end,
-              "URL:" ++ Maybe.fromMaybe "" url,
               aggregate
                 ( \Reminder {trigger, action} ->
                     [ "BEGIN:VALARM",

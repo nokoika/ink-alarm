@@ -112,7 +112,7 @@ data EventMatch = EventMatch
     endTime :: String,
     rule :: Rule,
     stages :: [Stage],
-    event :: EventSummary,
+    eventSummary :: EventSummary,
     isFest :: Bool
   }
   deriving (Show, Eq, Generic)

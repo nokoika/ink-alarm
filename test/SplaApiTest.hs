@@ -85,7 +85,7 @@ test = hspec $ do
                                           image = "https://example.com"
                                         }
                                     ],
-                                  event =
+                                  eventSummary =
                                     SplaApi.EventSummary
                                       { id = "FastMove",
                                         name = "イカダッシュバトル",

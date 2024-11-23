@@ -59,12 +59,12 @@ const sampleQuery: SplatoonStageScheduleQuery = {
       rules: ["LOFT"],
       timeSlots: [
         {
-          start: "2022-09-14T13:00:00+09:00",
-          end: "2022-09-14T15:00:00+09:00",
+          start: "13:00",
+          end: "15:00",
         },
         {
-          start: "2022-09-14T21:00:00+09:00",
-          end: "2022-09-15T01:00:00+09:00",
+          start: "21:00",
+          end: "01:00",
         },
       ],
       notifications: [{ minutesBefore: 10 }, { minutesBefore: 30 }],
@@ -74,12 +74,12 @@ const sampleQuery: SplatoonStageScheduleQuery = {
       rules: ["AREA", "CLAM"],
       timeSlots: [
         {
-          start: "2022-09-15T10:00:00+09:00",
-          end: "2022-09-15T12:00:00+09:00",
+          start: "10:00",
+          end: "12:00",
         },
         {
-          start: "2022-09-15T18:00:00+09:00",
-          end: "2022-09-15T20:00:00+09:00",
+          start: "18:00",
+          end: "20:00",
         },
       ],
       notifications: [{ minutesBefore: 15 }],
@@ -88,8 +88,8 @@ const sampleQuery: SplatoonStageScheduleQuery = {
       matchType: "event",
       timeSlots: [
         {
-          start: "2022-09-16T08:00:00+09:00",
-          end: "2022-09-16T10:00:00+09:00",
+          start: "08:00",
+          end: "10:00",
         },
       ],
       notifications: [{ minutesBefore: 5 }, { minutesBefore: 20 }],
