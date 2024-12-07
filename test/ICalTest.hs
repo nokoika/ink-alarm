@@ -1,9 +1,12 @@
 module ICalTest (test) where
 
+import Data.Time (UTCTime(UTCTime))
 import Data.List (intercalate)
+import Data.Time.Calendar (fromGregorian)
+import Data.Time.Clock (secondsToDiffTime)
 import qualified ICal (ICalInput(..), ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTrigger (..), buildICalText)
 import Test.Hspec (describe, hspec, it, shouldBe)
-import Prelude (IO, Maybe (Just), ($))
+import Prelude (IO, Maybe (Just), ($), (*))
 
 test :: IO ()
 test = hspec $ do
@@ -16,8 +19,8 @@ test = hspec $ do
                   [ ICal.ICalEvent
                       { summary = "バンカラマッチ(オープン) - ヤガラ市場 / チョウザメ造船 - ガチヤグラ",
                         description = "ルール: ガチヤグラ\nステージ: ヤガラ市場, チョウザメ造船",
-                        start = "20220914T040000Z", -- ここ、普通にISO8601にするか、あるいはRFC5545にするか悩む
-                        end = "20220914T060000Z",
+                        start = UTCTime (fromGregorian 2022 9 14) $ secondsToDiffTime (4 * 60 * 60),
+                        end = UTCTime (fromGregorian 2022 9 14) $ secondsToDiffTime (6 * 60 * 60),
                         reminders =
                           [ ICal.Reminder
                               { trigger = ICal.ReminderTrigger {time = 10},
@@ -32,8 +35,8 @@ test = hspec $ do
                     ICal.ICalEvent
                       { summary = "イベントマッチ - タラポートショッピングパーク",
                         description = "イベント名: 新シーズン開幕記念カップ\nステージ: タラポートショッピングパーク",
-                        start = "20220916T230000Z",
-                        end = "20220917T010000Z",
+                        start = UTCTime (fromGregorian 2022 9 16) $ secondsToDiffTime (23 * 60 * 60),
+                        end = UTCTime (fromGregorian 2022 9 17) $ secondsToDiffTime (1 * 60 * 60),
                         reminders =
                           [ ICal.Reminder
                               { trigger = ICal.ReminderTrigger {time = 5},

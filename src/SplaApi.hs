@@ -18,6 +18,7 @@ import GHC.Generics (Generic)
 import Network.HTTP.Conduit (simpleHttp)
 import Prelude (Bool, Either (..), Eq, IO, Int, Maybe, Show, String, ($), (<$>), (<*>))
 import qualified Prelude as P (show, return)
+import Data.Time (UTCTime)
 
 newtype Root = Root
   { result :: Result
@@ -54,8 +55,8 @@ instance A.FromJSON Result where
         .: "event"
 
 data DefaultSchedule = DefaultSchedule
-  { startTime :: String,
-    endTime :: String,
+  { startTime :: UTCTime,
+    endTime :: UTCTime,
     rule :: Maybe Rule, -- フェス中の場合は `Nothing`
     stages :: Maybe [Stage], -- フェス中の場合は `Nothing`
     isFest :: Bool
@@ -108,8 +109,8 @@ instance A.FromJSON Stage where
         .: "image"
 
 data EventMatch = EventMatch
-  { startTime :: String,
-    endTime :: String,
+  { startTime :: UTCTime,
+    endTime :: UTCTime,
     rule :: Rule,
     stages :: [Stage],
     eventSummary :: EventSummary,

@@ -1,28 +1,52 @@
-module Filter () where
+module Filter
+  ( createIcalInput,
+    createICalEventsFromDefaultSchedules,
+    createICalEventsFromEventMatches,
+    defaultReminders,
+    filterDefaultSchedule,
+    filterEventMatch,
+    inRules,
+    inStage,
+    inTimeSlot,
+    inTimeSlots,
+    isWithinTimeRange,
+    parseISO8601WithTimeZone,
+    changeTimeZone,
+    timeZoneFromOffsetString,
+    timeOfDayFromString,
+  )
+where
 
-import Control.Monad (when)
-import qualified Data.Maybe as M (fromJust, fromMaybe, isJust, isNothing, maybe)
+import qualified Data.Maybe as M (fromJust, fromMaybe, maybe)
 import qualified Data.Time as D
-import qualified Data.Time.Format.ISO8601 as DF (iso8601ParseM)
 import qualified Data.Time.LocalTime as LT (LocalTime, TimeOfDay (..), localTimeOfDay)
-import qualified ICal as I (ICalEvent (..), ICalInput (..), Reminder (..), ReminderAction (..), ReminderTrigger (..), buildICalText)
+import qualified ICal as I (ICalEvent (..), ICalInput (..), Reminder (..), ReminderAction (..), ReminderTrigger (..))
 import Query (StageFilter (StageFilter))
 import qualified Query as Q (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..))
 import SplaApi (EventMatch (isFest))
 import qualified SplaApi as S (DefaultSchedule (..), EventMatch (..), EventSummary (..), Result (..), Root (..), Rule (..), Stage (..), fetchSchedule)
 import qualified Text.Read as TR (readMaybe)
-import Prelude (($), (&&), (*), (+), (++), (/=), (<$>), (<=), (==), (||))
-import qualified Prelude as P (Bool (..), Foldable (null), Int, Maybe (..), Monad (return), Show (show), String, and, concatMap, drop, elem, not, or, otherwise, read, take)
+import Prelude (($), (&&), (*), (+), (++), (<$>), (<=), (==), (||))
+import qualified Prelude as P (Bool (..), Foldable (length, null), Int, Maybe (..), Monad (return), Show (show), String, and, concatMap, drop, elem, not, or, otherwise, read, splitAt, take)
+import Data.Time.Format.ISO8601 (iso8601ParseM)
+import qualified Data.Time as P
+import Data.Time (UTCTime)
 
 maybeTrue :: (a -> P.Bool) -> P.Maybe a -> P.Bool
 maybeTrue = M.maybe P.True
 
--- | タイムゾーン文字列を `TimeZone` 型に変換 (+09:00 -> TimeZone)
+-- タイムゾーン文字列を `TimeZone` 型に変換 (+09:00 -> TimeZone)
 timeZoneFromOffsetString :: P.String -> P.Maybe D.TimeZone
-timeZoneFromOffsetString offset = do
-  hours <- TR.readMaybe (P.take 3 offset) :: P.Maybe P.Int
-  mins <- TR.readMaybe (P.drop 4 offset) :: P.Maybe P.Int
-  P.return $ D.minutesToTimeZone (hours * 60 + mins)
+timeZoneFromOffsetString offset = case offset of
+  [signStr, h1, h2, ':', m1, m2] -> do
+    let hoursStr = [h1, h2]
+    let minsStr = [m1, m2]
+    let sign = if signStr == '+' then 1 else -1
+    hours <- TR.readMaybe hoursStr :: P.Maybe P.Int
+    mins <- TR.readMaybe minsStr :: P.Maybe P.Int
+    P.return $ D.minutesToTimeZone $ (hours * 60 + mins) * sign
+  ['Z'] -> P.return D.utc
+  _invalidInput -> P.Nothing
 
 -- 時間が指定の範囲内かどうかを判定。start, endはHH:mm形式(Queryのほう)。localTimeはTZ調整されたDateTime(SplaApiのほうを調整)のイメージ
 isWithinTimeRange :: LT.TimeOfDay -> LT.TimeOfDay -> D.ZonedTime -> P.Bool
@@ -30,33 +54,41 @@ isWithinTimeRange start end localTime =
   let localTimeOfDay = LT.localTimeOfDay $ D.zonedTimeToLocalTime localTime
    in start <= localTimeOfDay && localTimeOfDay <= end
 
--- | HH:mm形式をTimeOfDayに変換
+-- HH:mm形式をTimeOfDayに変換
 timeOfDayFromString :: P.String -> P.Maybe LT.TimeOfDay
-timeOfDayFromString time = do
-  hours <- TR.readMaybe (P.take 2 time) :: P.Maybe P.Int
-  mins <- TR.readMaybe (P.drop 3 time) :: P.Maybe P.Int
-  P.return $ LT.TimeOfDay hours mins 0
+timeOfDayFromString time = case time of
+  [h1, h2, ':', m1, m2] -> do
+    let hoursStr = [h1, h2]
+    let minsStr = [m1, m2]
+    hours <- TR.readMaybe hoursStr :: P.Maybe P.Int
+    mins <- TR.readMaybe minsStr :: P.Maybe P.Int
+    P.Just $ LT.TimeOfDay hours mins 0
+  _invalidInput -> P.Nothing
 
--- | ISO8601形式を解釈し、タイムゾーンを変更
--- | offset は +09:00 のような文字列を解釈したタイムゾーン
--- | time は 2021-01-01T00:00:00 のような文字列
+-- ISO8601形式を解釈し、タイムゾーンを変更
+-- offset は +09:00 のような文字列を解釈したタイムゾーン
+-- time は 2021-01-01T00:00:00 のような文字列
 parseISO8601WithTimeZone :: D.TimeZone -> P.String -> P.Maybe D.ZonedTime
 parseISO8601WithTimeZone offset time = do
-  (`D.ZonedTime` offset) <$> DF.iso8601ParseM time
+  (`D.ZonedTime` offset) <$> iso8601ParseM time
+
+-- UTCTime から ZonedTime に変換
+changeTimeZone :: UTCTime -> D.TimeZone -> D.ZonedTime
+changeTimeZone utcTime timeZone = D.ZonedTime (D.utcToLocalTime timeZone utcTime) timeZone
 
 -- apiStartTime or apiEndTime のどちらかが、isWithinTimeRange に含まれるかどうかを返す
 -- isWithinTimeRange の第3引数は apiStartTime と apiEndTime から作るんだが、タイムゾーンはQ.utcOffsetを適用する
--- TODO: 曜日、fromJust削除
-inTimeSlot :: P.String -> P.String -> P.String -> Q.TimeSlot -> P.Bool
+-- TODO: 曜日対応、fromJust削除
+inTimeSlot :: UTCTime -> UTCTime -> P.String -> Q.TimeSlot -> P.Bool
 inTimeSlot apiStartTime apiEndTime utcOffset Q.TimeSlot {start, end, dayOfWeek} =
   let startTime = M.fromJust $ timeOfDayFromString start
       endTime = M.fromJust $ timeOfDayFromString end
       timeZone = M.fromJust $ timeZoneFromOffsetString utcOffset
-      localStartTime = M.fromJust $ parseISO8601WithTimeZone timeZone apiStartTime
-      localEndTime = M.fromJust $ parseISO8601WithTimeZone timeZone apiEndTime
+      localStartTime = changeTimeZone apiStartTime timeZone 
+      localEndTime = changeTimeZone apiEndTime timeZone
    in isWithinTimeRange startTime endTime localStartTime || isWithinTimeRange startTime endTime localEndTime
 
-inTimeSlots :: P.String -> P.String -> P.String -> [Q.TimeSlot] -> P.Bool
+inTimeSlots :: UTCTime -> UTCTime -> P.String -> [Q.TimeSlot] -> P.Bool
 inTimeSlots apiStartTime apiEndTime utcOffset timeSlots = P.or [inTimeSlot apiStartTime apiEndTime utcOffset timeSlot | timeSlot <- timeSlots]
 
 inStage :: [S.Stage] -> Q.StageFilter -> P.Bool
@@ -110,8 +142,8 @@ createICalEventsFromDefaultSchedules queryRoot defaultSchedules matchType =
   [ I.ICalEvent
       { I.summary = "さまりー",
         I.description = "せつめい",
-        I.start = startTime, -- TODO: ZonedTime を渡す
-        I.end = endTime, -- TODO: ZonedTime を渡す
+        I.start = startTime, -- TODO: startTime を UTCTime にして渡す
+        I.end = endTime, -- TODO: startTime を UTCTime にして渡す
         I.reminders = convertNotificationsToReminders (M.fromMaybe [] notifications)
       }
     | defaultSchedule <- defaultSchedules,

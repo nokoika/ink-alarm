@@ -11,6 +11,7 @@ import qualified SplaApi
     Rule (..),
     Stage (..),
   )
+import qualified TestUtil as T (createUTCTime)
 import Test.Hspec (describe, hspec, it, shouldBe)
 import Prelude (Bool (..), Either (..), IO, Maybe (..), String, ($))
 
@@ -27,8 +28,8 @@ test = hspec $ do
                       SplaApi.Result
                         { regular =
                             [ SplaApi.DefaultSchedule
-                                { startTime = "2024-11-17T21:00:00+09:00",
-                                  endTime = "2024-11-17T23:00:00+09:00",
+                                { startTime = T.createUTCTime 2024 11 17 12 0,
+                                  endTime = T.createUTCTime 2024 11 17 14 0,
                                   rule = Just (SplaApi.Rule {key = "TURF_WAR", name = "ナワバリバトル"}),
                                   stages =
                                     Just
@@ -43,8 +44,8 @@ test = hspec $ do
                             ],
                           bankaraOpen =
                             [ SplaApi.DefaultSchedule
-                                { startTime = "2024-11-17T21:00:00+09:00",
-                                  endTime = "2024-11-17T23:00:00+09:00",
+                                { startTime = T.createUTCTime 2024 11 17 12 0,
+                                  endTime = T.createUTCTime 2024 11 17 14 0,
                                   rule = Just (SplaApi.Rule {key = "AREA", name = "ガチエリア"}),
                                   stages =
                                     Just
@@ -59,8 +60,8 @@ test = hspec $ do
                             ],
                           bankaraChallenge =
                             [ SplaApi.DefaultSchedule
-                                { startTime = "2024-11-17T21:00:00+09:00",
-                                  endTime = "2024-11-17T23:00:00+09:00",
+                                { startTime = T.createUTCTime 2024 11 17 12 0,
+                                  endTime = T.createUTCTime 2024 11 17 14 0,
                                   rule = Just (SplaApi.Rule {key = "GOAL", name = "ガチホコバトル"}),
                                   stages =
                                     Just
@@ -75,8 +76,8 @@ test = hspec $ do
                             ],
                           event =
                             [ SplaApi.EventMatch
-                                { startTime = "2024-11-20T11:00:00+09:00",
-                                  endTime = "2024-11-20T13:00:00+09:00",
+                                { startTime = T.createUTCTime 2024 11 20 2 0,
+                                  endTime = T.createUTCTime 2024 11 20 4 0,
                                   rule = (SplaApi.Rule {key = "AREA", name = "ガチエリア"}),
                                   stages =
                                     [ SplaApi.Stage
@@ -96,8 +97,8 @@ test = hspec $ do
                             ],
                           x =
                             [ SplaApi.DefaultSchedule
-                                { startTime = "2024-11-17T21:00:00+09:00",
-                                  endTime = "2024-11-17T23:00:00+09:00",
+                                { startTime = T.createUTCTime 2024 11 17 12 0,
+                                  endTime = T.createUTCTime 2024 11 17 14 0,
                                   rule = Just (SplaApi.Rule {key = "CLAM", name = "ガチアサリ"}),
                                   stages =
                                     Just

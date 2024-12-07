@@ -2,7 +2,9 @@ module ICal (ICalInput (..), ICalEvent (..), Reminder (..), ReminderTrigger (..)
 
 import qualified Data.List as List (intercalate)
 import Prelude (Enum, Eq, Int, Show, String, (++), (.))
-import qualified Prelude as P (Show (show), concatMap)
+import qualified Prelude as P (Show (show), concatMap, filter)
+import Data.Time (UTCTime (..), LocalTime(..), utcToLocalTime, utc)
+import qualified Data.Char as C (isDigit)
 
 data ICalInput = ICalInput
   { language :: String, -- "JA" | "EN"
@@ -13,8 +15,8 @@ data ICalInput = ICalInput
 data ICalEvent = ICalEvent
   { summary :: String,
     description :: String,
-    start :: String, -- ISO 8601
-    end :: String, -- ISO 8601
+    start :: UTCTime, -- ISO 8601
+    end :: UTCTime, -- ISO 8601
     reminders :: [Reminder]
   }
   deriving (Show, Eq)
@@ -40,6 +42,19 @@ data Reminder = Reminder
   }
   deriving (Show, Eq)
 
+convertUTCTimeToLocalTime :: UTCTime -> LocalTime
+convertUTCTimeToLocalTime = utcToLocalTime utc
+
+-- 20231207T120000Z <- 2023-12-07T12:00:00Z
+toICalTime :: UTCTime -> String
+toICalTime utcTime = day ++ "T" ++ dayTime ++ "Z"
+  where
+    LocalTime { localDay, localTimeOfDay } = convertUTCTimeToLocalTime utcTime
+    convert s = P.filter C.isDigit (P.show s)
+    day = convert localDay
+    dayTime = convert localTimeOfDay
+
+
 buildICalText :: ICalInput -> String
 buildICalText ICalInput {language, events} =
   List.intercalate
@@ -52,8 +67,8 @@ buildICalText ICalInput {language, events} =
             [ "BEGIN:VEVENT",
               "SUMMARY:" ++ summary,
               "DESCRIPTION:" ++ description,
-              "DTSTART:" ++ start,
-              "DTEND:" ++ end,
+              "DTSTART:" ++ toICalTime start,
+              "DTEND:" ++ toICalTime end,
               aggregate
                 ( \Reminder {trigger, action} ->
                     [ "BEGIN:VALARM",
