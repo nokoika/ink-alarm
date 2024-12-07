@@ -1,9 +1,10 @@
 module FilterTest (test) where
 
-import Data.Time (LocalTime (LocalTime), TimeOfDay (TimeOfDay), TimeZone (TimeZone), ZonedTime (ZonedTime), fromGregorian)
-import Filter as F (changeTimeZone, parseISO8601WithTimeZone, timeOfDayFromString, timeZoneFromOffsetString)
+import Data.Time (TimeOfDay (TimeOfDay), ZonedTime (..))
+import Filter as F (changeTimeZone, timeOfDayFromString, timeZoneFromOffsetString)
 import Test.Hspec (describe, hspec, it, shouldBe)
-import Prelude (Bool (..), IO, Maybe (Just, Nothing), Show (show), putStrLn, ($))
+import qualified TestUtil as T (createLocalTime, createTimeZone, createUTCTime)
+import Prelude (IO, Maybe (Just, Nothing), ($))
 
 test :: IO ()
 test = hspec $ do
@@ -25,15 +26,15 @@ test = hspec $ do
 
   describe "timeZoneFromOffsetString" $ do
     it "should convert +09:00 to TimeZone" $ do
-      F.timeZoneFromOffsetString "+09:00" `shouldBe` Just (TimeZone 540 False "")
-      F.timeZoneFromOffsetString "-09:00" `shouldBe` Just (TimeZone (-540) False "")
-      F.timeZoneFromOffsetString "+00:00" `shouldBe` Just (TimeZone 0 False "")
-      F.timeZoneFromOffsetString "-00:00" `shouldBe` Just (TimeZone 0 False "")
-      F.timeZoneFromOffsetString "+01:30" `shouldBe` Just (TimeZone 90 False "")
-      F.timeZoneFromOffsetString "-01:30" `shouldBe` Just (TimeZone (-90) False "")
-      F.timeZoneFromOffsetString "+12:00" `shouldBe` Just (TimeZone 720 False "")
-      F.timeZoneFromOffsetString "-12:00" `shouldBe` Just (TimeZone (-720) False "")
-      F.timeZoneFromOffsetString "Z" `shouldBe` Just (TimeZone 0 False "UTC")
+      F.timeZoneFromOffsetString "+09:00" `shouldBe` Just (T.createTimeZone 9 "")
+      F.timeZoneFromOffsetString "-09:00" `shouldBe` Just (T.createTimeZone (-9) "")
+      F.timeZoneFromOffsetString "+00:00" `shouldBe` Just (T.createTimeZone 0 "")
+      F.timeZoneFromOffsetString "-00:00" `shouldBe` Just (T.createTimeZone 0 "")
+      F.timeZoneFromOffsetString "+01:30" `shouldBe` Just (T.createTimeZone 1.5 "")
+      F.timeZoneFromOffsetString "-01:30" `shouldBe` Just (T.createTimeZone (-1.5) "")
+      F.timeZoneFromOffsetString "+12:00" `shouldBe` Just (T.createTimeZone 12 "")
+      F.timeZoneFromOffsetString "-12:00" `shouldBe` Just (T.createTimeZone (-12) "")
+      F.timeZoneFromOffsetString "Z" `shouldBe` Just (T.createTimeZone 0 "UTC")
 
     it "should return Nothing for invalid input" $ do
       F.timeZoneFromOffsetString "+09:00:00" `shouldBe` Nothing
@@ -44,12 +45,27 @@ test = hspec $ do
       F.timeZoneFromOffsetString "+9:0" `shouldBe` Nothing
       F.timeZoneFromOffsetString "+12:a0" `shouldBe` Nothing
 
-  -- describe "changeTimeZone" $ do
-  --   it "should change TimeZone" $ do
-  --     -- ZonedTime は Eq を持っていないので、LocalTime と TimeZone を個別に比較する
-  --     actualLocalTime `shouldBe` LocalTime (fromGregorian 2020 12 31) (TimeOfDay 15 0 0)
-  --     actualTimeZone `shouldBe` TimeZone 0 False ""
+  describe "changeTimeZone" $ do
+    it "should change TimeZone 1" $ do
+      let ZonedTime {zonedTimeZone, zonedTimeToLocalTime} = F.changeTimeZone (T.createUTCTime 2021 1 1 0 0) (T.createTimeZone 9 "")
+      -- UTC を JST にしているので、0時→9時になる
+      zonedTimeToLocalTime `shouldBe` T.createLocalTime 2021 1 1 9 0
+      zonedTimeZone `shouldBe` T.createTimeZone 9 ""
 
+    it "should change TimeZone 2" $ do
+      let ZonedTime {zonedTimeZone, zonedTimeToLocalTime} = F.changeTimeZone (T.createUTCTime 2021 1 1 0 0) (T.createTimeZone (-9) "")
+      zonedTimeToLocalTime `shouldBe` T.createLocalTime 2020 12 31 15 0
+      zonedTimeZone `shouldBe` T.createTimeZone (-9) ""
+
+    it "should change TimeZone 3" $ do
+      let ZonedTime {zonedTimeZone, zonedTimeToLocalTime} = F.changeTimeZone (T.createUTCTime 2021 1 1 0 0) (T.createTimeZone 0 "")
+      zonedTimeToLocalTime `shouldBe` T.createLocalTime 2021 1 1 0 0
+      zonedTimeZone `shouldBe` T.createTimeZone 0 ""
+
+    it "should change TimeZone 4" $ do
+      let ZonedTime {zonedTimeZone, zonedTimeToLocalTime} = F.changeTimeZone (T.createUTCTime 2021 1 1 0 0) (T.createTimeZone 1.5 "")
+      zonedTimeToLocalTime `shouldBe` T.createLocalTime 2021 1 1 1 30
+      zonedTimeZone `shouldBe` T.createTimeZone 1.5 ""
 
 -- describe "parseISO8601WithTimeZone" $ do
 --   it "should parse ISO8601 string with TimeZone" $ do
