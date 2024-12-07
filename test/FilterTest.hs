@@ -1,10 +1,11 @@
 module FilterTest (test) where
 
 import Data.Time (TimeOfDay (TimeOfDay), ZonedTime (..))
-import Filter as F (changeTimeZone, timeOfDayFromString, timeZoneFromOffsetString)
+import Filter as F (changeTimeZone, timeOfDayFromString, timeZoneFromOffsetString, isWithinTimeRange)
 import Test.Hspec (describe, hspec, it, shouldBe)
 import qualified TestUtil as T (createLocalTime, createTimeZone, createUTCTime)
-import Prelude (IO, Maybe (Just, Nothing), ($))
+import Prelude (IO, Maybe (Just, Nothing), ($), Bool (..))
+import Data.Char (isAsciiLower)
 
 test :: IO ()
 test = hspec $ do
@@ -67,16 +68,16 @@ test = hspec $ do
       zonedTimeToLocalTime `shouldBe` T.createLocalTime 2021 1 1 1 30
       zonedTimeZone `shouldBe` T.createTimeZone 1.5 ""
 
--- describe "parseISO8601WithTimeZone" $ do
---   it "should parse ISO8601 string with TimeZone" $ do
---     let actual = F.parseISO8601WithTimeZone (TimeZone 540 False "") "2021-01-01T00:00:00Z"
---     case actual of
---       Just (ZonedTime actualLocalTime actualTimeZone) -> do
---         -- Compare LocalTime
---         let expectedLocalTime = LocalTime (fromGregorian 2021 1 1) (TimeOfDay 0 0 0)
---         actualLocalTime `shouldBe` expectedLocalTime
---
---         -- Compare TimeZone
---         let expectedTimeZone = TimeZone 0 False ""
---         actualTimeZone `shouldBe` expectedTimeZone
---       Nothing -> True `shouldBe` False
+  describe "isWithinTimeRange" $ do
+    it "should match" $ do
+      F.isWithinTimeRange (TimeOfDay 0 0 0) (TimeOfDay 1 0 0) (ZonedTime (T.createLocalTime 2021 1 1 0 0) (T.createTimeZone 0 "")) `shouldBe` True
+      F.isWithinTimeRange (TimeOfDay 0 0 0) (TimeOfDay 1 0 0) (ZonedTime (T.createLocalTime 2021 1 1 0 30) (T.createTimeZone 0 "")) `shouldBe` True
+      F.isWithinTimeRange (TimeOfDay 0 0 0) (TimeOfDay 1 0 0) (ZonedTime (T.createLocalTime 2021 1 1 0 59) (T.createTimeZone 0 "")) `shouldBe` True
+      -- timezone は無視
+      F.isWithinTimeRange (TimeOfDay 0 0 0) (TimeOfDay 1 0 0) (ZonedTime (T.createLocalTime 2021 1 1 0 0) (T.createTimeZone 9 "")) `shouldBe` True
+
+    it "should not match" $ do
+      F.isWithinTimeRange (TimeOfDay 0 0 0) (TimeOfDay 1 0 0) (ZonedTime (T.createLocalTime 2021 1 1 1 1) (T.createTimeZone 0 "")) `shouldBe` False
+      -- Range が 0:00 - 1:00 であり、end は境界を含まないので 2021/1/1 1:10 は含まれない
+      F.isWithinTimeRange (TimeOfDay 0 0 0) (TimeOfDay 1 0 0) (ZonedTime (T.createLocalTime 2021 1 1 1 0) (T.createTimeZone 0 "")) `shouldBe` False
+

@@ -10,7 +10,6 @@ module Filter
     inTimeSlot,
     inTimeSlots,
     isWithinTimeRange,
-    parseISO8601WithTimeZone,
     changeTimeZone,
     timeZoneFromOffsetString,
     timeOfDayFromString,
@@ -19,17 +18,14 @@ where
 
 import qualified Data.Maybe as M (fromJust, fromMaybe, maybe)
 import qualified Data.Time as D
-import qualified Data.Time.LocalTime as LT (LocalTime, TimeOfDay (..), localTimeOfDay)
+import qualified Data.Time.LocalTime as LT (TimeOfDay (..), localTimeOfDay)
 import qualified ICal as I (ICalEvent (..), ICalInput (..), Reminder (..), ReminderAction (..), ReminderTrigger (..))
-import Query (StageFilter (StageFilter))
 import qualified Query as Q (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..))
 import SplaApi (EventMatch (isFest))
 import qualified SplaApi as S (DefaultSchedule (..), EventMatch (..), EventSummary (..), Result (..), Root (..), Rule (..), Stage (..), fetchSchedule)
 import qualified Text.Read as TR (readMaybe)
-import Prelude (($), (&&), (*), (+), (++), (<$>), (<=), (==), (||))
+import Prelude (($), (&&), (*), (+), (++), (<=), (<), (==), (||))
 import qualified Prelude as P (Bool (..), Foldable (length, null), Int, Maybe (..), Monad (return), Show (show), String, and, concatMap, drop, elem, not, or, otherwise, read, splitAt, take)
-import Data.Time.Format.ISO8601 (iso8601ParseM)
-import qualified Data.Time as P
 import Data.Time (UTCTime)
 
 maybeTrue :: (a -> P.Bool) -> P.Maybe a -> P.Bool
@@ -49,10 +45,11 @@ timeZoneFromOffsetString offset = case offset of
   _invalidInput -> P.Nothing
 
 -- 時間が指定の範囲内かどうかを判定。start, endはHH:mm形式(Queryのほう)。localTimeはTZ調整されたDateTime(SplaApiのほうを調整)のイメージ
+-- end は境界を含まない
 isWithinTimeRange :: LT.TimeOfDay -> LT.TimeOfDay -> D.ZonedTime -> P.Bool
 isWithinTimeRange start end localTime =
   let localTimeOfDay = LT.localTimeOfDay $ D.zonedTimeToLocalTime localTime
-   in start <= localTimeOfDay && localTimeOfDay <= end
+   in start <= localTimeOfDay && localTimeOfDay < end
 
 -- HH:mm形式をTimeOfDayに変換
 timeOfDayFromString :: P.String -> P.Maybe LT.TimeOfDay
@@ -64,13 +61,6 @@ timeOfDayFromString time = case time of
     mins <- TR.readMaybe minsStr :: P.Maybe P.Int
     P.Just $ LT.TimeOfDay hours mins 0
   _invalidInput -> P.Nothing
-
--- ISO8601形式を解釈し、タイムゾーンを変更
--- offset は +09:00 のような文字列を解釈したタイムゾーン
--- time は 2021-01-01T00:00:00 のような文字列
-parseISO8601WithTimeZone :: D.TimeZone -> P.String -> P.Maybe D.ZonedTime
-parseISO8601WithTimeZone offset time = do
-  (`D.ZonedTime` offset) <$> iso8601ParseM time
 
 -- UTCTime から ZonedTime に変換
 changeTimeZone :: UTCTime -> D.TimeZone -> D.ZonedTime
@@ -84,7 +74,7 @@ inTimeSlot apiStartTime apiEndTime utcOffset Q.TimeSlot {start, end, dayOfWeek} 
   let startTime = M.fromJust $ timeOfDayFromString start
       endTime = M.fromJust $ timeOfDayFromString end
       timeZone = M.fromJust $ timeZoneFromOffsetString utcOffset
-      localStartTime = changeTimeZone apiStartTime timeZone 
+      localStartTime = changeTimeZone apiStartTime timeZone
       localEndTime = changeTimeZone apiEndTime timeZone
    in isWithinTimeRange startTime endTime localStartTime || isWithinTimeRange startTime endTime localEndTime
 
