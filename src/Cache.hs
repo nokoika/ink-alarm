@@ -1,8 +1,7 @@
 module Cache (example) where
 
-import qualified Data.Cache as C (Cache, delete, insert, lookup, newCache)
-import Prelude (IO, Maybe (..), ($), (++), String)
-import qualified Prelude as P (putStrLn)
+import qualified Data.Cache as C
+import Prelude (IO, Maybe (..), String, putStrLn, ($), (++))
 
 example :: IO ()
 example = do
@@ -16,8 +15,8 @@ example = do
   -- 値を取得
   maybeValue <- C.lookup cache "key1"
   case maybeValue of
-    Just value -> P.putStrLn $ "Found: " ++ value
-    Nothing -> P.putStrLn "Not found or expired"
+    Just value -> putStrLn $ "Found: " ++ value
+    Nothing -> putStrLn "Not found or expired"
 
   -- 別の値をセット
   C.insert cache "key2" "value2"
@@ -28,7 +27,5 @@ example = do
   -- 削除後に再取得
   maybeValueAfterDelete <- C.lookup cache "key1"
   case maybeValueAfterDelete of
-    Just value -> P.putStrLn $ "Found after delete: " ++ value
-    Nothing -> P.putStrLn "Not found after delete"
-
-
+    Just value -> putStrLn $ "Found after delete: " ++ value
+    Nothing -> putStrLn "Not found after delete"

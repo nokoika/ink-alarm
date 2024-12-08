@@ -1,7 +1,7 @@
 module SplaApiTest (test) where
 
-import qualified Data.Aeson as A (eitherDecode)
-import qualified Data.ByteString.Lazy as BL (readFile)
+import qualified Data.Aeson as A
+import qualified Data.ByteString.Lazy as BL
 import qualified SplaApi
   ( DefaultSchedule (..),
     EventMatch (..),
@@ -12,9 +12,9 @@ import qualified SplaApi
     RuleKey (..),
     Stage (..),
   )
-import qualified TestUtil as T (createUTCTime)
+import qualified TestUtil as T
 import Test.Hspec (describe, hspec, it, shouldBe)
-import Prelude (Bool (..), Either (..), IO, Maybe (..), String, ($))
+import Prelude (Bool (False), Either (Right), IO, Maybe (Just), String, ($))
 
 test :: IO ()
 test = hspec $ do

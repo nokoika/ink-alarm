@@ -1,13 +1,11 @@
 module ICalTest (test) where
 
-import Data.Time (UTCTime(UTCTime))
 import Data.List (intercalate)
-import Data.Time.Calendar (fromGregorian)
-import Data.Time.Clock (secondsToDiffTime)
 import qualified ICal (ICalInput(..), ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTrigger (..), buildICalText)
 import Test.Hspec (describe, hspec, it, shouldBe)
-import qualified Query as Q (Language (..))
-import Prelude (IO, Maybe (Just), ($), (*))
+import qualified TestUtil as TU
+import qualified Query as Q
+import Prelude (IO, ($))
 
 test :: IO ()
 test = hspec $ do
@@ -20,8 +18,8 @@ test = hspec $ do
                   [ ICal.ICalEvent
                       { summary = "バンカラマッチ(オープン) - ヤガラ市場 / チョウザメ造船 - ガチヤグラ",
                         description = "ルール: ガチヤグラ\nステージ: ヤガラ市場, チョウザメ造船",
-                        start = UTCTime (fromGregorian 2022 9 14) $ secondsToDiffTime (4 * 60 * 60),
-                        end = UTCTime (fromGregorian 2022 9 14) $ secondsToDiffTime (6 * 60 * 60),
+                        start = TU.createUTCTime 2022 9 14 4 0,
+                        end = TU.createUTCTime 2022 9 14 6 0,
                         reminders =
                           [ ICal.Reminder
                               { trigger = ICal.ReminderTrigger {time = 10},
@@ -36,8 +34,8 @@ test = hspec $ do
                     ICal.ICalEvent
                       { summary = "イベントマッチ - タラポートショッピングパーク",
                         description = "イベント名: 新シーズン開幕記念カップ\nステージ: タラポートショッピングパーク",
-                        start = UTCTime (fromGregorian 2022 9 16) $ secondsToDiffTime (23 * 60 * 60),
-                        end = UTCTime (fromGregorian 2022 9 17) $ secondsToDiffTime (1 * 60 * 60),
+                        start = TU.createUTCTime 2022 9 16 23 0,
+                        end = TU.createUTCTime 2022 9 17 1 0,
                         reminders =
                           [ ICal.Reminder
                               { trigger = ICal.ReminderTrigger {time = 5},

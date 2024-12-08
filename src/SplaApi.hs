@@ -14,14 +14,13 @@ where
 
 import Control.Exception (SomeException, try)
 import Data.Aeson ((.:), (.:?))
-import qualified Data.Aeson as A (FromJSON (..), eitherDecode, withObject, withText)
-import qualified Data.ByteString.Lazy.Char8 as L8 (ByteString)
-import Data.Time (UTCTime)
+import qualified Data.Aeson as A
+import qualified Data.ByteString.Lazy.Char8 as L8
+import Data.Time as T
 import GHC.Generics (Generic)
-import Network.HTTP.Conduit (simpleHttp)
-import qualified Query as Q (Rule (..))
-import Prelude (Bool, Bounded, Either (..), Enum, Eq, IO, Int, Maybe, Show, String, ($), (++), (<$>), (<*>))
-import qualified Prelude as P (fail, pure, return, show)
+import qualified Network.HTTP.Conduit as H (simpleHttp)
+import qualified Query as Q
+import Prelude (Bool, Bounded, Either (Left, Right), Enum, Eq, IO, Int, Maybe, Show, String, fail, pure, return, show, ($), (++), (<$>), (<*>))
 
 newtype Root = Root
   { result :: Result
@@ -58,8 +57,8 @@ instance A.FromJSON Result where
         .: "event"
 
 data DefaultSchedule = DefaultSchedule
-  { startTime :: UTCTime,
-    endTime :: UTCTime,
+  { startTime :: T.UTCTime,
+    endTime :: T.UTCTime,
     rule :: Maybe Rule, -- フェス中の場合は `Nothing`
     stages :: Maybe [Stage], -- フェス中の場合は `Nothing`
     isFest :: Bool
@@ -90,12 +89,12 @@ data RuleKey
 
 instance A.FromJSON RuleKey where
   parseJSON = A.withText "RuleKey" $ \t -> case t of
-    "AREA" -> P.pure SplatZones
-    "LOFT" -> P.pure TowerControl
-    "GOAL" -> P.pure Rainmaker
-    "CLAM" -> P.pure ClamBlitz
-    "TURF_WAR" -> P.pure TurfWar
-    _invalid -> P.fail $ "Invalid RuleKey: " ++ P.show t
+    "AREA" -> pure SplatZones
+    "LOFT" -> pure TowerControl
+    "GOAL" -> pure Rainmaker
+    "CLAM" -> pure ClamBlitz
+    "TURF_WAR" -> pure TurfWar
+    _invalid -> fail $ "Invalid RuleKey: " ++ show t
 
 data Rule = Rule
   { key :: RuleKey,
@@ -129,8 +128,8 @@ instance A.FromJSON Stage where
         .: "image"
 
 data EventMatch = EventMatch
-  { startTime :: UTCTime,
-    endTime :: UTCTime,
+  { startTime :: T.UTCTime,
+    endTime :: T.UTCTime,
     rule :: Rule,
     stages :: [Stage],
     eventSummary :: EventSummary,
@@ -174,10 +173,10 @@ instance A.FromJSON EventSummary where
 fetchSchedule :: IO (Either String Root)
 fetchSchedule = do
   let url = "https://spla3.yuu26.com/api/schedule"
-  response <- try (simpleHttp url) :: IO (Either SomeException L8.ByteString)
+  response <- try (H.simpleHttp url) :: IO (Either SomeException L8.ByteString)
   case response of
-    Left err -> P.return $ Left $ P.show err
-    Right body -> P.return $ A.eitherDecode body
+    Left err -> return $ Left $ show err
+    Right body -> return $ A.eitherDecode body
 
 convertQueryRule :: Q.Rule -> RuleKey
 convertQueryRule Q.TurfWar = TurfWar

@@ -16,10 +16,9 @@ import qualified Query
     Rule (..),
   )
 import Test.Hspec (describe, hspec, it, shouldBe)
-import Prelude (Bool (..), Either (..), IO, Maybe (..), ($))
-import qualified Data.Time.LocalTime as LT (TimeOfDay (..))
-import qualified Data.Time as LT
-import qualified TestUtil as T (createTimeZone)
+import Prelude (Bool (True), IO, Maybe (Just), Either (Right), ($))
+import qualified Data.Time.LocalTime as LT
+import qualified TestUtil as TU
 
 test :: IO ()
 test = hspec $ do
@@ -31,7 +30,7 @@ test = hspec $ do
             Right
               ( Query.QueryRoot
                   { Query.language = Query.Japanese,
-                    Query.utcOffset = Query.UtcOffsetTimeZone $ T.createTimeZone 9 "",
+                    Query.utcOffset = Query.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                     Query.filters =
                       [ Query.FilterCondition
                           { Query.matchType = Query.BankaraOpen,

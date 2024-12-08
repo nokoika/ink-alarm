@@ -1,11 +1,10 @@
 module ICal (ICalInput (..), ICalEvent (..), Reminder (..), ReminderTrigger (..), ReminderAction (..), buildICalText) where
 
-import qualified Data.List as List (intercalate)
-import Prelude (Enum, Eq, Int, Show, String, (++), (.))
-import qualified Prelude as P (Show (show), concatMap, filter)
-import Data.Time (UTCTime (..), LocalTime(..), utcToLocalTime, utc)
-import qualified Data.Char as C (isDigit)
-import qualified Query as Q (Language (..))
+import qualified Data.Char as C
+import Data.List (intercalate)
+import qualified Data.Time as T
+import qualified Query as Q
+import Prelude (Enum, Eq, Int, Show (show), String, concatMap, filter, (++), (.))
 
 data ICalInput = ICalInput
   { language :: Q.Language,
@@ -16,8 +15,8 @@ data ICalInput = ICalInput
 data ICalEvent = ICalEvent
   { summary :: String,
     description :: String,
-    start :: UTCTime, -- ISO 8601
-    end :: UTCTime, -- ISO 8601
+    start :: T.UTCTime, -- ISO 8601
+    end :: T.UTCTime, -- ISO 8601
     reminders :: [Reminder]
   }
   deriving (Show, Eq)
@@ -35,7 +34,7 @@ newtype ReminderTrigger = ReminderTrigger
   deriving (Eq)
 
 instance Show ReminderTrigger where
-  show ReminderTrigger {time} = "-PT" ++ P.show time ++ "M"
+  show ReminderTrigger {time} = "-PT" ++ show time ++ "M"
 
 data Reminder = Reminder
   { trigger :: ReminderTrigger,
@@ -43,26 +42,25 @@ data Reminder = Reminder
   }
   deriving (Show, Eq)
 
-convertUTCTimeToLocalTime :: UTCTime -> LocalTime
-convertUTCTimeToLocalTime = utcToLocalTime utc
+convertUTCTimeToLocalTime :: T.UTCTime -> T.LocalTime
+convertUTCTimeToLocalTime = T.utcToLocalTime T.utc
 
 showLanguage :: Q.Language -> String
 showLanguage Q.Japanese = "JA"
 showLanguage Q.English = "EN"
 
 -- 20231207T120000Z <- 2023-12-07T12:00:00Z
-toICalTime :: UTCTime -> String
+toICalTime :: T.UTCTime -> String
 toICalTime utcTime = day ++ "T" ++ dayTime ++ "Z"
   where
-    LocalTime { localDay, localTimeOfDay } = convertUTCTimeToLocalTime utcTime
-    convert s = P.filter C.isDigit (P.show s)
+    T.LocalTime {localDay, localTimeOfDay} = convertUTCTimeToLocalTime utcTime
+    convert s = filter C.isDigit (show s)
     day = convert localDay
     dayTime = convert localTimeOfDay
 
-
 buildICalText :: ICalInput -> String
 buildICalText ICalInput {language, events} =
-  List.intercalate
+  intercalate
     "\n"
     [ "BEGIN:VCALENDAR",
       "VERSION:2.0",
@@ -77,8 +75,8 @@ buildICalText ICalInput {language, events} =
               aggregate
                 ( \Reminder {trigger, action} ->
                     [ "BEGIN:VALARM",
-                      "TRIGGER:" ++ P.show trigger,
-                      "ACTION:" ++ P.show action,
+                      "TRIGGER:" ++ show trigger,
+                      "ACTION:" ++ show action,
                       "END:VALARM"
                     ]
                 )
@@ -91,4 +89,4 @@ buildICalText ICalInput {language, events} =
     ]
   where
     aggregate :: (a -> [String]) -> [a] -> String
-    aggregate f = List.intercalate "\n" . P.concatMap f
+    aggregate f = intercalate "\n" . concatMap f

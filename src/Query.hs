@@ -1,18 +1,31 @@
-module Query (FilterCondition (..), NotificationSetting (..), QueryRoot (..), UtcOffsetTimeZone (..), StageFilter (..), TimeSlot (..), TimeSlotTimeOfDay (..), DayOfWeek (..), Language (..), MatchType (..), Rule (..), parseBase64Url) where
+module Query
+  ( FilterCondition (..),
+    NotificationSetting (..),
+    QueryRoot (..),
+    UtcOffsetTimeZone (..),
+    StageFilter (..),
+    TimeSlot (..),
+    TimeSlotTimeOfDay (..),
+    DayOfWeek (..),
+    Language (..),
+    MatchType (..),
+    Rule (..),
+    parseBase64Url,
+  )
+where
 
-import qualified Data.Aeson as A (FromJSON (..), eitherDecode, withText)
+import qualified Data.Aeson as A
 import qualified Data.ByteString as BS
-import qualified Data.ByteString.Base64.URL as BU (decode)
+import qualified Data.ByteString.Base64.URL as BU
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Lazy.Char8 as L8
-import qualified Data.Text as T (Text, unpack)
-import qualified Data.Text.Encoding as TE (decodeUtf8', encodeUtf8)
-import qualified Data.Time as T (TimeZone)
-import qualified Data.Time.LocalTime as LT (TimeOfDay (..))
-import qualified Date (timeOfDayFromString, timeZoneFromOffsetString)
+import qualified Data.Text as Text
+import qualified Data.Text.Encoding as TE
+import qualified Data.Time as Time
+import qualified Data.Time.LocalTime as LT
+import qualified Date as D
 import GHC.Generics (Generic)
-import Prelude (Bool, Bounded, Either (Left, Right), Enum, Eq, Int, Maybe (..), Show, String, ($), (++))
-import qualified Prelude as P (Applicative (pure), fail, show)
+import Prelude (Applicative (pure), Bool, Bounded, Either (Left, Right), Enum, Eq, Int, Maybe (Just, Nothing), Show, String, fail, show, ($), (++))
 
 data QueryRoot = QueryRoot
   { language :: Language,
@@ -31,18 +44,18 @@ data Language
 
 instance A.FromJSON Language where
   parseJSON = A.withText "Language" $ \t -> case t of
-    "ja" -> P.pure Japanese
-    "en" -> P.pure English
-    _invalid -> P.fail $ "Invalid Language: " ++ P.show t
+    "ja" -> pure Japanese
+    "en" -> pure English
+    _invalid -> fail $ "Invalid Language: " ++ show t
 
 -- UTCオフセット
-newtype UtcOffsetTimeZone = UtcOffsetTimeZone {timeZone :: T.TimeZone}
+newtype UtcOffsetTimeZone = UtcOffsetTimeZone {timeZone :: Time.TimeZone}
   deriving (Show, Eq, Generic)
 
 instance A.FromJSON UtcOffsetTimeZone where
-  parseJSON = A.withText "UtcOffsetTimeZone" $ \t -> case Date.timeZoneFromOffsetString (T.unpack t) of
-    Just timeZone -> P.pure $ UtcOffsetTimeZone timeZone
-    Nothing -> P.fail $ "Invalid UtcOffsetTimeZone: " ++ P.show t
+  parseJSON = A.withText "UtcOffsetTimeZone" $ \t -> case D.timeZoneFromOffsetString (Text.unpack t) of
+    Just timeZone -> pure $ UtcOffsetTimeZone timeZone
+    Nothing -> fail $ "Invalid UtcOffsetTimeZone: " ++ show t
 
 -- matchType (オープン, チャレンジ, X, レギュラー, イベント)
 data MatchType
@@ -55,12 +68,12 @@ data MatchType
 
 instance A.FromJSON MatchType where
   parseJSON = A.withText "MatchType" $ \t -> case t of
-    "bankara_open" -> P.pure BankaraOpen
-    "bankara_challenge" -> P.pure BankaraChallenge
-    "x" -> P.pure XMatch
-    "regular" -> P.pure Regular
-    "event" -> P.pure Event
-    _invalid -> P.fail $ "Invalid MatchType: " ++ P.show t
+    "bankara_open" -> pure BankaraOpen
+    "bankara_challenge" -> pure BankaraChallenge
+    "x" -> pure XMatch
+    "regular" -> pure Regular
+    "event" -> pure Event
+    _invalid -> fail $ "Invalid MatchType: " ++ show t
 
 -- ルール(ガチエリア, ガチヤグラ, ガチホコ, ガチアサリ, ナワバリ)
 data Rule
@@ -73,12 +86,12 @@ data Rule
 
 instance A.FromJSON Rule where
   parseJSON = A.withText "Rule" $ \t -> case t of
-    "area" -> P.pure SplatZones
-    "yagura" -> P.pure TowerControl
-    "hoko" -> P.pure Rainmaker
-    "asari" -> P.pure ClamBlitz
-    "nawabari" -> P.pure TurfWar
-    _invalid -> P.fail $ "Invalid Rule: " ++ P.show t
+    "area" -> pure SplatZones
+    "yagura" -> pure TowerControl
+    "hoko" -> pure Rainmaker
+    "asari" -> pure ClamBlitz
+    "nawabari" -> pure TurfWar
+    _invalid -> fail $ "Invalid Rule: " ++ show t
 
 -- フィルタ条件
 data FilterCondition
@@ -115,22 +128,22 @@ data DayOfWeek
 
 instance A.FromJSON DayOfWeek where
   parseJSON = A.withText "DayOfWeek" $ \t -> case t of
-    "mon" -> P.pure Monday
-    "tue" -> P.pure Tuesday
-    "wed" -> P.pure Wednesday
-    "thu" -> P.pure Thursday
-    "fri" -> P.pure Friday
-    "sat" -> P.pure Saturday
-    "sun" -> P.pure Sunday
-    _invalid -> P.fail $ "Invalid DayOfWeek: " ++ P.show t
+    "mon" -> pure Monday
+    "tue" -> pure Tuesday
+    "wed" -> pure Wednesday
+    "thu" -> pure Thursday
+    "fri" -> pure Friday
+    "sat" -> pure Saturday
+    "sun" -> pure Sunday
+    _invalid -> fail $ "Invalid DayOfWeek: " ++ show t
 
 newtype TimeSlotTimeOfDay = TimeSlotTimeOfDay {timeOfDay :: LT.TimeOfDay}
   deriving (Eq, Show)
 
 instance A.FromJSON TimeSlotTimeOfDay where
-  parseJSON = A.withText "TimeSlotTimeOfDay" $ \t -> case Date.timeOfDayFromString (T.unpack t) of
-    Just timeOfDay -> P.pure $ TimeSlotTimeOfDay timeOfDay
-    Nothing -> P.fail $ "Invalid TimeSlotTimeOfDay: " ++ P.show t
+  parseJSON = A.withText "TimeSlotTimeOfDay" $ \t -> case D.timeOfDayFromString (Text.unpack t) of
+    Just timeOfDay -> pure $ TimeSlotTimeOfDay timeOfDay
+    Nothing -> fail $ "Invalid TimeSlotTimeOfDay: " ++ show t
 
 -- 時間帯
 data TimeSlot = TimeSlot
@@ -151,16 +164,16 @@ newtype NotificationSetting = NotificationSetting
 
 instance A.FromJSON NotificationSetting
 
-parseBase64Url :: T.Text -> Either String QueryRoot
+parseBase64Url :: Text.Text -> Either String QueryRoot
 parseBase64Url base64Url = case decodeBase64UriToJson $ TE.encodeUtf8 base64Url of
   Left err -> Left err
   Right decodedText -> parseJsonToQueryRoot $ BL.fromStrict $ TE.encodeUtf8 decodedText
   where
-    decodeBase64UriToJson :: BS.ByteString -> Either String T.Text
+    decodeBase64UriToJson :: BS.ByteString -> Either String Text.Text
     decodeBase64UriToJson base64Url' = case BU.decode base64Url' of
-      Left err -> Left $ P.show err
+      Left err -> Left $ show err
       Right decoded -> case TE.decodeUtf8' decoded of
-        Left err -> Left $ P.show err
+        Left err -> Left $ show err
         Right decodedText -> Right decodedText
 
     parseJsonToQueryRoot :: L8.ByteString -> Either String QueryRoot
