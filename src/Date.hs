@@ -6,6 +6,7 @@ import qualified Data.Time.LocalTime as LT (TimeOfDay (..), localTimeOfDay)
 import Prelude (($), (&&), (*), (+), (++), (<=), (<), (==), (||))
 import qualified Prelude as P (Bool (..), Foldable (length, null), Int, Maybe (..), Monad (return), Show (show), String, and, concatMap, drop, elem, not, or, otherwise, read, splitAt, take)
 import qualified Text.Read as TR (readMaybe)
+import qualified Control.Monad as P
 
 -- UTCTime から ZonedTime に変換
 changeTimeZone :: UTCTime -> D.TimeZone -> D.ZonedTime
@@ -19,6 +20,8 @@ timeOfDayFromString time = case time of
     let minsStr = [m1, m2]
     hours <- TR.readMaybe hoursStr :: P.Maybe P.Int
     mins <- TR.readMaybe minsStr :: P.Maybe P.Int
+    P.guard (0 <= hours && hours < 24)
+    P.guard (0 <= mins && mins < 60)
     P.Just $ LT.TimeOfDay hours mins 0
   _invalidInput -> P.Nothing
 
@@ -31,6 +34,8 @@ timeZoneFromOffsetString offset = case offset of
     let sign = if signStr == '+' then 1 else -1
     hours <- TR.readMaybe hoursStr :: P.Maybe P.Int
     mins <- TR.readMaybe minsStr :: P.Maybe P.Int
+    P.guard (0 <= hours && hours <= 14)
+    P.guard (0 <= mins && mins < 60)
     P.return $ D.minutesToTimeZone $ (hours * 60 + mins) * sign
   ['Z'] -> P.return D.utc
   _invalidInput -> P.Nothing

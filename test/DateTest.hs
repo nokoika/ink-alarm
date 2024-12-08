@@ -26,6 +26,8 @@ test = hspec $ do
       D.timeOfDayFromString "12:a4" `shouldBe` Nothing
       D.timeOfDayFromString "12:4" `shouldBe` Nothing
       D.timeOfDayFromString "1:23" `shouldBe` Nothing
+      D.timeOfDayFromString "24:00" `shouldBe` Nothing
+      D.timeOfDayFromString "00:60" `shouldBe` Nothing
 
   describe "timeZoneFromOffsetString" $ do
     it "should convert +09:00 to TimeZone" $ do
@@ -37,6 +39,7 @@ test = hspec $ do
       D.timeZoneFromOffsetString "-01:30" `shouldBe` Just (T.createTimeZone (-1.5) "")
       D.timeZoneFromOffsetString "+12:00" `shouldBe` Just (T.createTimeZone 12 "")
       D.timeZoneFromOffsetString "-12:00" `shouldBe` Just (T.createTimeZone (-12) "")
+      D.timeZoneFromOffsetString "+14:00" `shouldBe` Nothing
       D.timeZoneFromOffsetString "Z" `shouldBe` Just (T.createTimeZone 0 "UTC")
 
     it "should return Nothing for invalid input" $ do
@@ -47,6 +50,8 @@ test = hspec $ do
       D.timeZoneFromOffsetString "+9:0" `shouldBe` Nothing
       D.timeZoneFromOffsetString "+9:0" `shouldBe` Nothing
       D.timeZoneFromOffsetString "+12:a0" `shouldBe` Nothing
+      D.timeZoneFromOffsetString "+15:00" `shouldBe` Nothing
+      D.timeZoneFromOffsetString "+10:99" `shouldBe` Nothing
 
   describe "changeTimeZone" $ do
     it "should change TimeZone 1" $ do
