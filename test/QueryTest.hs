@@ -11,6 +11,7 @@ import qualified Query
     TimeSlot (..),
     MatchType (..),
     parseBase64Url,
+    Rule (..),
   )
 import Test.Hspec (describe, hspec, it, shouldBe)
 import Prelude (Bool (..), Either (..), IO, Maybe (..), ($))
@@ -36,7 +37,7 @@ test = hspec $ do
                                       Query.stageIds = [22]
                                     }
                                 ),
-                            Query.rules = Just ["TURF_WAR"],
+                            Query.rules = Just [Query.TurfWar],
                             Query.timeSlots =
                               Just
                                 [ Query.TimeSlot

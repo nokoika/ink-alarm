@@ -3,22 +3,25 @@ module SplaApi
     Result (..),
     DefaultSchedule (..),
     Rule (..),
+    RuleKey (..),
     Stage (..),
     EventMatch (..),
     EventSummary (..),
     fetchSchedule,
+    convertQueryRule,
   )
 where
 
 import Control.Exception (SomeException, try)
 import Data.Aeson ((.:), (.:?))
-import qualified Data.Aeson as A (FromJSON (..), eitherDecode, withObject)
+import qualified Data.Aeson as A (FromJSON (..), eitherDecode, withObject, withText)
 import qualified Data.ByteString.Lazy.Char8 as L8 (ByteString)
+import Data.Time (UTCTime)
 import GHC.Generics (Generic)
 import Network.HTTP.Conduit (simpleHttp)
-import Prelude (Bool, Either (..), Eq, IO, Int, Maybe, Show, String, ($), (<$>), (<*>))
-import qualified Prelude as P (show, return)
-import Data.Time (UTCTime)
+import qualified Query as Q (Rule (..))
+import Prelude (Bool, Bounded, Either (..), Enum, Eq, IO, Int, Maybe, Show, String, ($), (++), (<$>), (<*>))
+import qualified Prelude as P (fail, pure, return, show)
 
 newtype Root = Root
   { result :: Result
@@ -77,8 +80,25 @@ instance A.FromJSON DefaultSchedule where
       <*> v
         .: "is_fest"
 
+data RuleKey
+  = SplatZones
+  | TowerControl
+  | Rainmaker
+  | ClamBlitz
+  | TurfWar
+  deriving (Show, Eq, Generic, Enum, Bounded)
+
+instance A.FromJSON RuleKey where
+  parseJSON = A.withText "RuleKey" $ \t -> case t of
+    "AREA" -> P.pure SplatZones
+    "LOFT" -> P.pure TowerControl
+    "GOAL" -> P.pure Rainmaker
+    "CLAM" -> P.pure ClamBlitz
+    "TURF_WAR" -> P.pure TurfWar
+    _invalid -> P.fail $ "Invalid RuleKey: " ++ P.show t
+
 data Rule = Rule
-  { key :: String,
+  { key :: RuleKey,
     name :: String
   }
   deriving (Show, Eq, Generic)
@@ -158,3 +178,10 @@ fetchSchedule = do
   case response of
     Left err -> P.return $ Left $ P.show err
     Right body -> P.return $ A.eitherDecode body
+
+convertQueryRule :: Q.Rule -> RuleKey
+convertQueryRule Q.TurfWar = TurfWar
+convertQueryRule Q.SplatZones = SplatZones
+convertQueryRule Q.TowerControl = TowerControl
+convertQueryRule Q.Rainmaker = Rainmaker
+convertQueryRule Q.ClamBlitz = ClamBlitz

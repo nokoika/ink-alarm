@@ -1,4 +1,4 @@
-module Query (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), DayOfWeek (..), Language (..), MatchType (..), parseBase64Url) where
+module Query (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), DayOfWeek (..), Language (..), MatchType (..), Rule (..), parseBase64Url) where
 
 import qualified Data.Aeson as A (FromJSON (..), eitherDecode, withText)
 import qualified Data.ByteString as BS
@@ -50,12 +50,30 @@ instance A.FromJSON MatchType where
     "event" -> P.pure Event
     _invalid -> P.fail $ "Invalid MatchType: " ++ P.show t
 
+-- ルール(ガチエリア, ガチヤグラ, ガチホコ, ガチアサリ, ナワバリ)
+data Rule
+  = SplatZones
+  | TowerControl
+  | Rainmaker
+  | ClamBlitz
+  | TurfWar
+  deriving (Show, Eq, Generic, Enum, Bounded)
+
+instance A.FromJSON Rule where
+  parseJSON = A.withText "Rule" $ \t -> case t of
+    "area" -> P.pure SplatZones
+    "yagura" -> P.pure TowerControl
+    "hoko" -> P.pure Rainmaker
+    "asari" -> P.pure ClamBlitz
+    "nawabari" -> P.pure TurfWar
+    _invalid -> P.fail $ "Invalid Rule: " ++ P.show t
+
 -- フィルタ条件
 data FilterCondition
   = FilterCondition
   { matchType :: MatchType,
     stages :: Maybe StageFilter,
-    rules :: Maybe [String], -- ["TURF_WAR", "AREA", ...]
+    rules :: Maybe [Rule],
     timeSlots :: Maybe [TimeSlot],
     notifications :: Maybe [NotificationSetting]
   }

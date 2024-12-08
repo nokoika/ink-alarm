@@ -16,12 +16,12 @@ import qualified Data.Maybe as M (fromJust, fromMaybe, maybe)
 import qualified Data.Time as D
 import qualified Data.Time.LocalTime as LT (TimeOfDay (..), localTimeOfDay)
 import qualified ICal as I (ICalEvent (..), ICalInput (..), Reminder (..), ReminderAction (..), ReminderTrigger (..))
-import qualified Query as Q (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), MatchType (..))
-import SplaApi (EventMatch (isFest))
+import qualified Query as Q (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), MatchType (..), Rule (..))
+import SplaApi (EventMatch (isFest), convertQueryRule)
 import qualified SplaApi as S (DefaultSchedule (..), EventMatch (..), EventSummary (..), Result (..), Root (..), Rule (..), Stage (..), fetchSchedule)
 import qualified Text.Read as TR (readMaybe)
 import Prelude (($), (&&), (*), (+), (++), (<=), (<), (==), (||))
-import qualified Prelude as P (Bool (..), Foldable (length, null), Int, Maybe (..), Monad (return), Show (show), String, and, concatMap, drop, elem, not, or, otherwise, read, splitAt, take)
+import qualified Prelude as P (Bool (..), Foldable (length, null), Int, Maybe (..), Monad (return), Show (show), String, and, concatMap, drop, elem, not, or, otherwise, read, splitAt, take, map)
 import Data.Time (UTCTime)
 import qualified Date (changeTimeZone, timeOfDayFromString, timeZoneFromOffsetString, isWithinTimeRange)
 
@@ -50,8 +50,10 @@ inStage apiStages Q.StageFilter {matchBothStages, stageIds} =
     match = if matchBothStages then P.and else P.or
 
 -- TODO: 実際はapiRuleKeyはキーなので変換する
-inRules :: S.Rule -> [P.String] -> P.Bool
-inRules S.Rule {key = apiRuleKey} rules = apiRuleKey `P.elem` rules
+inRules :: S.Rule -> [Q.Rule] -> P.Bool
+inRules S.Rule {key = apiRuleKey} rules = apiRuleKey `P.elem` ruleKeys
+  where
+    ruleKeys = P.map convertQueryRule rules
 
 filterDefaultSchedule :: Q.FilterCondition -> S.DefaultSchedule -> P.String -> Q.MatchType -> P.Bool
 filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.DefaultSchedule {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset apiMatchType =
@@ -65,7 +67,7 @@ filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.
   where
     inMaybeStages :: P.Maybe [S.Stage] -> Q.StageFilter -> P.Bool
     inMaybeStages apiStages' selectedStages = maybeTrue (`inStage` selectedStages) apiStages'
-    inMaybeRules :: P.Maybe S.Rule -> [P.String] -> P.Bool
+    inMaybeRules :: P.Maybe S.Rule -> [Q.Rule] -> P.Bool
     inMaybeRules apiRule' selectedRules = maybeTrue (`inRules` selectedRules) apiRule'
 
 filterEventMatch :: Q.FilterCondition -> S.EventMatch -> P.String -> P.Bool

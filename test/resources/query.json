@@ -7,10 +7,14 @@
     {
       "matchType": "bankara_open",
       "stages": {
-        "stageIds": [22],
+        "stageIds": [
+          22
+        ],
         "matchBothStages": true
       },
-      "rules": ["TURF_WAR"],
+      "rules": [
+        "nawabari"
+      ],
       "timeSlots": [
         {
           "start": "00:00",
