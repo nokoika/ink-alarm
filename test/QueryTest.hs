@@ -7,6 +7,7 @@ import qualified Query
     QueryRoot (..),
     StageFilter (..),
     TimeSlot (..),
+    DayOfWeek (..),
     parseBase64Url,
   )
 import Test.Hspec (describe, hspec, it, shouldBe)
@@ -39,7 +40,7 @@ test = hspec $ do
                                 [ Query.TimeSlot
                                     { Query.start = "00:00",
                                       Query.end = "06:00",
-                                      Query.dayOfWeek = Just "sun"
+                                      Query.dayOfWeek = Just Query.Sunday
                                     }
                                 ],
                             Query.notifications =

@@ -1,6 +1,6 @@
-module Query (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), parseBase64Url) where
+module Query (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), DayOfWeek (..), parseBase64Url) where
 
-import qualified Data.Aeson as A (FromJSON (..), eitherDecode)
+import qualified Data.Aeson as A (FromJSON (..), eitherDecode, withText)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Base64.URL as BU (decode)
 import qualified Data.ByteString.Lazy as BL
@@ -8,8 +8,8 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.Text as T (Text)
 import qualified Data.Text.Encoding as TE (decodeUtf8', encodeUtf8)
 import GHC.Generics (Generic)
-import Prelude (Bool, Either (Left, Right), Eq, Int, Maybe, Show, String, ($))
-import qualified Prelude as P (show)
+import Prelude (Bool, Either (Left, Right), Eq, Int, Maybe, Show, String, ($), Enum, Bounded, (++))
+import qualified Prelude as P (show, Applicative (pure), fail)
 
 data QueryRoot = QueryRoot
   { language :: String, -- "ja" | "en"
@@ -44,11 +44,34 @@ data StageFilter = StageFilter
 
 instance A.FromJSON StageFilter
 
+-- 曜日
+data DayOfWeek
+  = Monday
+  | Tuesday
+  | Wednesday
+  | Thursday
+  | Friday
+  | Saturday
+  | Sunday
+  deriving (Show, Eq, Generic, Enum, Bounded)
+
+instance A.FromJSON DayOfWeek where
+  parseJSON = A.withText "DayOfWeek" $ \t -> case t of
+    "mon"    -> P.pure Monday
+    "tue"    -> P.pure Tuesday
+    "wed"    -> P.pure Wednesday
+    "thu"    -> P.pure Thursday
+    "fri"    -> P.pure Friday
+    "sat"    -> P.pure Saturday
+    "sun"    -> P.pure Sunday
+    _invalid -> P.fail $ "Invalid DayOfWeek: " ++ P.show t
+
+
 -- 時間帯
 data TimeSlot = TimeSlot
   { start :: String, -- HH:mm
     end :: String, -- HH:mm
-    dayOfWeek :: Maybe String -- e.g., "Monday"
+    dayOfWeek :: Maybe DayOfWeek
   }
   deriving (Show, Eq, Generic)
 
