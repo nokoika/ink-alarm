@@ -6,6 +6,7 @@ import Data.Time.Calendar (fromGregorian)
 import Data.Time.Clock (secondsToDiffTime)
 import qualified ICal (ICalInput(..), ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTrigger (..), buildICalText)
 import Test.Hspec (describe, hspec, it, shouldBe)
+import qualified Query as Q (Language (..))
 import Prelude (IO, Maybe (Just), ($), (*))
 
 test :: IO ()
@@ -14,7 +15,7 @@ test = hspec $ do
     it "should create ics text" $ do
       let arg =
             ICal.ICalInput
-              { ICal.language = "JA",
+              { ICal.language = Q.Japanese,
                 ICal.events =
                   [ ICal.ICalEvent
                       { summary = "バンカラマッチ(オープン) - ヤガラ市場 / チョウザメ造船 - ガチヤグラ",

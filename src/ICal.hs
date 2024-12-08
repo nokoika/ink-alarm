@@ -5,9 +5,10 @@ import Prelude (Enum, Eq, Int, Show, String, (++), (.))
 import qualified Prelude as P (Show (show), concatMap, filter)
 import Data.Time (UTCTime (..), LocalTime(..), utcToLocalTime, utc)
 import qualified Data.Char as C (isDigit)
+import qualified Query as Q (Language (..))
 
 data ICalInput = ICalInput
-  { language :: String, -- "JA" | "EN"
+  { language :: Q.Language,
     events :: [ICalEvent]
   }
   deriving (Show, Eq)
@@ -45,6 +46,10 @@ data Reminder = Reminder
 convertUTCTimeToLocalTime :: UTCTime -> LocalTime
 convertUTCTimeToLocalTime = utcToLocalTime utc
 
+showLanguage :: Q.Language -> String
+showLanguage Q.Japanese = "JA"
+showLanguage Q.English = "EN"
+
 -- 20231207T120000Z <- 2023-12-07T12:00:00Z
 toICalTime :: UTCTime -> String
 toICalTime utcTime = day ++ "T" ++ dayTime ++ "Z"
@@ -61,7 +66,7 @@ buildICalText ICalInput {language, events} =
     "\n"
     [ "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//Splatoon 3//" ++ language,
+      "PRODID:-//Splatoon 3//" ++ showLanguage language,
       aggregate
         ( \ICalEvent {summary, description, start, end, reminders} ->
             [ "BEGIN:VEVENT",

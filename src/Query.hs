@@ -1,4 +1,4 @@
-module Query (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), DayOfWeek (..), parseBase64Url) where
+module Query (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), DayOfWeek (..), Language (..), parseBase64Url) where
 
 import qualified Data.Aeson as A (FromJSON (..), eitherDecode, withText)
 import qualified Data.ByteString as BS
@@ -12,13 +12,25 @@ import Prelude (Bool, Either (Left, Right), Eq, Int, Maybe, Show, String, ($), E
 import qualified Prelude as P (show, Applicative (pure), fail)
 
 data QueryRoot = QueryRoot
-  { language :: String, -- "ja" | "en"
+  { language :: Language, -- "ja" | "en"
     utcOffset :: String, -- e.g., "+09:00"
     filters :: [FilterCondition]
   }
   deriving (Show, Eq, Generic)
 
 instance A.FromJSON QueryRoot
+
+-- 言語
+data Language
+  = Japanese
+  | English
+  deriving (Show, Eq, Generic, Enum, Bounded)
+
+instance A.FromJSON Language where
+  parseJSON = A.withText "Language" $ \t -> case t of
+    "ja" -> P.pure Japanese
+    "en" -> P.pure English
+    _invalid -> P.fail $ "Invalid Language: " ++ P.show t
 
 -- TODO: matchType とかを enum にする
 

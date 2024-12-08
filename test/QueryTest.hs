@@ -2,12 +2,13 @@ module QueryTest (test) where
 
 import qualified Data.Text.IO as T (readFile)
 import qualified Query
-  ( FilterCondition (..),
+  ( DayOfWeek (..),
+    Language (..),
+    FilterCondition (..),
     NotificationSetting (..),
     QueryRoot (..),
     StageFilter (..),
     TimeSlot (..),
-    DayOfWeek (..),
     parseBase64Url,
   )
 import Test.Hspec (describe, hspec, it, shouldBe)
@@ -22,7 +23,7 @@ test = hspec $ do
       let expect =
             Right
               ( Query.QueryRoot
-                  { Query.language = "ja",
+                  { Query.language = Query.Japanese,
                     Query.utcOffset = "+09:00",
                     Query.filters =
                       [ Query.FilterCondition
