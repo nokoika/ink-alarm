@@ -1,14 +1,16 @@
-module Query (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), DayOfWeek (..), Language (..), MatchType (..), Rule (..), parseBase64Url) where
+module Query (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), TimeSlotTimeOfDay (..), DayOfWeek (..), Language (..), MatchType (..), Rule (..), parseBase64Url) where
 
 import qualified Data.Aeson as A (FromJSON (..), eitherDecode, withText)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Base64.URL as BU (decode)
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Lazy.Char8 as L8
-import qualified Data.Text as T (Text)
+import qualified Data.Text as T (Text, unpack)
 import qualified Data.Text.Encoding as TE (decodeUtf8', encodeUtf8)
+import qualified Data.Time.LocalTime as LT (TimeOfDay (..))
+import qualified Date (timeOfDayFromString, timeZoneFromOffsetString)
 import GHC.Generics (Generic)
-import Prelude (Bool, Either (Left, Right), Eq, Int, Maybe, Show, String, ($), Enum, Bounded, (++))
+import Prelude (Bool, Either (Left, Right), Eq, Int, Maybe, Show, String, ($), Enum, Bounded, (++), Maybe (..))
 import qualified Prelude as P (show, Applicative (pure), fail)
 
 data QueryRoot = QueryRoot
@@ -112,11 +114,18 @@ instance A.FromJSON DayOfWeek where
     "sun"    -> P.pure Sunday
     _invalid -> P.fail $ "Invalid DayOfWeek: " ++ P.show t
 
+newtype TimeSlotTimeOfDay = TimeSlotTimeOfDay { timeOfDay :: LT.TimeOfDay }
+  deriving (Eq, Show)
+
+instance A.FromJSON TimeSlotTimeOfDay where
+  parseJSON = A.withText "TimeSlotTimeOfDay" $ \t -> case Date.timeOfDayFromString (T.unpack t) of
+    Just timeOfDay -> P.pure $ TimeSlotTimeOfDay timeOfDay
+    Nothing -> P.fail $ "Invalid TimeSlotTimeOfDay: " ++ P.show t
 
 -- 時間帯
 data TimeSlot = TimeSlot
-  { start :: String, -- HH:mm
-    end :: String, -- HH:mm
+  { start :: TimeSlotTimeOfDay, -- HH:mm
+    end :: TimeSlotTimeOfDay, -- HH:mm
     dayOfWeek :: Maybe DayOfWeek
   }
   deriving (Show, Eq, Generic)

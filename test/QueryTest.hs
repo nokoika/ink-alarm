@@ -9,12 +9,14 @@ import qualified Query
     QueryRoot (..),
     StageFilter (..),
     TimeSlot (..),
+    TimeSlotTimeOfDay (..),
     MatchType (..),
     parseBase64Url,
     Rule (..),
   )
 import Test.Hspec (describe, hspec, it, shouldBe)
 import Prelude (Bool (..), Either (..), IO, Maybe (..), ($))
+import qualified Data.Time.LocalTime as LT (TimeOfDay (..))
 
 test :: IO ()
 test = hspec $ do
@@ -41,8 +43,8 @@ test = hspec $ do
                             Query.timeSlots =
                               Just
                                 [ Query.TimeSlot
-                                    { Query.start = "00:00",
-                                      Query.end = "06:00",
+                                    { Query.start = Query.TimeSlotTimeOfDay { timeOfDay = LT.TimeOfDay 0 0 0 },
+                                      Query.end = Query.TimeSlotTimeOfDay { timeOfDay = LT.TimeOfDay 6 0 0 },
                                       Query.dayOfWeek = Just Query.Sunday
                                     }
                                 ],

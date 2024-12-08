@@ -13,17 +13,17 @@ module Filter
 where
 
 import qualified Data.Maybe as M (fromJust, fromMaybe, maybe)
+import Data.Time (UTCTime)
 import qualified Data.Time as D
 import qualified Data.Time.LocalTime as LT (TimeOfDay (..), localTimeOfDay)
+import qualified Date (changeTimeZone, isWithinTimeRange, timeOfDayFromString, timeZoneFromOffsetString)
 import qualified ICal as I (ICalEvent (..), ICalInput (..), Reminder (..), ReminderAction (..), ReminderTrigger (..))
-import qualified Query as Q (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), MatchType (..), Rule (..))
+import qualified Query as Q (FilterCondition (..), MatchType (..), NotificationSetting (..), QueryRoot (..), Rule (..), StageFilter (..), TimeSlot (..), TimeSlotTimeOfDay (..))
 import SplaApi (EventMatch (isFest), convertQueryRule)
 import qualified SplaApi as S (DefaultSchedule (..), EventMatch (..), EventSummary (..), Result (..), Root (..), Rule (..), Stage (..), fetchSchedule)
 import qualified Text.Read as TR (readMaybe)
-import Prelude (($), (&&), (*), (+), (++), (<=), (<), (==), (||))
-import qualified Prelude as P (Bool (..), Foldable (length, null), Int, Maybe (..), Monad (return), Show (show), String, and, concatMap, drop, elem, not, or, otherwise, read, splitAt, take, map)
-import Data.Time (UTCTime)
-import qualified Date (changeTimeZone, timeOfDayFromString, timeZoneFromOffsetString, isWithinTimeRange)
+import Prelude (($), (&&), (*), (+), (++), (<), (<=), (==), (||))
+import qualified Prelude as P (Bool (..), Foldable (length, null), Int, Maybe (..), Monad (return), Show (show), String, and, concatMap, drop, elem, map, not, or, otherwise, read, splitAt, take)
 
 maybeTrue :: (a -> P.Bool) -> P.Maybe a -> P.Bool
 maybeTrue = M.maybe P.True
@@ -33,8 +33,8 @@ maybeTrue = M.maybe P.True
 -- TODO: 曜日対応、fromJust削除
 inTimeSlot :: UTCTime -> UTCTime -> P.String -> Q.TimeSlot -> P.Bool
 inTimeSlot apiStartTime apiEndTime utcOffset Q.TimeSlot {start, end, dayOfWeek} =
-  let startTime = M.fromJust $ Date.timeOfDayFromString start
-      endTime = M.fromJust $ Date.timeOfDayFromString end
+  let Q.TimeSlotTimeOfDay { timeOfDay = startTime } = start
+      Q.TimeSlotTimeOfDay { timeOfDay = endTime } = end
       timeZone = M.fromJust $ Date.timeZoneFromOffsetString utcOffset
       localStartTime = Date.changeTimeZone apiStartTime timeZone
       localEndTime = Date.changeTimeZone apiEndTime timeZone
