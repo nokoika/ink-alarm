@@ -16,7 +16,7 @@ import qualified Data.Maybe as M (fromJust, fromMaybe, maybe)
 import qualified Data.Time as D
 import qualified Data.Time.LocalTime as LT (TimeOfDay (..), localTimeOfDay)
 import qualified ICal as I (ICalEvent (..), ICalInput (..), Reminder (..), ReminderAction (..), ReminderTrigger (..))
-import qualified Query as Q (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..))
+import qualified Query as Q (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), MatchType (..))
 import SplaApi (EventMatch (isFest))
 import qualified SplaApi as S (DefaultSchedule (..), EventMatch (..), EventSummary (..), Result (..), Root (..), Rule (..), Stage (..), fetchSchedule)
 import qualified Text.Read as TR (readMaybe)
@@ -53,7 +53,7 @@ inStage apiStages Q.StageFilter {matchBothStages, stageIds} =
 inRules :: S.Rule -> [P.String] -> P.Bool
 inRules S.Rule {key = apiRuleKey} rules = apiRuleKey `P.elem` rules
 
-filterDefaultSchedule :: Q.FilterCondition -> S.DefaultSchedule -> P.String -> P.String -> P.Bool
+filterDefaultSchedule :: Q.FilterCondition -> S.DefaultSchedule -> P.String -> Q.MatchType -> P.Bool
 filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.DefaultSchedule {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset apiMatchType =
   P.and
     [ P.not apiIsFest, -- フェスの場合はデフォルトスケジュールのルールで遊ぶことができない
@@ -89,7 +89,7 @@ defaultReminders =
     I.Reminder {I.trigger = I.ReminderTrigger {I.time = 60 * 60}, I.action = I.Email}
   ]
 
-createICalEventsFromDefaultSchedules :: Q.QueryRoot -> [S.DefaultSchedule] -> P.String -> [I.ICalEvent]
+createICalEventsFromDefaultSchedules :: Q.QueryRoot -> [S.DefaultSchedule] -> Q.MatchType -> [I.ICalEvent]
 createICalEventsFromDefaultSchedules queryRoot defaultSchedules matchType =
   [ I.ICalEvent
       { I.summary = "さまりー",
@@ -130,8 +130,8 @@ createIcalInput queryRoot result =
       I.events = regular ++ bankaraChallenge ++ bankaraOpen ++ x ++ event
     }
   where
-    regular = createICalEventsFromDefaultSchedules queryRoot (S.regular result) "regular"
-    bankaraChallenge = createICalEventsFromDefaultSchedules queryRoot (S.bankaraChallenge result) "bankara_challenge"
-    bankaraOpen = createICalEventsFromDefaultSchedules queryRoot (S.bankaraOpen result) "bankara_open"
-    x = createICalEventsFromDefaultSchedules queryRoot (S.x result) "x"
+    regular = createICalEventsFromDefaultSchedules queryRoot (S.regular result) Q.Regular
+    bankaraChallenge = createICalEventsFromDefaultSchedules queryRoot (S.bankaraChallenge result) Q.BankaraChallenge
+    bankaraOpen = createICalEventsFromDefaultSchedules queryRoot (S.bankaraOpen result) Q.BankaraOpen
+    x = createICalEventsFromDefaultSchedules queryRoot (S.x result) Q.XMatch
     event = createICalEventsFromEventMatches queryRoot (S.event result)

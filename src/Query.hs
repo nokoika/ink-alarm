@@ -1,4 +1,4 @@
-module Query (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), DayOfWeek (..), Language (..), parseBase64Url) where
+module Query (FilterCondition (..), NotificationSetting (..), QueryRoot (..), StageFilter (..), TimeSlot (..), DayOfWeek (..), Language (..), MatchType (..), parseBase64Url) where
 
 import qualified Data.Aeson as A (FromJSON (..), eitherDecode, withText)
 import qualified Data.ByteString as BS
@@ -32,12 +32,28 @@ instance A.FromJSON Language where
     "en" -> P.pure English
     _invalid -> P.fail $ "Invalid Language: " ++ P.show t
 
--- TODO: matchType とかを enum にする
+-- matchType (オープン, チャレンジ, X, レギュラー, イベント)
+data MatchType
+  = BankaraOpen
+  | BankaraChallenge
+  | XMatch
+  | Regular
+  | Event
+  deriving (Show, Eq, Generic, Enum, Bounded)
+
+instance A.FromJSON MatchType where
+  parseJSON = A.withText "MatchType" $ \t -> case t of
+    "bankara_open" -> P.pure BankaraOpen
+    "bankara_challenge" -> P.pure BankaraChallenge
+    "x" -> P.pure XMatch
+    "regular" -> P.pure Regular
+    "event" -> P.pure Event
+    _invalid -> P.fail $ "Invalid MatchType: " ++ P.show t
 
 -- フィルタ条件
 data FilterCondition
   = FilterCondition
-  { matchType :: String, -- "bankara_open" | "bankara_challenge" | "x" | "regular" | "event"
+  { matchType :: MatchType,
     stages :: Maybe StageFilter,
     rules :: Maybe [String], -- ["TURF_WAR", "AREA", ...]
     timeSlots :: Maybe [TimeSlot],

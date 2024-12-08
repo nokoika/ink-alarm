@@ -9,6 +9,7 @@ import qualified Query
     QueryRoot (..),
     StageFilter (..),
     TimeSlot (..),
+    MatchType (..),
     parseBase64Url,
   )
 import Test.Hspec (describe, hspec, it, shouldBe)
@@ -27,7 +28,7 @@ test = hspec $ do
                     Query.utcOffset = "+09:00",
                     Query.filters =
                       [ Query.FilterCondition
-                          { Query.matchType = "bankara_open",
+                          { Query.matchType = Query.BankaraOpen,
                             Query.stages =
                               Just
                                 ( Query.StageFilter
