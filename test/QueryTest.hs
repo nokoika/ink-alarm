@@ -1,6 +1,6 @@
 module QueryTest (test) where
 
-import qualified Data.Text.IO as T (readFile)
+import qualified Data.Text.IO as TIO (readFile)
 import qualified Query
   ( DayOfWeek (..),
     Language (..),
@@ -8,6 +8,7 @@ import qualified Query
     NotificationSetting (..),
     QueryRoot (..),
     StageFilter (..),
+    UtcOffsetTimeZone (..),
     TimeSlot (..),
     TimeSlotTimeOfDay (..),
     MatchType (..),
@@ -17,18 +18,20 @@ import qualified Query
 import Test.Hspec (describe, hspec, it, shouldBe)
 import Prelude (Bool (..), Either (..), IO, Maybe (..), ($))
 import qualified Data.Time.LocalTime as LT (TimeOfDay (..))
+import qualified Data.Time as LT
+import qualified TestUtil as T (createTimeZone)
 
 test :: IO ()
 test = hspec $ do
   describe "Query Parser" $ do
     it "hoge" $ do
-      base64Url <- T.readFile "test/resources/query-base64url.txt"
+      base64Url <- TIO.readFile "test/resources/query-base64url.txt"
       let actual = Query.parseBase64Url base64Url
       let expect =
             Right
               ( Query.QueryRoot
                   { Query.language = Query.Japanese,
-                    Query.utcOffset = "+09:00",
+                    Query.utcOffset = Query.UtcOffsetTimeZone $ T.createTimeZone 9 "",
                     Query.filters =
                       [ Query.FilterCondition
                           { Query.matchType = Query.BankaraOpen,
@@ -43,8 +46,8 @@ test = hspec $ do
                             Query.timeSlots =
                               Just
                                 [ Query.TimeSlot
-                                    { Query.start = Query.TimeSlotTimeOfDay { timeOfDay = LT.TimeOfDay 0 0 0 },
-                                      Query.end = Query.TimeSlotTimeOfDay { timeOfDay = LT.TimeOfDay 6 0 0 },
+                                    { Query.start = Query.TimeSlotTimeOfDay $ LT.TimeOfDay 0 0 0,
+                                      Query.end = Query.TimeSlotTimeOfDay $ LT.TimeOfDay 6 0 0,
                                       Query.dayOfWeek = Just Query.Sunday
                                     }
                                 ],

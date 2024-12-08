@@ -18,7 +18,7 @@ import qualified Data.Time as D
 import qualified Data.Time.LocalTime as LT (TimeOfDay (..), localTimeOfDay)
 import qualified Date (changeTimeZone, isWithinTimeRange, timeOfDayFromString, timeZoneFromOffsetString)
 import qualified ICal as I (ICalEvent (..), ICalInput (..), Reminder (..), ReminderAction (..), ReminderTrigger (..))
-import qualified Query as Q (FilterCondition (..), MatchType (..), NotificationSetting (..), QueryRoot (..), Rule (..), StageFilter (..), TimeSlot (..), TimeSlotTimeOfDay (..))
+import qualified Query as Q (FilterCondition (..), MatchType (..), NotificationSetting (..), QueryRoot (..), UtcOffsetTimeZone (..), Rule (..), StageFilter (..), TimeSlot (..), TimeSlotTimeOfDay (..))
 import SplaApi (EventMatch (isFest), convertQueryRule)
 import qualified SplaApi as S (DefaultSchedule (..), EventMatch (..), EventSummary (..), Result (..), Root (..), Rule (..), Stage (..), fetchSchedule)
 import qualified Text.Read as TR (readMaybe)
@@ -31,16 +31,16 @@ maybeTrue = M.maybe P.True
 -- apiStartTime or apiEndTime のどちらかが、isWithinTimeRange に含まれるかどうかを返す
 -- isWithinTimeRange の第3引数は apiStartTime と apiEndTime から作るんだが、タイムゾーンはQ.utcOffsetを適用する
 -- TODO: 曜日対応、fromJust削除
-inTimeSlot :: UTCTime -> UTCTime -> P.String -> Q.TimeSlot -> P.Bool
+inTimeSlot :: UTCTime -> UTCTime -> Q.UtcOffsetTimeZone -> Q.TimeSlot -> P.Bool
 inTimeSlot apiStartTime apiEndTime utcOffset Q.TimeSlot {start, end, dayOfWeek} =
-  let Q.TimeSlotTimeOfDay { timeOfDay = startTime } = start
-      Q.TimeSlotTimeOfDay { timeOfDay = endTime } = end
-      timeZone = M.fromJust $ Date.timeZoneFromOffsetString utcOffset
+  let Q.TimeSlotTimeOfDay startTime = start
+      Q.TimeSlotTimeOfDay endTime = end
+      Q.UtcOffsetTimeZone timeZone = utcOffset
       localStartTime = Date.changeTimeZone apiStartTime timeZone
       localEndTime = Date.changeTimeZone apiEndTime timeZone
    in Date.isWithinTimeRange startTime endTime localStartTime || Date.isWithinTimeRange startTime endTime localEndTime
 
-inTimeSlots :: UTCTime -> UTCTime -> P.String -> [Q.TimeSlot] -> P.Bool
+inTimeSlots :: UTCTime -> UTCTime -> Q.UtcOffsetTimeZone -> [Q.TimeSlot] -> P.Bool
 inTimeSlots apiStartTime apiEndTime utcOffset timeSlots = P.or [inTimeSlot apiStartTime apiEndTime utcOffset timeSlot | timeSlot <- timeSlots]
 
 inStage :: [S.Stage] -> Q.StageFilter -> P.Bool
@@ -55,7 +55,7 @@ inRules S.Rule {key = apiRuleKey} rules = apiRuleKey `P.elem` ruleKeys
   where
     ruleKeys = P.map convertQueryRule rules
 
-filterDefaultSchedule :: Q.FilterCondition -> S.DefaultSchedule -> P.String -> Q.MatchType -> P.Bool
+filterDefaultSchedule :: Q.FilterCondition -> S.DefaultSchedule -> Q.UtcOffsetTimeZone -> Q.MatchType -> P.Bool
 filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.DefaultSchedule {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset apiMatchType =
   P.and
     [ P.not apiIsFest, -- フェスの場合はデフォルトスケジュールのルールで遊ぶことができない
@@ -70,7 +70,7 @@ filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.
     inMaybeRules :: P.Maybe S.Rule -> [Q.Rule] -> P.Bool
     inMaybeRules apiRule' selectedRules = maybeTrue (`inRules` selectedRules) apiRule'
 
-filterEventMatch :: Q.FilterCondition -> S.EventMatch -> P.String -> P.Bool
+filterEventMatch :: Q.FilterCondition -> S.EventMatch -> Q.UtcOffsetTimeZone -> P.Bool
 filterEventMatch Q.FilterCondition {stages, rules, timeSlots} S.EventMatch {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset =
   P.and
     [ P.not apiIsFest, -- フェスの場合にイベントマッチが来ることはない
