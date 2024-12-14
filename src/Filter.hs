@@ -14,7 +14,7 @@ where
 
 import qualified Data.Maybe as M
 import qualified Data.Time as T
-import qualified Date (changeTimeZone, isWithinTimeRange)
+import qualified Date (changeTimeZone, hasTimeRangesIntersect, timeRangesIntersect)
 import Debug.Trace (trace)
 import qualified ICal as I
 import qualified Query as Q
@@ -27,18 +27,20 @@ maybeTrue = M.maybe True
 -- API のスケジュールが timeSlot に該当するかどうかを返す
 -- 1. apiStartTime or apiEndTime のどちらかが、isWithinTimeRange に含まれるかどうか
 -- 2. apiStartTime の曜日が TimeSlot の曜日と一致するかどうか
--- 判定のタイムゾーンは utcOffset で指定されたものを使う
+-- 判定のタイムゾーンは utcOffsetTimeZone で指定されたものを使う
 inTimeSlot :: T.UTCTime -> T.UTCTime -> Q.UtcOffsetTimeZone -> Q.TimeSlot -> Bool
-inTimeSlot apiStartTime apiEndTime utcOffset Q.TimeSlot {start, end, dayOfWeek} =
-  trace ("matchStartTime: " ++ show matchStartTime ++ ", matchEndTime: " ++ show matchEndTime ++ ", matchDayOfWeek: " ++ show matchDayOfWeek) $ (matchStartTime || matchEndTime) && matchDayOfWeek
+inTimeSlot apiStartTime apiEndTime utcOffsetTimeZone Q.TimeSlot {start, end, dayOfWeek} =
+  matchDayOfWeek
   where
-    Q.TimeSlotTimeOfDay startTime = start
-    Q.TimeSlotTimeOfDay endTime = end
-    Q.UtcOffsetTimeZone timeZone = utcOffset
+    Q.UtcOffsetTimeZone timeZone = utcOffsetTimeZone
+    pickApiTimeOfDay :: T.UTCTime -> T.TimeOfDay
+    pickApiTimeOfDay utcTime = T.localTimeOfDay $ T.utcToLocalTime timeZone utcTime
+    pickTimeSlotTimeOfDay :: Q.TimeSlotTimeOfDay -> T.TimeOfDay
+    pickTimeSlotTimeOfDay (Q.TimeSlotTimeOfDay timeOfDay) = timeOfDay
+
+    intersect = Date.timeRangesIntersect (pickTimeSlotTimeOfDay start) (pickTimeSlotTimeOfDay end) (pickApiTimeOfDay apiStartTime) (pickApiTimeOfDay apiEndTime)
+
     localStartTime = T.zonedTimeToLocalTime $ Date.changeTimeZone apiStartTime timeZone
-    localEndTime = T.zonedTimeToLocalTime $ Date.changeTimeZone apiEndTime timeZone
-    matchStartTime = Date.isWithinTimeRange startTime endTime localStartTime
-    matchEndTime = Date.isWithinTimeRange startTime endTime localEndTime
     localTimeToWeekDay = T.dayOfWeek . T.localDay
     getDayOfWeek :: Q.TimeSlotDayOfWeek -> T.DayOfWeek
     getDayOfWeek (Q.TimeSlotDayOfWeek dow) = dow
