@@ -15,10 +15,11 @@ where
 import qualified Data.Maybe as M
 import qualified Data.Time as T
 import qualified Date (changeTimeZone, isWithinTimeRange)
+import Debug.Trace (trace)
 import qualified ICal as I
 import qualified Query as Q
 import qualified SplaApi as S
-import Prelude (Bool (True), Maybe, and, elem, map, not, or, ($), (&&), (*), (++), (.), (==), (||))
+import Prelude (Bool (True), Maybe, Show (show), and, elem, map, not, or, ($), (&&), (*), (++), (.), (==), (||))
 
 maybeTrue :: (a -> Bool) -> Maybe a -> Bool
 maybeTrue = M.maybe True
@@ -29,7 +30,7 @@ maybeTrue = M.maybe True
 -- 判定のタイムゾーンは utcOffset で指定されたものを使う
 inTimeSlot :: T.UTCTime -> T.UTCTime -> Q.UtcOffsetTimeZone -> Q.TimeSlot -> Bool
 inTimeSlot apiStartTime apiEndTime utcOffset Q.TimeSlot {start, end, dayOfWeek} =
-  (matchStartTime || matchEndTime) && matchDayOfWeek
+  trace ("matchStartTime: " ++ show matchStartTime ++ ", matchEndTime: " ++ show matchEndTime ++ ", matchDayOfWeek: " ++ show matchDayOfWeek) $ (matchStartTime || matchEndTime) && matchDayOfWeek
   where
     Q.TimeSlotTimeOfDay startTime = start
     Q.TimeSlotTimeOfDay endTime = end

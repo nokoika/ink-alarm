@@ -4,7 +4,7 @@ import Control.Monad (guard)
 import qualified Data.Time as T
 import qualified Data.Time.LocalTime as LT
 import qualified Text.Read as TR
-import Prelude (Bool, Int, Maybe (Just, Nothing), Monad (return), String, ($), (&&), (*), (+), (<), (<=), (==))
+import Prelude (Bool, Int, Maybe (Just, Nothing), Monad (return), String, not, ($), (&&), (*), (+), (<), (<=), (==))
 
 -- UTCTime から ZonedTime に変換
 changeTimeZone :: T.UTCTime -> T.TimeZone -> T.ZonedTime
@@ -42,5 +42,12 @@ timeZoneFromOffsetString offset = case offset of
 -- end は境界を含まない
 isWithinTimeRange :: LT.TimeOfDay -> LT.TimeOfDay -> T.LocalTime -> Bool
 isWithinTimeRange start end localTime =
-  let localTimeOfDay = LT.localTimeOfDay localTime
-   in start <= localTimeOfDay && localTimeOfDay < end
+  let t = LT.localTimeOfDay localTime
+   in if start <= end
+        -- 通常の日付内の場合はそのまま範囲チェック
+        then start <= t && t < end
+        else
+          -- start > end の場合、日付またぎ。(ex: 23:00~01:00)
+          -- この場合、範囲外となる区間は [end, start) で連続している。
+          -- よって、範囲内はその否定、つまり t が [end, start) に入っていない場合。
+          not (end <= t && t < start)
