@@ -18,7 +18,7 @@ import qualified Date (changeTimeZone, isWithinTimeRange)
 import qualified ICal as I
 import qualified Query as Q
 import qualified SplaApi as S
-import Prelude (Bool (True), Maybe, and, elem, map, not, or, (&&), (*), (++), (==), (||), ($))
+import Prelude (Bool (True), Maybe, and, elem, map, not, or, ($), (&&), (*), (++), (.), (==), (||))
 
 maybeTrue :: (a -> Bool) -> Maybe a -> Bool
 maybeTrue = M.maybe True
@@ -26,19 +26,24 @@ maybeTrue = M.maybe True
 -- API のスケジュールが timeSlot に該当するかどうかを返す
 -- 1. apiStartTime or apiEndTime のどちらかが、isWithinTimeRange に含まれるかどうか
 -- 2. apiStartTime の曜日が TimeSlot の曜日と一致するかどうか
--- isWithinTimeRange の第3引数は apiStartTime と apiEndTime から作るんだが、タイムゾーンはQ.utcOffsetを適用する
--- TODO: 曜日対応
+-- 判定のタイムゾーンは utcOffset で指定されたものを使う
 inTimeSlot :: T.UTCTime -> T.UTCTime -> Q.UtcOffsetTimeZone -> Q.TimeSlot -> Bool
 inTimeSlot apiStartTime apiEndTime utcOffset Q.TimeSlot {start, end, dayOfWeek} =
-  let Q.TimeSlotTimeOfDay startTime = start
-      Q.TimeSlotTimeOfDay endTime = end
-      Q.UtcOffsetTimeZone timeZone = utcOffset
-      localStartTime = T.zonedTimeToLocalTime $ Date.changeTimeZone apiStartTime timeZone
-      localEndTime = T.zonedTimeToLocalTime $ Date.changeTimeZone apiEndTime timeZone
-      matchStartTime = Date.isWithinTimeRange startTime endTime localStartTime
-      matchEndTime = Date.isWithinTimeRange startTime endTime localEndTime
-   in -- matchDayOfWeek =
-      (matchStartTime || matchEndTime) && True
+  (matchStartTime || matchEndTime) && matchDayOfWeek
+  where
+    Q.TimeSlotTimeOfDay startTime = start
+    Q.TimeSlotTimeOfDay endTime = end
+    Q.UtcOffsetTimeZone timeZone = utcOffset
+    localStartTime = T.zonedTimeToLocalTime $ Date.changeTimeZone apiStartTime timeZone
+    localEndTime = T.zonedTimeToLocalTime $ Date.changeTimeZone apiEndTime timeZone
+    matchStartTime = Date.isWithinTimeRange startTime endTime localStartTime
+    matchEndTime = Date.isWithinTimeRange startTime endTime localEndTime
+    localTimeToWeekDay = T.dayOfWeek . T.localDay
+    getDayOfWeek :: Q.TimeSlotDayOfWeek -> T.DayOfWeek
+    getDayOfWeek (Q.TimeSlotDayOfWeek dow) = dow
+    sameDayOfWeek :: T.DayOfWeek -> Bool
+    sameDayOfWeek = (== localTimeToWeekDay localStartTime)
+    matchDayOfWeek = maybeTrue (sameDayOfWeek . getDayOfWeek) dayOfWeek
 
 inTimeSlots :: T.UTCTime -> T.UTCTime -> Q.UtcOffsetTimeZone -> [Q.TimeSlot] -> Bool
 inTimeSlots apiStartTime apiEndTime utcOffset timeSlots = or [inTimeSlot apiStartTime apiEndTime utcOffset timeSlot | timeSlot <- timeSlots]
