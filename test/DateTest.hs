@@ -77,14 +77,12 @@ test = hspec $ do
 
   describe "isWithinTimeRange" $ do
     it "should match" $ do
-      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.ZonedTime (TU.createLocalTime 2021 1 1 0 0) (TU.createTimeZone 0 "")) `shouldBe` True
-      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.ZonedTime (TU.createLocalTime 2021 1 1 0 30) (TU.createTimeZone 0 "")) `shouldBe` True
-      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.ZonedTime (TU.createLocalTime 2021 1 1 0 59) (TU.createTimeZone 0 "")) `shouldBe` True
-      -- timezone は無視
-      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.ZonedTime (TU.createLocalTime 2021 1 1 0 0) (TU.createTimeZone 9 "")) `shouldBe` True
+      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 0 0) `shouldBe` True
+      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 0 30) `shouldBe` True
+      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 0 59) `shouldBe` True
 
     it "should not match" $ do
-      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.ZonedTime (TU.createLocalTime 2021 1 1 1 1) (TU.createTimeZone 0 "")) `shouldBe` False
+      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 1 1) `shouldBe` False
       -- Range が 0:00 - 1:00 であり、end は境界を含まないので 2021/1/1 1:10 は含まれない
-      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.ZonedTime (TU.createLocalTime 2021 1 1 1 0) (TU.createTimeZone 0 "")) `shouldBe` False
+      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 1 0) `shouldBe` False
 

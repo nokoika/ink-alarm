@@ -38,9 +38,9 @@ timeZoneFromOffsetString offset = case offset of
   ['Z'] -> return T.utc
   _invalidInput -> Nothing
 
--- 時間が指定の範囲内かどうかを判定。start, endはHH:mm形式(Queryのほう)。localTimeはTZ調整されたDateTime(SplaApiのほうを調整)のイメージ
+-- 時間が指定の範囲内かどうかを判定。start, endはHH:mm形式(Queryのほう)。localTimeはTZ調整されたLocalTime(SplaApiのほうを調整)のイメージ
 -- end は境界を含まない
-isWithinTimeRange :: LT.TimeOfDay -> LT.TimeOfDay -> T.ZonedTime -> Bool
+isWithinTimeRange :: LT.TimeOfDay -> LT.TimeOfDay -> T.LocalTime -> Bool
 isWithinTimeRange start end localTime =
-  let localTimeOfDay = LT.localTimeOfDay $ T.zonedTimeToLocalTime localTime
+  let localTimeOfDay = LT.localTimeOfDay localTime
    in start <= localTimeOfDay && localTimeOfDay < end
