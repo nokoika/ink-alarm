@@ -2,7 +2,7 @@ module QueryTest (test) where
 
 import qualified Data.Text.IO as TIO (readFile)
 import qualified Query
-  ( DayOfWeek (..),
+  ( TimeSlotDayOfWeek (..),
     Language (..),
     FilterCondition (..),
     NotificationSetting (..),
@@ -18,6 +18,7 @@ import qualified Query
 import Test.Hspec (describe, hspec, it, shouldBe)
 import Prelude (Bool (True), IO, Maybe (Just), Either (Right), ($))
 import qualified Data.Time.LocalTime as LT
+import qualified Data.Time.Calendar as C
 import qualified TestUtil as TU
 
 test :: IO ()
@@ -47,7 +48,7 @@ test = hspec $ do
                                 [ Query.TimeSlot
                                     { Query.start = Query.TimeSlotTimeOfDay $ LT.TimeOfDay 0 0 0,
                                       Query.end = Query.TimeSlotTimeOfDay $ LT.TimeOfDay 6 0 0,
-                                      Query.dayOfWeek = Just Query.Sunday
+                                      Query.dayOfWeek = Just $ Query.TimeSlotDayOfWeek C.Sunday
                                     }
                                 ],
                             Query.notifications =

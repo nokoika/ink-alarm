@@ -6,7 +6,7 @@ module Query
     StageFilter (..),
     TimeSlot (..),
     TimeSlotTimeOfDay (..),
-    DayOfWeek (..),
+    TimeSlotDayOfWeek (..),
     Language (..),
     MatchType (..),
     Rule (..),
@@ -22,6 +22,7 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as TE
 import qualified Data.Time as Time
+import qualified Data.Time.Calendar as C
 import qualified Data.Time.LocalTime as LT
 import qualified Date as D
 import GHC.Generics (Generic)
@@ -43,10 +44,10 @@ data Language
   deriving (Show, Eq, Generic, Enum, Bounded)
 
 instance A.FromJSON Language where
-  parseJSON = A.withText "Language" $ \t -> case t of
+  parseJSON = A.withText "Language" $ \case
     "ja" -> pure Japanese
     "en" -> pure English
-    _invalid -> fail $ "Invalid Language: " ++ show t
+    _invalid -> pure English
 
 -- UTCオフセット
 newtype UtcOffsetTimeZone = UtcOffsetTimeZone {timeZone :: Time.TimeZone}
@@ -115,27 +116,21 @@ data StageFilter = StageFilter
 
 instance A.FromJSON StageFilter
 
--- 曜日
-data DayOfWeek
-  = Monday
-  | Tuesday
-  | Wednesday
-  | Thursday
-  | Friday
-  | Saturday
-  | Sunday
-  deriving (Show, Eq, Generic, Enum, Bounded)
+newtype TimeSlotDayOfWeek = TimeSlotDayOfWeek { dayOfWeek :: C.DayOfWeek }
+  deriving (Eq, Show)
 
-instance A.FromJSON DayOfWeek where
-  parseJSON = A.withText "DayOfWeek" $ \t -> case t of
-    "mon" -> pure Monday
-    "tue" -> pure Tuesday
-    "wed" -> pure Wednesday
-    "thu" -> pure Thursday
-    "fri" -> pure Friday
-    "sat" -> pure Saturday
-    "sun" -> pure Sunday
-    _invalid -> fail $ "Invalid DayOfWeek: " ++ show t
+-- FromJSON インスタンスの実装
+instance A.FromJSON TimeSlotDayOfWeek where
+  parseJSON = A.withText "TimeSlotDayOfWeek" $ \t -> 
+    case Text.toLower t of
+      "mon" -> pure $ TimeSlotDayOfWeek C.Monday
+      "tue" -> pure $ TimeSlotDayOfWeek C.Tuesday
+      "wed" -> pure $ TimeSlotDayOfWeek C.Wednesday
+      "thu" -> pure $ TimeSlotDayOfWeek C.Thursday
+      "fri" -> pure $ TimeSlotDayOfWeek C.Friday
+      "sat" -> pure $ TimeSlotDayOfWeek C.Saturday
+      "sun" -> pure $ TimeSlotDayOfWeek C.Sunday
+      other -> fail $ "Invalid TimeSlotDayOfWeek: " ++ show other
 
 newtype TimeSlotTimeOfDay = TimeSlotTimeOfDay {timeOfDay :: LT.TimeOfDay}
   deriving (Eq, Show)
@@ -149,7 +144,7 @@ instance A.FromJSON TimeSlotTimeOfDay where
 data TimeSlot = TimeSlot
   { start :: TimeSlotTimeOfDay, -- HH:mm
     end :: TimeSlotTimeOfDay, -- HH:mm
-    dayOfWeek :: Maybe DayOfWeek
+    dayOfWeek :: Maybe TimeSlotDayOfWeek
   }
   deriving (Show, Eq, Generic)
 
