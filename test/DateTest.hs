@@ -1,12 +1,10 @@
 module DateTest (test) where
 
 import qualified Data.Time as T
-import Date as D (changeTimeZone, timeOfDayFromString, timeZoneFromOffsetString, isWithinTimeRange)
+import qualified Date as D (changeTimeZone, timeOfDayFromString, timeZoneFromOffsetString, isWithinTimeRange, isWithinTimeOfDay, hasTimeRangesIntersect)
 import Test.Hspec (describe, hspec, it, shouldBe)
 import qualified TestUtil as TU
 import Prelude (IO, Maybe (Just, Nothing), ($), Bool (..))
-
-import Debug.Trace
 
 test :: IO ()
 test = hspec $ do
@@ -100,3 +98,140 @@ test = hspec $ do
       D.isWithinTimeRange (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 6 0) `shouldBe` False
       -- 25時は想定しない
       D.isWithinTimeRange (T.TimeOfDay 23 0 0) (T.TimeOfDay 25 0 0) (TU.createLocalTime 2021 1 1 0 0) `shouldBe` False
+
+  describe "isWithinTimeOfDay" $ do
+    it "should match" $ do
+      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 0 0 0) `shouldBe` True
+      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 0 30 0) `shouldBe` True
+      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 0 59 0) `shouldBe` True
+      -- 日をまたぐ
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 23 0 0) `shouldBe` True
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 23 59 0) `shouldBe` True
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 0 0 0) `shouldBe` True
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 0 59 0) `shouldBe` True
+
+    it "should not match" $ do
+      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 1 0 0) `shouldBe` False
+      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 1 1 0) `shouldBe` False
+      -- 日をまたぐ
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 1 0 0) `shouldBe` False
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 1 1 0) `shouldBe` False
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 6 0 0) `shouldBe` False
+      -- 25時は想定しない
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 25 0 0) (T.TimeOfDay 0 0 0) `shouldBe` False
+
+
+  describe "hasTimeRangesIntersect" $ do
+    let d1 = T.TimeOfDay 3 0 0
+    let d2 = T.TimeOfDay 5 0 0
+    let d3 = T.TimeOfDay 7 0 0
+    let d4 = T.TimeOfDay 9 0 0
+
+    let d1' = T.TimeOfDay 21 0 0
+    let d2' = T.TimeOfDay 23 0 0
+    let d3' = T.TimeOfDay 1 0 0
+    let d4' = T.TimeOfDay 3 0 0
+
+    -- ============
+    -- 時刻が範囲内かどうかを調べるのは、慎重にテストをする場合でもA~Mの13パターンを考えればよい
+    -- ============
+    -- s1: schedule start
+    -- e1: schedule end
+    -- s2: time slot start
+    -- e2: time slot end
+    -- ============
+    --  1| 2|  |3 |4
+    -- ============
+    -- A. True
+    --    s1|  |e1
+    -- s2|        |e2
+    -- B. True
+    -- s1|        |e1
+    -- s2|        |e2
+    -- C. True
+    --    s1|     |e1
+    -- s2|        |e2
+    -- D. True
+    -- s1|     |e1
+    -- s2|        |e2
+    -- E. True
+    -- s1|        |e1
+    --    s2|  |e2
+    -- F. True
+    -- s1|        |e1
+    --    s2|     |e2
+    -- G. True
+    -- s1|        |e1
+    -- s2|     |e2
+    -- H. True
+    -- s1|     |e1
+    --    s2|     |e2
+    -- I. False
+    -- s1|  |e1
+    --    s2|     |e2
+    -- J. False
+    -- s1|  |e1
+    --       s2|  |e2
+    -- K. True
+    --    s1|     |e1
+    -- s2|     |e2
+    -- L. False
+    --    s1|     |e1
+    -- s2|  |e2
+    -- M. False
+    --       s1|  |e1
+    -- s2|  |e2
+
+    it "Case A." $ do
+      D.hasTimeRangesIntersect d2 d3 d1 d4 `shouldBe` True
+    it "Case B." $ do
+      D.hasTimeRangesIntersect d1 d4 d1 d4 `shouldBe` True
+    it "Case C." $ do
+      D.hasTimeRangesIntersect d2 d4 d1 d4 `shouldBe` True
+    it "Case D." $ do
+      D.hasTimeRangesIntersect d1 d3 d1 d4 `shouldBe` True
+    it "Case E." $ do
+      D.hasTimeRangesIntersect d1 d4 d2 d3 `shouldBe` True
+    it "Case F." $ do
+      D.hasTimeRangesIntersect d1 d4 d2 d4 `shouldBe` True
+    it "Case G." $ do
+      D.hasTimeRangesIntersect d1 d4 d1 d3 `shouldBe` True
+    it "Case H." $ do
+      D.hasTimeRangesIntersect d1 d3 d2 d4 `shouldBe` True
+    it "Case I." $ do
+      D.hasTimeRangesIntersect d1 d2 d2 d4 `shouldBe` False
+    it "Case J." $ do
+      D.hasTimeRangesIntersect d1 d2 d3 d4 `shouldBe` False
+    it "Case K." $ do
+      D.hasTimeRangesIntersect d2 d4 d1 d3 `shouldBe` True
+    it "Case L." $ do
+      D.hasTimeRangesIntersect d2 d4 d1 d2 `shouldBe` False
+    it "Case M." $ do
+      D.hasTimeRangesIntersect d3 d4 d1 d2 `shouldBe` False
+
+    it "Case A. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d2' d3' d1' d4' `shouldBe` True
+    it "Case B. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d1' d4' d1' d4' `shouldBe` True
+    it "Case C. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d2' d4' d1' d4' `shouldBe` True
+    it "Case D. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d1' d3' d1' d4' `shouldBe` True
+    it "Case E. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d1' d4' d2' d3' `shouldBe` True
+    it "Case F. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d1' d4' d2' d4' `shouldBe` True
+    it "Case G. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d1' d4' d1' d3' `shouldBe` True
+    it "Case H. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d1' d3' d2' d4' `shouldBe` True
+    it "Case I. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d1' d2' d2' d4' `shouldBe` False
+    it "Case J. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d1' d2' d3' d4' `shouldBe` False
+    it "Case K. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d2' d4' d1' d4' `shouldBe` True
+    it "Case L. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d2' d4' d1' d2' `shouldBe` False
+    it "Case M. 日をまたぐ" $ do
+      D.hasTimeRangesIntersect d3' d4' d1' d2' `shouldBe` False
