@@ -18,22 +18,27 @@ import qualified Date (changeTimeZone, isWithinTimeRange)
 import qualified ICal as I
 import qualified Query as Q
 import qualified SplaApi as S
-import Prelude (Bool (True), Maybe, and, or, (*), (++), (==), (||), elem, map, not, and)
+import Prelude (Bool (True), Maybe, and, or, (*), (++), (==), (&&), (||), elem, map, not, and)
 
 maybeTrue :: (a -> Bool) -> Maybe a -> Bool
 maybeTrue = M.maybe True
 
--- apiStartTime or apiEndTime のどちらかが、isWithinTimeRange に含まれるかどうかを返す
+-- API のスケジュールが timeSlot に該当するかどうかを返す
+-- * apiStartTime or apiEndTime のどちらかが、isWithinTimeRange に含まれるかどうか
+-- * apiStartTime の曜日が TimeSlot の曜日と一致するかどうか
 -- isWithinTimeRange の第3引数は apiStartTime と apiEndTime から作るんだが、タイムゾーンはQ.utcOffsetを適用する
--- TODO: 曜日対応、fromJust削除
+-- TODO: 曜日対応
 inTimeSlot :: T.UTCTime -> T.UTCTime -> Q.UtcOffsetTimeZone -> Q.TimeSlot -> Bool
 inTimeSlot apiStartTime apiEndTime utcOffset Q.TimeSlot {start, end, dayOfWeek} =
   let Q.TimeSlotTimeOfDay startTime = start
       Q.TimeSlotTimeOfDay endTime = end
       Q.UtcOffsetTimeZone timeZone = utcOffset
-      localStartTime = Date.changeTimeZone apiStartTime timeZone
-      localEndTime = Date.changeTimeZone apiEndTime timeZone
-   in Date.isWithinTimeRange startTime endTime localStartTime || Date.isWithinTimeRange startTime endTime localEndTime
+      zonedStartTime = Date.changeTimeZone apiStartTime timeZone
+      zonedEndTime = Date.changeTimeZone apiEndTime timeZone
+      matchStartTime = Date.isWithinTimeRange startTime endTime zonedStartTime
+      matchEndTime = Date.isWithinTimeRange startTime endTime zonedEndTime
+      -- matchDayOfWeek = 
+  in (matchStartTime || matchEndTime) && True
 
 inTimeSlots :: T.UTCTime -> T.UTCTime -> Q.UtcOffsetTimeZone -> [Q.TimeSlot] -> Bool
 inTimeSlots apiStartTime apiEndTime utcOffset timeSlots = or [inTimeSlot apiStartTime apiEndTime utcOffset timeSlot | timeSlot <- timeSlots]
