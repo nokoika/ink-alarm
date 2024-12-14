@@ -1,7 +1,6 @@
 module Date (changeTimeZone, timeOfDayFromString, timeZoneFromOffsetString, isWithinTimeRange, isWithinTimeOfDay, hasTimeRangesIntersect, timeRangesIntersect, intersectTimeRangesWithLocalTime) where
 
 import Control.Monad (guard)
-import Data.Time (LocalTime (LocalTime))
 import qualified Data.Time as T
 import qualified Data.Time.LocalTime as LT
 import qualified Text.Read as TR

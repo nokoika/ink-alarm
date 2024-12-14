@@ -14,12 +14,11 @@ where
 
 import qualified Data.Maybe as M
 import qualified Data.Time as T
-import qualified Date (changeTimeZone, hasTimeRangesIntersect, timeRangesIntersect)
-import Debug.Trace (trace)
+import qualified Date (changeTimeZone, intersectTimeRangesWithLocalTime)
 import qualified ICal as I
 import qualified Query as Q
 import qualified SplaApi as S
-import Prelude (Bool (True), Maybe, Show (show), and, elem, map, not, or, ($), (&&), (*), (++), (.), (==), (||))
+import Prelude (Bool (False, True), Maybe (Just, Nothing), and, const, elem, fst, map, not, or, ($), (&&), (*), (++), (.), (<$>), (==))
 
 maybeTrue :: (a -> Bool) -> Maybe a -> Bool
 maybeTrue = M.maybe True
@@ -30,22 +29,24 @@ maybeTrue = M.maybe True
 -- 判定のタイムゾーンは utcOffsetTimeZone で指定されたものを使う
 inTimeSlot :: T.UTCTime -> T.UTCTime -> Q.UtcOffsetTimeZone -> Q.TimeSlot -> Bool
 inTimeSlot apiStartTime apiEndTime utcOffsetTimeZone Q.TimeSlot {start, end, dayOfWeek} =
-  matchDayOfWeek
+  M.isJust intersect && matchDayOfWeek
   where
     Q.UtcOffsetTimeZone timeZone = utcOffsetTimeZone
-    pickApiTimeOfDay :: T.UTCTime -> T.TimeOfDay
-    pickApiTimeOfDay utcTime = T.localTimeOfDay $ T.utcToLocalTime timeZone utcTime
+    pickApiLocalTime :: T.UTCTime -> T.LocalTime
+    pickApiLocalTime utcTime = T.zonedTimeToLocalTime $ Date.changeTimeZone utcTime timeZone
     pickTimeSlotTimeOfDay :: Q.TimeSlotTimeOfDay -> T.TimeOfDay
     pickTimeSlotTimeOfDay (Q.TimeSlotTimeOfDay timeOfDay) = timeOfDay
+    intersect = Date.intersectTimeRangesWithLocalTime (pickTimeSlotTimeOfDay start) (pickTimeSlotTimeOfDay end) (pickApiLocalTime apiStartTime) (pickApiLocalTime apiEndTime)
 
-    intersect = Date.timeRangesIntersect (pickTimeSlotTimeOfDay start) (pickTimeSlotTimeOfDay end) (pickApiTimeOfDay apiStartTime) (pickApiTimeOfDay apiEndTime)
-
-    localStartTime = T.zonedTimeToLocalTime $ Date.changeTimeZone apiStartTime timeZone
+    -- 交差部分がある場合、交差の開始時刻の曜日がTimeSlotの曜日と一致するかどうかをチェックする
+    intersectStartTime = fst <$> intersect
     localTimeToWeekDay = T.dayOfWeek . T.localDay
     getDayOfWeek :: Q.TimeSlotDayOfWeek -> T.DayOfWeek
     getDayOfWeek (Q.TimeSlotDayOfWeek dow) = dow
     sameDayOfWeek :: T.DayOfWeek -> Bool
-    sameDayOfWeek = (== localTimeToWeekDay localStartTime)
+    sameDayOfWeek = case intersectStartTime of
+      Just i -> (== localTimeToWeekDay i)
+      Nothing -> const False
     matchDayOfWeek = maybeTrue (sameDayOfWeek . getDayOfWeek) dayOfWeek
 
 inTimeSlots :: T.UTCTime -> T.UTCTime -> Q.UtcOffsetTimeZone -> [Q.TimeSlot] -> Bool
