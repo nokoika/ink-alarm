@@ -7,6 +7,7 @@ import qualified Filter as F
 import Test.Hspec (describe, hspec, it, shouldBe)
 import qualified TestUtil as TU
 import Prelude (Bool (..), IO, Maybe (Just, Nothing), ($), Int)
+import qualified SplaApi as S
 
 test :: IO ()
 test = hspec $ do
@@ -90,3 +91,38 @@ test = hspec $ do
         stageIds = [1, 2, 3, 4]
       }
       F.inStage apiStages stageFilter `shouldBe` False
+    it "API: [], StageFilter: [] のとき、マッチしない" $ do
+      let apiStages = []
+      let stageFilter = Q.StageFilter {
+        matchBothStages = False,
+        stageIds = []
+      }
+      F.inStage apiStages stageFilter `shouldBe` False
+
+  describe "inRules" $ do
+    it "API Rule: アサリ, Query Rule: アサリ のとき、マッチする" $ do
+      let apiRule = S.Rule {key=S.ClamBlitz, name=""}
+      let rules = [Q.ClamBlitz]
+      F.inRules apiRule rules `shouldBe` True
+    it "API Rule: アサリ, Query Rule: ヤグラ,アサリ のとき、マッチする" $ do
+      let apiRule = S.Rule {key=S.ClamBlitz, name=""}
+      let rules = [Q.TowerControl, Q.ClamBlitz]
+      F.inRules apiRule rules `shouldBe` True
+    it "API Rule: アサリ, Query Rule: ナワバリ のとき、マッチしない" $ do
+      let apiRule = S.Rule {key=S.ClamBlitz, name=""}
+      let rules = [Q.TurfWar]
+      F.inRules apiRule rules `shouldBe` False
+    it "API Rule: アサリ, Query Rule: [] のとき、マッチしない" $ do
+      let apiRule = S.Rule {key=S.ClamBlitz, name=""}
+      let rules = []
+      F.inRules apiRule rules `shouldBe` False
+    it "API Rule: [], Query Rule: アサリ のとき、マッチしない" $ do
+      let apiRule = S.Rule {key=S.ClamBlitz, name=""}
+      let rules = [Q.ClamBlitz]
+      F.inRules apiRule rules `shouldBe` True
+    it "API Rule: [], Query Rule: [] のとき、マッチしない" $ do
+      let apiRule = S.Rule {key=S.ClamBlitz, name=""}
+      let rules = []
+      F.inRules apiRule rules `shouldBe` False
+
+  

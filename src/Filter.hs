@@ -58,7 +58,6 @@ inStage apiStages Q.StageFilter {matchBothStages, stageIds} =
   where
     match = if matchBothStages then and else or
 
--- TODO: 実際はapiRuleKeyはキーなので変換する
 inRules :: S.Rule -> [Q.Rule] -> Bool
 inRules S.Rule {key = apiRuleKey} rules = apiRuleKey `elem` ruleKeys
   where
