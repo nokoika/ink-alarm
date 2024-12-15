@@ -24,8 +24,8 @@ maybeTrue :: (a -> Bool) -> Maybe a -> Bool
 maybeTrue = M.maybe True
 
 -- API のスケジュールが timeSlot に該当するかどうかを返す
--- 1. apiStartTime or apiEndTime のどちらかが、isWithinTimeRange に含まれるかどうか
--- 2. apiStartTime の曜日が TimeSlot の曜日と一致するかどうか
+-- 1. スケジュールの時刻が TimeSlot の時刻と交差しているかどうか
+-- 2. 交差の開始時刻の曜日が TimeSlot の曜日と一致するかどうか
 -- 判定のタイムゾーンは utcOffsetTimeZone で指定されたものを使う
 inTimeSlot :: T.UTCTime -> T.UTCTime -> Q.UtcOffsetTimeZone -> Q.TimeSlot -> Bool
 inTimeSlot apiStartTime apiEndTime utcOffsetTimeZone Q.TimeSlot {start, end, dayOfWeek} =
