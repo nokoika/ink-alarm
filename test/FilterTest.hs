@@ -302,3 +302,172 @@ test = hspec $ do
         Q.notifications = Nothing
       }
       F.filterDefaultSchedule query defaultSchedule (Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "") Q.XMatch `shouldBe` False
+
+  describe "filterEventMatch" $ do
+    it "条件全指定 マッチ" $ do
+      let eventMatch = S.EventMatch {
+        S.startTime = TU.createUTCTime 2021 1 1 4 0,
+        S.endTime = TU.createUTCTime 2021 1 1 6 0,
+        S.rule = S.Rule {key=S.ClamBlitz, name=""},
+        S.stages = [S.Stage 1 "" "", S.Stage 2 "" ""],
+        S.eventSummary = S.EventSummary "id" "name" "desc",
+        S.isFest = False
+      }
+      let query = Q.FilterCondition {
+        Q.matchType = Q.Event,
+        Q.timeSlots = Just [Q.TimeSlot {
+          Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
+          Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
+          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+        }],
+        Q.stages = Just Q.StageFilter {
+          Q.matchBothStages = False,
+          Q.stageIds = [1, 4]
+        },
+        Q.rules = Just [Q.ClamBlitz],
+        Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+      }
+      F.filterEventMatch query eventMatch (Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "") `shouldBe` True
+
+    it "条件全指定 ステージがマッチしない" $ do
+      let eventMatch = S.EventMatch {
+        S.startTime = TU.createUTCTime 2021 1 1 4 0,
+        S.endTime = TU.createUTCTime 2021 1 1 6 0,
+        S.rule = S.Rule {key=S.ClamBlitz, name=""},
+        S.stages = [S.Stage 1 "" "", S.Stage 2 "" ""],
+        S.eventSummary = S.EventSummary "id" "name" "desc",
+        S.isFest = False
+      }
+      let query = Q.FilterCondition {
+        Q.matchType = Q.Event,
+        Q.timeSlots = Just [Q.TimeSlot {
+          Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
+          Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
+          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+        }],
+        Q.stages = Just Q.StageFilter {
+          Q.matchBothStages = True, -- 片方しかマッチしてないから結果は False になるはず
+          Q.stageIds = [1, 4]
+        },
+        Q.rules = Just [Q.ClamBlitz],
+        Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+      }
+      F.filterEventMatch query eventMatch (Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "") `shouldBe` False
+
+    it "条件全指定 ルールがマッチしない" $ do
+      let eventMatch = S.EventMatch {
+        S.startTime = TU.createUTCTime 2021 1 1 4 0,
+        S.endTime = TU.createUTCTime 2021 1 1 6 0,
+        S.rule = S.Rule {key=S.ClamBlitz, name=""},
+        S.stages = [S.Stage 1 "" "", S.Stage 2 "" ""],
+        S.eventSummary = S.EventSummary "id" "name" "desc",
+        S.isFest = False
+      }
+      let query = Q.FilterCondition {
+        Q.matchType = Q.Event,
+        Q.timeSlots = Just [Q.TimeSlot {
+          Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
+          Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
+          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+        }],
+        Q.stages = Just Q.StageFilter {
+          Q.matchBothStages = False,
+          Q.stageIds = [1, 4]
+        },
+        Q.rules = Just [Q.TowerControl], -- マッチしないルール
+        Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+      }
+      F.filterEventMatch query eventMatch (Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "") `shouldBe` False
+
+    it "条件全指定 時間帯がマッチしない" $ do
+      let eventMatch = S.EventMatch {
+        S.startTime = TU.createUTCTime 2021 1 1 4 0,
+        S.endTime = TU.createUTCTime 2021 1 1 6 0,
+        S.rule = S.Rule {key=S.ClamBlitz, name=""},
+        S.stages = [S.Stage 1 "" "", S.Stage 2 "" ""],
+        S.eventSummary = S.EventSummary "id" "name" "desc",
+        S.isFest = False
+      }
+      let query = Q.FilterCondition {
+        Q.matchType = Q.Event,
+        Q.timeSlots = Just [Q.TimeSlot {
+          Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
+          Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
+          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Saturday -- 金曜日じゃない
+        }],
+        Q.stages = Just Q.StageFilter {
+          Q.matchBothStages = False,
+          Q.stageIds = [1, 4]
+        },
+        Q.rules = Just [Q.ClamBlitz],
+        Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+      }
+      F.filterEventMatch query eventMatch (Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "") `shouldBe` False
+
+    it "条件全指定 フェスの場合はマッチしない" $ do
+      let eventMatch = S.EventMatch {
+        S.startTime = TU.createUTCTime 2021 1 1 4 0,
+        S.endTime = TU.createUTCTime 2021 1 1 6 0,
+        S.rule = S.Rule {key=S.ClamBlitz, name=""},
+        S.stages = [S.Stage 1 "" "", S.Stage 2 "" ""],
+        S.eventSummary = S.EventSummary "id" "name" "desc",
+        S.isFest = True
+      }
+      let query = Q.FilterCondition {
+        Q.matchType = Q.Event,
+        Q.timeSlots = Just [Q.TimeSlot {
+          Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
+          Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
+          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+        }],
+        Q.stages = Just Q.StageFilter {
+          Q.matchBothStages = False,
+          Q.stageIds = [1, 4]
+        },
+        Q.rules = Just [Q.ClamBlitz],
+        Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+      }
+      F.filterEventMatch query eventMatch (Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "") `shouldBe` False
+
+    it "条件全指定 マッチタイプが違う" $ do
+      let eventMatch = S.EventMatch {
+        S.startTime = TU.createUTCTime 2021 1 1 4 0,
+        S.endTime = TU.createUTCTime 2021 1 1 6 0,
+        S.rule = S.Rule {key=S.ClamBlitz, name=""},
+        S.stages = [S.Stage 1 "" "", S.Stage 2 "" ""],
+        S.eventSummary = S.EventSummary "id" "name" "desc",
+        S.isFest = False
+      }
+      let query = Q.FilterCondition {
+        Q.matchType = Q.BankaraChallenge,
+        Q.timeSlots = Just [Q.TimeSlot {
+          Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
+          Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
+          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+        }],
+        Q.stages = Just Q.StageFilter {
+          Q.matchBothStages = False,
+          Q.stageIds = [1, 4]
+        },
+        Q.rules = Just [Q.ClamBlitz],
+        Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+      }
+      F.filterEventMatch query eventMatch (Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "") `shouldBe` False
+
+    it "条件最小限 マッチ" $ do
+      let eventMatch = S.EventMatch {
+        S.startTime = TU.createUTCTime 2021 1 1 4 0,
+        S.endTime = TU.createUTCTime 2021 1 1 6 0,
+        S.rule = S.Rule {key=S.ClamBlitz, name=""},
+        S.stages = [S.Stage 1 "" "", S.Stage 2 "" ""],
+        S.eventSummary = S.EventSummary "id" "name" "desc",
+        S.isFest = False
+      }
+      let query = Q.FilterCondition {
+        Q.matchType = Q.Event,
+        Q.timeSlots = Nothing,
+        Q.stages = Nothing,
+        Q.rules = Nothing,
+        Q.notifications = Nothing
+      }
+      F.filterEventMatch query eventMatch (Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "") `shouldBe` True

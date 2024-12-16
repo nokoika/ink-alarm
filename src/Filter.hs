@@ -79,9 +79,10 @@ filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.
     inMaybeRules apiRule' selectedRules = maybeTrue (`inRules` selectedRules) apiRule'
 
 filterEventMatch :: Q.FilterCondition -> S.EventMatch -> Q.UtcOffsetTimeZone -> Bool
-filterEventMatch Q.FilterCondition {stages, rules, timeSlots} S.EventMatch {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset =
+filterEventMatch Q.FilterCondition {stages, rules, timeSlots, matchType} S.EventMatch {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset =
   and
     [ not apiIsFest, -- フェスの場合にイベントマッチが来ることはない
+      matchType == Q.Event, -- マッチタイプがイベントであること
       maybeTrue (inTimeSlots apiStartTime apiEndTime utcOffset) timeSlots, -- 時間帯が通知設定にかぶっているか。未指定の場合は任意の時間でマッチ
       maybeTrue (inStage apiStages) stages, -- 選んだステージがスケジュールに含まれているか。未指定の場合は任意のステージでマッチ
       maybeTrue (inRules apiRule) rules -- ルールが指定したものに含まれるか。未指定の場合は任意のルールでマッチ
