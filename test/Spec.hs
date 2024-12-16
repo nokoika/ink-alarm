@@ -4,6 +4,7 @@ import qualified SplaApiTest (test)
 import qualified QueryTest (test)
 import qualified DateTest (test)
 import qualified FilterTest (test)
+import qualified TranslationTest (test)
 import Prelude (IO)
 
 main :: IO ()
@@ -14,3 +15,4 @@ main = do
   QueryTest.test
   DateTest.test
   FilterTest.test
+  TranslationTest.test

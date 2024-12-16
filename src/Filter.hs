@@ -100,18 +100,27 @@ defaultReminders =
     I.Reminder {I.trigger = I.ReminderTrigger {I.time = 60 * 60}, I.action = I.Email}
   ]
 
+-- buildSummary :: Q.Language -> Q.MatchType -> S.Rule -> [S.Stage] -> String
+-- buildSummary language matchType S.Rule {name} stages = name ++ " " ++ stageNames
+--   where
+--     getStageName S.Stage {name} = name
+--     stageNames = concatMap (\stage -> getStageName stage ++ " ") stages
+--     stageIds = map S.id stages
+--     stageIdAndNames = map (\stage -> (S.id stage, S.name stage)) stages
+
+
 createICalEventsFromDefaultSchedules :: Q.QueryRoot -> [S.DefaultSchedule] -> Q.MatchType -> [I.ICalEvent]
 createICalEventsFromDefaultSchedules queryRoot defaultSchedules matchType =
   [ I.ICalEvent
       { I.summary = "さまりー",
         I.description = "せつめい",
-        I.start = startTime, -- TODO: startTime を UTCTime にして渡す
-        I.end = endTime, -- TODO: startTime を UTCTime にして渡す
+        I.start = startTime,
+        I.end = endTime,
         I.reminders = convertNotificationsToReminders (M.fromMaybe [] notifications)
       }
     | defaultSchedule <- defaultSchedules,
-      let S.DefaultSchedule {S.startTime, S.endTime} = defaultSchedule
-          Q.QueryRoot {Q.utcOffset, Q.filters} = queryRoot,
+      let S.DefaultSchedule {startTime, endTime} = defaultSchedule
+          Q.QueryRoot {utcOffset, filters} = queryRoot,
       filter <- filters,
       let Q.FilterCondition {notifications} = filter,
       filterDefaultSchedule filter defaultSchedule utcOffset matchType
@@ -122,8 +131,8 @@ createICalEventsFromEventMatches queryRoot eventMatches =
   [ I.ICalEvent
       { I.summary = "さまりー",
         I.description = "せつめい",
-        I.start = startTime, -- TODO: ZonedTime を渡す
-        I.end = endTime, -- TODO: ZonedTime を渡す
+        I.start = startTime,
+        I.end = endTime,
         I.reminders = convertNotificationsToReminders (M.fromMaybe [] notifications)
       }
     | eventMatch <- eventMatches,

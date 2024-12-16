@@ -32,6 +32,7 @@ library
       Lib
       Query
       SplaApi
+      Translation
   other-modules:
       Paths_spla_ical
   autogen-modules:
@@ -140,6 +141,7 @@ test-suite spla-ical-test
       QueryTest
       SplaApiTest
       TestUtil
+      TranslationTest
       Paths_spla_ical
   autogen-modules:
       Paths_spla_ical

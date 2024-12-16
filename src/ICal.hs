@@ -15,8 +15,8 @@ data ICalInput = ICalInput
 data ICalEvent = ICalEvent
   { summary :: String,
     description :: String,
-    start :: T.UTCTime, -- ISO 8601
-    end :: T.UTCTime, -- ISO 8601
+    start :: T.UTCTime,
+    end :: T.UTCTime,
     reminders :: [Reminder]
   }
   deriving (Show, Eq)
