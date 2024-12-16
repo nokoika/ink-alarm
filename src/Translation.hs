@@ -75,8 +75,8 @@ showRuleName Q.English S.Rule {key} = case key of
   S.TurfWar -> "Turf War"
 
 showMatchType :: Q.Language -> Q.MatchType -> String
-showMatchType Q.Japanese Q.BankaraOpen = "バンカラマッチ(オープン)"
-showMatchType Q.Japanese Q.BankaraChallenge = "バンカラマッチ(チャレンジ)"
+showMatchType Q.Japanese Q.BankaraOpen = "バンカラオープン"
+showMatchType Q.Japanese Q.BankaraChallenge = "バンカラチャレンジ"
 showMatchType Q.Japanese Q.XMatch = "Xマッチ"
 showMatchType Q.Japanese Q.Regular = "レギュラーマッチ"
 showMatchType Q.Japanese Q.Event = "イベントマッチ"

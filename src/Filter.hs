@@ -2,7 +2,6 @@ module Filter
   ( createIcalInput,
     createICalEventsFromDefaultSchedules,
     createICalEventsFromEventMatches,
-    defaultReminders,
     filterDefaultSchedule,
     filterEventMatch,
     inRules,
@@ -14,10 +13,11 @@ where
 
 import qualified Data.Maybe as M
 import qualified Data.Time as T
-import qualified Date (changeTimeZone, intersectTimeRangesWithLocalTime)
+import qualified Date
 import qualified ICal as I
 import qualified Query as Q
 import qualified SplaApi as S
+import qualified Translation
 import Prelude (Bool (False, True), Maybe (Just, Nothing), and, const, elem, fst, map, not, or, ($), (&&), (*), (++), (.), (<$>), (==))
 
 maybeTrue :: (a -> Bool) -> Maybe a -> Bool
@@ -26,14 +26,13 @@ maybeTrue = M.maybe True
 -- API のスケジュールが timeSlot に該当するかどうかを返す
 -- 1. スケジュールの時刻が TimeSlot の時刻と交差しているかどうか
 -- 2. 交差の開始時刻の曜日が TimeSlot の曜日と一致するかどうか
--- 判定のタイムゾーンは utcOffsetTimeZone で指定されたものを使う
-inTimeSlot :: T.UTCTime -> T.UTCTime -> Q.UtcOffsetTimeZone -> Q.TimeSlot -> Bool
-inTimeSlot apiStartTime apiEndTime utcOffsetTimeZone Q.TimeSlot {start, end, dayOfWeek} =
+-- 判定のタイムゾーンは utcOffset で指定されたものを使う
+inTimeSlot :: T.UTCTime -> T.UTCTime -> T.TimeZone -> Q.TimeSlot -> Bool
+inTimeSlot apiStartTime apiEndTime utcOffset Q.TimeSlot {start, end, dayOfWeek} =
   M.isJust intersect && matchDayOfWeek
   where
-    Q.UtcOffsetTimeZone timeZone = utcOffsetTimeZone
     pickApiLocalTime :: T.UTCTime -> T.LocalTime
-    pickApiLocalTime utcTime = T.zonedTimeToLocalTime $ Date.changeTimeZone utcTime timeZone
+    pickApiLocalTime utcTime = T.zonedTimeToLocalTime $ Date.changeTimeZone utcTime utcOffset
     pickTimeSlotTimeOfDay :: Q.TimeSlotTimeOfDay -> T.TimeOfDay
     pickTimeSlotTimeOfDay (Q.TimeSlotTimeOfDay timeOfDay) = timeOfDay
     intersect = Date.intersectTimeRangesWithLocalTime (pickTimeSlotTimeOfDay start) (pickTimeSlotTimeOfDay end) (pickApiLocalTime apiStartTime) (pickApiLocalTime apiEndTime)
@@ -49,7 +48,7 @@ inTimeSlot apiStartTime apiEndTime utcOffsetTimeZone Q.TimeSlot {start, end, day
       Nothing -> const False
     matchDayOfWeek = maybeTrue (sameDayOfWeek . getDayOfWeek) dayOfWeek
 
-inTimeSlots :: T.UTCTime -> T.UTCTime -> Q.UtcOffsetTimeZone -> [Q.TimeSlot] -> Bool
+inTimeSlots :: T.UTCTime -> T.UTCTime -> T.TimeZone -> [Q.TimeSlot] -> Bool
 inTimeSlots apiStartTime apiEndTime utcOffset timeSlots = or [inTimeSlot apiStartTime apiEndTime utcOffset timeSlot | timeSlot <- timeSlots]
 
 inStage :: [S.Stage] -> Q.StageFilter -> Bool
@@ -63,7 +62,7 @@ inRules S.Rule {key = apiRuleKey} rules = apiRuleKey `elem` ruleKeys
   where
     ruleKeys = map S.convertQueryRule rules
 
-filterDefaultSchedule :: Q.FilterCondition -> S.DefaultSchedule -> Q.UtcOffsetTimeZone -> Q.MatchType -> Bool
+filterDefaultSchedule :: Q.FilterCondition -> S.DefaultSchedule -> T.TimeZone -> Q.MatchType -> Bool
 filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.DefaultSchedule {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset apiMatchType =
   and
     [ not apiIsFest, -- フェスの場合はデフォルトスケジュールのルールで遊ぶことができない
@@ -78,7 +77,7 @@ filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.
     inMaybeRules :: Maybe S.Rule -> [Q.Rule] -> Bool
     inMaybeRules apiRule' selectedRules = maybeTrue (`inRules` selectedRules) apiRule'
 
-filterEventMatch :: Q.FilterCondition -> S.EventMatch -> Q.UtcOffsetTimeZone -> Bool
+filterEventMatch :: Q.FilterCondition -> S.EventMatch -> T.TimeZone -> Bool
 filterEventMatch Q.FilterCondition {stages, rules, timeSlots, matchType} S.EventMatch {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset =
   and
     [ not apiIsFest, -- フェスの場合にイベントマッチが来ることはない
@@ -90,57 +89,56 @@ filterEventMatch Q.FilterCondition {stages, rules, timeSlots, matchType} S.Event
 
 convertNotificationsToReminders :: [Q.NotificationSetting] -> [I.Reminder]
 convertNotificationsToReminders notifications =
-  [ I.Reminder {I.trigger = I.ReminderTrigger {I.time = minutesBefore * 60}, I.action = I.Display}
+  [ I.Reminder {I.trigger = I.ReminderTrigger {I.time = minutesBefore}, I.action = I.Display}
     | Q.NotificationSetting {Q.minutesBefore} <- notifications
   ]
 
-defaultReminders :: [I.Reminder]
-defaultReminders =
-  [ I.Reminder {I.trigger = I.ReminderTrigger {I.time = 30 * 60}, I.action = I.Display},
-    I.Reminder {I.trigger = I.ReminderTrigger {I.time = 60 * 60}, I.action = I.Email}
-  ]
-
--- buildSummary :: Q.Language -> Q.MatchType -> S.Rule -> [S.Stage] -> String
--- buildSummary language matchType S.Rule {name} stages = name ++ " " ++ stageNames
---   where
---     getStageName S.Stage {name} = name
---     stageNames = concatMap (\stage -> getStageName stage ++ " ") stages
---     stageIds = map S.id stages
---     stageIdAndNames = map (\stage -> (S.id stage, S.name stage)) stages
-
-
 createICalEventsFromDefaultSchedules :: Q.QueryRoot -> [S.DefaultSchedule] -> Q.MatchType -> [I.ICalEvent]
-createICalEventsFromDefaultSchedules queryRoot defaultSchedules matchType =
+createICalEventsFromDefaultSchedules Q.QueryRoot {utcOffset, filters, language} defaultSchedules matchType =
   [ I.ICalEvent
-      { I.summary = "さまりー",
-        I.description = "せつめい",
+      { I.summary = Translation.showCalendarSummary language matchType apiRule apiStages,
+        I.description = Translation.showCalendarDescription language matchType apiRule apiStages timeRange,
         I.start = startTime,
         I.end = endTime,
-        I.reminders = convertNotificationsToReminders (M.fromMaybe [] notifications)
+        I.reminders = convertNotificationsToReminders (M.fromMaybe [] (Q.notifications filter))
       }
-    | defaultSchedule <- defaultSchedules,
-      let S.DefaultSchedule {startTime, endTime} = defaultSchedule
-          Q.QueryRoot {utcOffset, filters} = queryRoot,
+    | defaultSchedule@S.DefaultSchedule {startTime, endTime, rule = Just apiRule, stages = Just apiStages} <- defaultSchedules,
+      let Q.UtcOffsetTimeZone utcOffset' = utcOffset
+          timeRange = (Date.changeTimeZone startTime utcOffset', Date.changeTimeZone endTime utcOffset'),
       filter <- filters,
-      let Q.FilterCondition {notifications} = filter,
-      filterDefaultSchedule filter defaultSchedule utcOffset matchType
+      filterDefaultSchedule filter defaultSchedule utcOffset' matchType
   ]
 
 createICalEventsFromEventMatches :: Q.QueryRoot -> [S.EventMatch] -> [I.ICalEvent]
-createICalEventsFromEventMatches queryRoot eventMatches =
+createICalEventsFromEventMatches Q.QueryRoot {utcOffset, filters, language} eventMatches =
   [ I.ICalEvent
-      { I.summary = "さまりー",
-        I.description = "せつめい",
+      { -- API では日本語のイベント名しか手に入らないので、日本語以外の場合は末尾にイベント名を追加する。descも同様
+        I.summary =
+          if language == Q.Japanese
+            then eventName ++ baseSummary
+            else baseSummary ++ " / " ++ eventName,
+        I.description =
+          if language == Q.Japanese
+            then eventDescription ++ "\n\n" ++ baseDescription
+            else baseDescription ++ "\n\n" ++ eventDescription,
         I.start = startTime,
         I.end = endTime,
-        I.reminders = convertNotificationsToReminders (M.fromMaybe [] notifications)
+        I.reminders = convertNotificationsToReminders (M.fromMaybe [] (Q.notifications filter))
       }
-    | eventMatch <- eventMatches,
-      let S.EventMatch {S.startTime, S.endTime} = eventMatch
-          Q.QueryRoot {Q.utcOffset, Q.filters} = queryRoot,
+    | eventMatch@S.EventMatch
+        { S.startTime,
+          S.endTime,
+          S.rule = apiRule,
+          S.stages = apiStages,
+          eventSummary = S.EventSummary {name = eventName, desc = eventDescription}
+        } <-
+        eventMatches,
+      let Q.UtcOffsetTimeZone utcOffset' = utcOffset
+          timeRange = (Date.changeTimeZone startTime utcOffset', Date.changeTimeZone endTime utcOffset')
+          baseSummary = Translation.showCalendarSummary language Q.Event apiRule apiStages
+          baseDescription = Translation.showCalendarDescription language Q.Event apiRule apiStages timeRange,
       filter <- filters,
-      let Q.FilterCondition {notifications} = filter,
-      filterEventMatch filter eventMatch utcOffset
+      filterEventMatch filter eventMatch utcOffset'
   ]
 
 createIcalInput :: Q.QueryRoot -> S.Result -> I.ICalInput
