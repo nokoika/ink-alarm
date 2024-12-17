@@ -1,9 +1,9 @@
 module FilterTest (test) where
 
 import qualified Data.Time as T
-import Filter (createIcalInput)
 import qualified Filter as F
 import qualified ICal as I
+import Query (Rule (Rainmaker))
 import qualified Query as Q
 import qualified SplaApi as S
 import Test.Hspec (describe, hspec, it, shouldBe)
@@ -749,7 +749,7 @@ test = hspec $ do
                    ]
 
   describe "createIcalInput" $ do
-    it "正常系" $ do
+    it "正常系　日本人向け" $ do
       let splaApiResult =
             S.Result
               { regular =
@@ -786,7 +786,7 @@ test = hspec $ do
                   ],
                 bankaraChallenge =
                   [ S.DefaultSchedule
-                      { startTime = TU.createUTCTime 2024 11 17 12 0, -- 日曜日, 日本時間 21:00 から 23:00
+                      { startTime = TU.createUTCTime 2024 11 17 12 0, -- 日本時間 21:00 から 23:00, 日曜日
                         endTime = TU.createUTCTime 2024 11 17 14 0,
                         rule = Just (S.Rule {key = S.Rainmaker, name = "ガチホコバトル"}),
                         stages =
@@ -879,6 +879,145 @@ test = hspec $ do
               [ I.ICalEvent
                   { I.summary = "【ガチホコバトル】バンカラチャレンジ / マサバ海峡大橋, ヒラメが丘団地",
                     I.description = "21:00から23:00までガチホコバトルの予定があります。\n・バンカラチャレンジ\n・ステージ: マサバ海峡大橋, ヒラメが丘団地",
+                    I.start = TU.createUTCTime 2024 11 17 12 0,
+                    I.end = TU.createUTCTime 2024 11 17 14 0,
+                    I.reminders =
+                      [ I.Reminder {I.trigger = I.ReminderTrigger {I.time = 10}, I.action = I.Display},
+                        I.Reminder {I.trigger = I.ReminderTrigger {I.time = 20}, I.action = I.Display}
+                      ]
+                  }
+              ]
+          }
+
+    it "正常系　北米向け(ロサンゼルス想定)" $ do
+      let splaApiResult =
+            S.Result
+              { regular =
+                  [ S.DefaultSchedule
+                      { startTime = TU.createUTCTime 2024 11 17 12 0,
+                        endTime = TU.createUTCTime 2024 11 17 14 0,
+                        rule = Just (S.Rule {key = S.TurfWar, name = "ナワバリバトル"}),
+                        stages =
+                          Just
+                            [ S.Stage
+                                { id = 22,
+                                  name = "ネギトロ炭鉱",
+                                  image = "https://example.com"
+                                }
+                            ],
+                        isFest = False
+                      }
+                  ],
+                bankaraOpen =
+                  [ S.DefaultSchedule
+                      { startTime = TU.createUTCTime 2024 11 17 12 0,
+                        endTime = TU.createUTCTime 2024 11 17 14 0,
+                        rule = Just (S.Rule {key = S.SplatZones, name = "ガチエリア"}),
+                        stages =
+                          Just
+                            [ S.Stage
+                                { id = 9,
+                                  name = "ヒラメが丘団地",
+                                  image = "https://example.com"
+                                }
+                            ],
+                        isFest = False
+                      }
+                  ],
+                bankaraChallenge =
+                  [ S.DefaultSchedule
+                      { startTime = TU.createUTCTime 2024 11 17 12 0, -- ロサンゼルス時間 04:00 から 06:00, 日曜日
+                        endTime = TU.createUTCTime 2024 11 17 14 0,
+                        rule = Just (S.Rule {key = S.Rainmaker, name = "ガチホコバトル"}),
+                        stages =
+                          Just
+                            [ S.Stage
+                                { id = 10,
+                                  name = "マサバ海峡大橋",
+                                  image = "https://example.com"
+                                },
+                              S.Stage
+                                { id = 9,
+                                  name = "ヒラメが丘団地",
+                                  image = "https://example.com"
+                                }
+                            ],
+                        isFest = False
+                      }
+                  ],
+                event =
+                  [ S.EventMatch
+                      { startTime = TU.createUTCTime 2024 11 20 2 0,
+                        endTime = TU.createUTCTime 2024 11 20 4 0,
+                        rule = (S.Rule {key = S.SplatZones, name = "ガチエリア"}),
+                        stages =
+                          [ S.Stage
+                              { id = 10,
+                                name = "マサバ海峡大橋",
+                                image = "https://example.com"
+                              }
+                          ],
+                        eventSummary =
+                          S.EventSummary
+                            { id = "FastMove",
+                              name = "イカダッシュバトル",
+                              desc = "イカダッシュ速度アップ！ イカやタコでステージを泳ぎ回れ！"
+                            },
+                        isFest = False
+                      }
+                  ],
+                x =
+                  [ S.DefaultSchedule
+                      { startTime = TU.createUTCTime 2024 11 17 12 0,
+                        endTime = TU.createUTCTime 2024 11 17 14 0,
+                        rule = Just (S.Rule {key = S.ClamBlitz, name = "ガチアサリ"}),
+                        stages =
+                          Just
+                            [ S.Stage
+                                { id = 23,
+                                  name = "カジキ空港",
+                                  image = "https://example.com"
+                                }
+                            ],
+                        isFest = False
+                      }
+                  ]
+              }
+      let queryRoot =
+            Q.QueryRoot
+              { Q.language = Q.English,
+                Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone (-8) "", -- ロサンゼルスは UTC-8
+                Q.filters =
+                  [ Q.FilterCondition
+                      { Q.matchType = Q.BankaraChallenge,
+                        Q.timeSlots =
+                          Just
+                            [ Q.TimeSlot
+                                { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 3 0 0,
+                                  Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 5 0 0,
+                                  Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Sunday
+                                }
+                            ],
+                        Q.stages =
+                          Just
+                            Q.StageFilter
+                              { Q.matchBothStages = False,
+                                Q.stageIds = [10, 4]
+                              },
+                        Q.rules = Just [Q.Rainmaker],
+                        Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                      }
+                  ]
+              }
+
+      let icalInput = F.createIcalInput queryRoot splaApiResult
+      icalInput
+        `shouldBe` I.ICalInput
+          { I.language = Q.English,
+            I.events =
+              [ I.ICalEvent
+                  { I.summary = "【Rainmaker】Anarchy Battle (Series) / Hammerhead Bridge, Flounder Heights",
+                    I.description = "There is a scheduled Rainmaker from 04:00 to 06:00.\n- Anarchy Battle (Series)\n- Stages: Hammerhead Bridge, Flounder Heights",
                     I.start = TU.createUTCTime 2024 11 17 12 0,
                     I.end = TU.createUTCTime 2024 11 17 14 0,
                     I.reminders =
