@@ -3,7 +3,6 @@ module FilterTest (test) where
 import qualified Data.Time as T
 import qualified Filter as F
 import qualified ICal as I
-import Query (Rule (Rainmaker))
 import qualified Query as Q
 import qualified SplaApi as S
 import Test.Hspec (describe, hspec, it, shouldBe)
@@ -55,6 +54,17 @@ test = hspec $ do
               { start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Saturday
+              }
+      F.inTimeSlot apiStartTime apiEndTime utcOffset timeSlot `shouldBe` False
+    it "API: [13:00 (金), 15:00(金)), TimeSlot: [00:00, 00:00), 金 のとき、マッチする" $ do
+      let apiStartTime = TU.createUTCTime 2021 1 1 4 0 -- 日本では2021年1月1日13時 金曜日
+      let apiEndTime = TU.createUTCTime 2021 1 1 6 0 -- 日本では2021年1月1日15時
+      let utcOffset = TU.createTimeZone 9 ""
+      let timeSlot =
+            Q.TimeSlot
+              { start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
+                end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
+                dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
               }
       F.inTimeSlot apiStartTime apiEndTime utcOffset timeSlot `shouldBe` False
 

@@ -18,7 +18,7 @@ import qualified ICal as I
 import qualified Query as Q
 import qualified SplaApi as S
 import qualified Translation
-import Prelude (Bool (False, True), Maybe (Just, Nothing), and, const, elem, fst, map, not, or, ($), (&&), (*), (++), (.), (<$>), (==))
+import Prelude (Bool (False, True), Maybe (Just, Nothing), and, const, elem, fst, map, not, or, ($), (&&), (++), (.), (<$>), (==))
 
 maybeTrue :: (a -> Bool) -> Maybe a -> Bool
 maybeTrue = M.maybe True
