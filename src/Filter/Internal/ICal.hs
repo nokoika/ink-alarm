@@ -5,18 +5,14 @@ module Filter.Internal.ICal
   )
 where
 
-import qualified Filter.Internal.Schedule as FS
 import qualified Data.Maybe as M
-import qualified Data.Time as T
 import qualified Date
+import qualified Filter.Internal.Schedule as FS
 import qualified ICal as I
 import qualified Query as Q
 import qualified SplaApi as S
 import qualified Translation
-import Prelude (Bool (False, True), Maybe (Just, Nothing), and, const, elem, fst, map, not, or, ($), (&&), (++), (.), (<$>), (==))
-
-maybeTrue :: (a -> Bool) -> Maybe a -> Bool
-maybeTrue = M.maybe True
+import Prelude (Maybe (Just), (++), (==))
 
 convertNotificationsToReminders :: [Q.NotificationSetting] -> [I.Reminder]
 convertNotificationsToReminders notifications =

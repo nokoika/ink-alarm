@@ -136,14 +136,14 @@ test-suite spla-ical-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      DateTest
-      FilterTest
-      ICalTest
-      LibTest
-      QueryTest
-      SplaApiTest
+      Test.Date
+      Test.Filter
+      Test.ICal
+      Test.Lib
+      Test.Query
+      Test.SplaApi
+      Test.Translation
       TestUtil
-      TranslationTest
       Paths_spla_ical
   autogen-modules:
       Paths_spla_ical

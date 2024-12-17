@@ -1,4 +1,4 @@
-module SplaApiTest (test) where
+module Test.SplaApi (test) where
 
 import qualified Data.Aeson as A
 import qualified Data.ByteString.Lazy as BL

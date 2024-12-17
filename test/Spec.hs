@@ -1,18 +1,18 @@
-import qualified LibTest (test)
-import qualified ICalTest (test)
-import qualified SplaApiTest (test)
-import qualified QueryTest (test)
-import qualified DateTest (test)
-import qualified FilterTest (test)
-import qualified TranslationTest (test)
+import qualified Test.Lib (test)
+import qualified Test.ICal (test)
+import qualified Test.SplaApi (test)
+import qualified Test.Query (test)
+import qualified Test.Date (test)
+import qualified Test.Filter (test)
+import qualified Test.Translation (test)
 import Prelude (IO)
 
 main :: IO ()
 main = do
-  LibTest.test
-  ICalTest.test
-  SplaApiTest.test
-  QueryTest.test
-  DateTest.test
-  FilterTest.test
-  TranslationTest.test
+  Test.Lib.test
+  Test.ICal.test
+  Test.SplaApi.test
+  Test.Query.test
+  Test.Date.test
+  Test.Filter.test
+  Test.Translation.test

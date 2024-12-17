@@ -1,4 +1,4 @@
-module DateTest (test) where
+module Test.Date (test) where
 
 import qualified Data.Time as T
 import qualified Date as D (changeTimeZone, hasTimeRangesIntersect, isWithinTimeOfDay, isWithinTimeRange, timeOfDayFromString, timeRangesIntersect, timeZoneFromOffsetString, intersectTimeRangesWithLocalTime)

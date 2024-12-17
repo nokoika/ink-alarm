@@ -1,4 +1,4 @@
-module ICalTest (test) where
+module Test.ICal (test) where
 
 import Data.List (intercalate)
 import qualified ICal (ICalInput(..), ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTrigger (..), buildICalText)

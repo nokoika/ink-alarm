@@ -1,4 +1,4 @@
-module QueryTest (test) where
+module Test.Query (test) where
 
 import qualified Data.Text.IO as TIO (readFile)
 import qualified Query

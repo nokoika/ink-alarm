@@ -1,4 +1,4 @@
-module TranslationTest (test) where
+module Test.Translation (test) where
 
 import qualified Query as Q
 import qualified SplaApi as S
