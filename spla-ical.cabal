@@ -28,6 +28,8 @@ library
       Cache
       Date
       Filter
+      Filter.Internal.ICal
+      Filter.Internal.Schedule
       ICal
       Lib
       Query
