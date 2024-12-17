@@ -137,7 +137,8 @@ test-suite spla-ical-test
   main-is: Spec.hs
   other-modules:
       Test.Date
-      Test.Filter
+      Test.Filter.Internal.ICal
+      Test.Filter.Internal.Schedule
       Test.ICal
       Test.Lib
       Test.Query

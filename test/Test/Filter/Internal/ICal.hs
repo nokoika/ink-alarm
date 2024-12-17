@@ -1,4 +1,4 @@
-module Test.Filter (test) where
+module Test.Filter.Internal.ICal (test) where
 
 import qualified Data.Time as T
 import qualified Filter.Internal.Schedule as FS
