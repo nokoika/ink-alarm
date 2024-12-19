@@ -45,10 +45,11 @@ jobs:
         run: "stack --system-ghc test"
       - name: "E2E Test"
         run: |
-          # HTTP サーバーをバックグラウンドで起動
+          set -x
+
           stack --system-ghc exec -- spla-ical-exe &
           API_PID=$!
           # テストが終わったらサーバーを停止
-          trap 'kill $API_PID' EXIT
+          trap 'kill $API_PID && echo "API server stopped"' EXIT
           sleep 1
           ./test/e2e.sh
