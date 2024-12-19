@@ -17,7 +17,7 @@ jobs:
       - uses: "actions/checkout@v4"
       - uses: "actions/cache@v4"
         with:
-          path: "~/.stack"
+          path: "~/.stack" # Cache stack's global packages
           key: "\
             ${{ runner.os }}-stack\
             -${{ hashFiles('**/stack.yaml.lock') }}\
@@ -29,8 +29,9 @@ jobs:
           ghc-version: "${{ env.GHC_VERSION }}"
           enable-stack: true
           stack-version: "latest"
-      - run: "stack --system-ghc test"
+      - run: "stack --system-ghc build --only-dependencies"
       - run: "stack --system-ghc build"
+      - run: "stack --system-ghc test"
       - run: "stack --system-ghc exec -- hlint app/ src/ test/"
       - run: |
           find app/ src/ test/ -name "*.hs" | xargs -n1 stack exec -- ormolu --mode check
