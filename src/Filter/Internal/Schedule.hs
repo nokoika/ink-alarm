@@ -52,10 +52,17 @@ inStage apiStages Q.StageFilter {matchBothStages, stageIds} =
   where
     match = if matchBothStages then and else or
 
+
 inRules :: S.Rule -> [Q.Rule] -> Bool
 inRules S.Rule {key = apiRuleKey} rules = apiRuleKey `elem` ruleKeys
   where
-    ruleKeys = map S.convertQueryRule rules
+    ruleKeys = map convertRule rules
+    convertRule :: Q.Rule -> S.RuleKey
+    convertRule Q.TurfWar = S.TurfWar
+    convertRule Q.SplatZones = S.SplatZones
+    convertRule Q.TowerControl = S.TowerControl
+    convertRule Q.Rainmaker = S.Rainmaker
+    convertRule Q.ClamBlitz = S.ClamBlitz
 
 filterDefaultSchedule :: Q.FilterCondition -> S.DefaultSchedule -> T.TimeZone -> Q.MatchType -> Bool
 filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.DefaultSchedule {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset apiMatchType =

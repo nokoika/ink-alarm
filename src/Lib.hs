@@ -7,8 +7,9 @@ import qualified Filter
 import qualified ICal
 import qualified Query
 import qualified SplaApi
+import qualified SplaApi.Cached
 import qualified Web.Scotty as Scotty
-import Prelude (IO, Maybe (Just, Nothing), const, either, putStrLn, ($), Ord, Monad (return))
+import Prelude (IO, const, either, putStrLn, ($))
 
 -- - (できた) リクエスト内容の受理
 -- - (できた) 全スケジュールを確認するために Spla API を叩く
@@ -24,23 +25,22 @@ main :: IO ()
 main = do
   putStrLn "Starting server on port 8080"
 
-  scheduleCache :: SplaApi.ScheduleCache <- SplaApi.initScheduleCache
+  scheduleCache :: SplaApi.Cached.ScheduleCache <- SplaApi.Cached.initScheduleCache
 
   Scotty.scotty 8080 $ do
     Scotty.get "/api" $ handleApi scheduleCache
-
   where
-    handleApi :: SplaApi.ScheduleCache -> Scotty.ActionM ()
+    handleApi :: SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()
     handleApi scheduleCache = do
       -- クエリの取得とデコード
       base64Uri <- Scotty.queryParam "query" :: Scotty.ActionM T.Text
       either (const $ Scotty.text "Invalid query") (handleQuery scheduleCache) (Query.parseBase64Url base64Uri)
 
     -- クエリが有効な場合の処理
-    handleQuery :: SplaApi.ScheduleCache -> Query.QueryRoot -> Scotty.ActionM ()
+    handleQuery :: SplaApi.Cached.ScheduleCache -> Query.QueryRoot -> Scotty.ActionM ()
     handleQuery scheduleCache query = do
       -- APIからデータを取得
-      apiRes <- liftIO $ SplaApi.fetchScheduleWithCache scheduleCache
+      apiRes <- liftIO $ SplaApi.Cached.fetchScheduleWithCache scheduleCache
       either (const $ Scotty.text "Failed to fetch schedules") (handleSchedule query) apiRes
 
     -- スケジュールデータが取得できた場合の処理

@@ -8,17 +8,9 @@ module SplaApi
     EventMatch (..),
     EventSummary (..),
     fetchSchedule,
-    convertQueryRule,
-
-    -- Cache
-    scheduleCacheKey,
-    ScheduleCache,
-    initScheduleCache,
-    fetchScheduleWithCache
   )
 where
 
-import qualified Data.Cache as Cache
 import Control.Exception (SomeException, try)
 import Data.Aeson ((.:), (.:?))
 import qualified Data.Aeson as A
@@ -26,8 +18,7 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 import Data.Time as T
 import GHC.Generics (Generic)
 import qualified Network.HTTP.Conduit as H (simpleHttp)
-import qualified Query as Q
-import Prelude (Bool, Bounded, Either (Left, Right), Enum, Eq, IO, Int, Maybe (Just, Nothing), Show, String, fail, pure, return, show, ($), (++), (<$>), (<*>))
+import Prelude (Bool, Bounded, Either (Left, Right), Enum, Eq, IO, Int, Maybe, Show, String, fail, pure, return, show, ($), (++), (<$>), (<*>))
 
 newtype Root = Root
   { result :: Result
@@ -184,38 +175,3 @@ fetchSchedule = do
   case response of
     Left err -> return $ Left $ show err
     Right body -> return $ A.eitherDecode body
-
--- TODO: あとでモジュールを分ける
--- TODO: キャッシュのテスト
-
-type ScheduleCacheKey = ()
-scheduleCacheKey :: ScheduleCacheKey
-scheduleCacheKey = ()
-
-type ScheduleCache = Cache.Cache ScheduleCacheKey SplaApi.Root
-
-initScheduleCache :: IO ScheduleCache
-initScheduleCache = Cache.newCache (Just 1800) -- 有効期限30分
-
-fetchScheduleWithCache :: ScheduleCache -> IO (Either String SplaApi.Root)
-fetchScheduleWithCache cache = do
-  cachedData <- Cache.lookup cache scheduleCacheKey
-  case cachedData of
-    -- キャッシュが存在する場合はキャッシュを返す
-    Just value -> return (Right value)
-    Nothing -> do
-      -- キャッシュがない場合データを取得
-      apiRes <- fetchSchedule
-      case apiRes of
-        Left err -> return (Left err)
-        Right root -> do
-          -- 取得したデータをキャッシュに保存し、取得したデータを返す
-          Cache.insert cache scheduleCacheKey root
-          return (Right root)
-
-convertQueryRule :: Q.Rule -> RuleKey
-convertQueryRule Q.TurfWar = TurfWar
-convertQueryRule Q.SplatZones = SplatZones
-convertQueryRule Q.TowerControl = TowerControl
-convertQueryRule Q.Rainmaker = Rainmaker
-convertQueryRule Q.ClamBlitz = ClamBlitz

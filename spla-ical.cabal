@@ -33,6 +33,7 @@ library
       Lib
       Query
       SplaApi
+      SplaApi.Cached
       Translation
   other-modules:
       Paths_spla_ical
