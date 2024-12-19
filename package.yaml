@@ -30,6 +30,8 @@ dependencies:
   - bytestring
   - http-conduit
   - cache
+  - hlint
+  - ormolu
 
 ghc-options:
   - -Wall
@@ -41,6 +43,7 @@ ghc-options:
   - -Wmissing-home-modules
   - -Wpartial-fields
   - -Wredundant-constraints
+  - -Werror # すべての警告をエラーとして扱う
 
 default-extensions:
   - NoImplicitPrelude # Preludeを自動importしない。独自のPreludeを使いたいときに有効。

@@ -1,4 +1,7 @@
 module Main (main) where
 
-import Lib (main)
+import qualified Lib (main)
 import Prelude (IO)
+
+main :: IO ()
+main = Lib.main

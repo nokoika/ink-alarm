@@ -68,15 +68,17 @@ library
       Arrows
       RecursiveDo
       DeriveGeneric
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Werror
   build-depends:
       aeson
     , base >=4.7 && <5
     , base64-bytestring
     , bytestring
     , cache
+    , hlint
     , hspec
     , http-conduit
+    , ormolu
     , scotty
     , text
     , time
@@ -117,15 +119,17 @@ executable spla-ical-exe
       Arrows
       RecursiveDo
       DeriveGeneric
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
     , base >=4.7 && <5
     , base64-bytestring
     , bytestring
     , cache
+    , hlint
     , hspec
     , http-conduit
+    , ormolu
     , scotty
     , spla-ical
     , text
@@ -177,15 +181,17 @@ test-suite spla-ical-test
       Arrows
       RecursiveDo
       DeriveGeneric
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
     , base >=4.7 && <5
     , base64-bytestring
     , bytestring
     , cache
+    , hlint
     , hspec
     , http-conduit
+    , ormolu
     , scotty
     , spla-ical
     , text
