@@ -16,13 +16,14 @@ jobs:
     steps:
       - uses: "actions/checkout@v4"
       - uses: "actions/cache@v4"
-        path: "~/.stack"
-        key: "\
-          ${{ runner.os }}-stack\
-          -${{ hashFiles('**/stack.yaml.lock') }}\
-          -${{ hashFiles('**/package.yaml') }}\
-        "
-        restore-keys: "${{ runner.os }}-stack-"
+        with:
+          path: "~/.stack"
+          key: "\
+            ${{ runner.os }}-stack\
+            -${{ hashFiles('**/stack.yaml.lock') }}\
+            -${{ hashFiles('**/package.yaml') }}\
+          "
+          restore-keys: "${{ runner.os }}-stack-"
       - uses: "haskell-actions/setup@v2"
         with:
           ghc-version: "${{ env.GHC_VERSION }}"
