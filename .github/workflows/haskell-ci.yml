@@ -1,34 +1,36 @@
-name: Haskell CI
+name: "Haskell CI"
 
 on:
+  pull_request: null
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - "main"
+
+env:
+  GHC_VERSION: "9.4.8"
 
 jobs:
   build-and-check:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
 
     steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-stack@v2
+      - uses: "actions/checkout@v4"
+      - uses: "actions/cache@v4"
         with:
-          stack-version: '3.1.1'
-
-      - uses: actions/cache@v3
+        path: "~/.stack"
+        key: "\
+          ${{ runner.os }}-stack\
+          -${{ hashFiles('**/stack.yaml.lock') }}\
+          -${{ hashFiles('**/package.yaml') }}\
+        "
+        restore-keys: "${{ runner.os }}-stack-"
+      - uses: "haskell-actions/setup@v2"
         with:
-          path: |
-            ~/.stack
-            ~/.local/bin
-          key: ${{ runner.os }}-stack-${{ hashFiles('**/stack.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-stack-
-
-      - run: stack setup
-      - run: stack build
-      - run: stack exec -- hlint app/ src/ test/ --report=hlint-report.txt
+          ghc-version: "${{ env.GHC_VERSION }}"
+          enable-stack: true
+          stack-version: "latest"
+      - run: "stack --system-ghc test"
+      - run: "stack --system-ghc build"
+      - run: "stack --system-ghc exec -- hlint app/ src/ test/"
       - run: |
           find app/ src/ test/ -name "*.hs" | xargs -n1 stack exec -- ormolu --mode check
-      - run: stack test
