@@ -1,4 +1,5 @@
-module TestUtil (createUTCTime, createLocalTime, createTimeZone, createZonedTime) where
+module TestUtil (createUTCTime, 
+createLocalTime, createTimeZone, createZonedTime) where
 
 import Data.Time (LocalTime (LocalTime), TimeOfDay (TimeOfDay), TimeZone (TimeZone), UTCTime (UTCTime), ZonedTime (ZonedTime))
 import Data.Time.Calendar (fromGregorian)
