@@ -10,7 +10,6 @@ import Prelude (Bool (..), IO, Int, Maybe (Just, Nothing), ($))
 
 test :: IO ()
 test = hspec $ do
-
   describe "inTimeSlot" $ do
     it "API: [13:00 (金), 15:00(金)), TimeSlot: [12:00, 16:00), 金 のとき、マッチする" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 4 0 -- 日本では2021年1月1日13時 金曜日
@@ -583,4 +582,3 @@ test = hspec $ do
                 Q.notifications = Nothing
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` True
-

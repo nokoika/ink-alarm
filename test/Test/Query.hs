@@ -1,25 +1,25 @@
 module Test.Query (test) where
 
 import qualified Data.Text.IO as TIO (readFile)
+import qualified Data.Time.Calendar as C
+import qualified Data.Time.LocalTime as LT
 import qualified Query
-  ( TimeSlotDayOfWeek (..),
+  ( FilterCondition (..),
     Language (..),
-    FilterCondition (..),
+    MatchType (..),
     NotificationSetting (..),
     QueryRoot (..),
-    StageFilter (..),
-    UtcOffsetTimeZone (..),
-    TimeSlot (..),
-    TimeSlotTimeOfDay (..),
-    MatchType (..),
-    parseBase64Url,
     Rule (..),
+    StageFilter (..),
+    TimeSlot (..),
+    TimeSlotDayOfWeek (..),
+    TimeSlotTimeOfDay (..),
+    UtcOffsetTimeZone (..),
+    parseBase64Url,
   )
 import Test.Hspec (describe, hspec, it, shouldBe)
-import Prelude (Bool (True), IO, Maybe (Just), Either (Right), ($))
-import qualified Data.Time.LocalTime as LT
-import qualified Data.Time.Calendar as C
 import qualified TestUtil as TU
+import Prelude (Bool (True), Either (Right), IO, Maybe (Just), ($))
 
 test :: IO ()
 test = hspec $ do

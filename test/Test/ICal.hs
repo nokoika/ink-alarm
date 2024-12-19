@@ -1,10 +1,10 @@
 module Test.ICal (test) where
 
 import Data.List (intercalate)
-import qualified ICal (ICalInput(..), ICalEvent (..), Reminder (..), ReminderAction (..), ReminderTrigger (..), buildICalText)
+import qualified ICal (ICalEvent (..), ICalInput (..), Reminder (..), ReminderAction (..), ReminderTrigger (..), buildICalText)
+import qualified Query as Q
 import Test.Hspec (describe, hspec, it, shouldBe)
 import qualified TestUtil as TU
-import qualified Query as Q
 import Prelude (IO, ($))
 
 test :: IO ()

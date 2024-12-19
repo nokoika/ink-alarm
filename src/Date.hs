@@ -45,12 +45,11 @@ isWithinTimeRange :: LT.TimeOfDay -> LT.TimeOfDay -> T.LocalTime -> Bool
 isWithinTimeRange start end localTime =
   let t = LT.localTimeOfDay localTime
    in if start <= end
-        -- 通常の日付内の場合はそのまま範囲チェック
-        then start <= t && t < end
-        else
-          -- start > end の場合、日付またぎ。(ex: 23:00~01:00)
-          -- この場合、範囲外となる区間は [end, start) で連続している。
-          -- よって、範囲内はその否定、つまり t が [end, start) に入っていない場合。
+        then -- 通常の日付内の場合はそのまま範囲チェック
+          start <= t && t < end
+        else -- start > end の場合、日付またぎ。(ex: 23:00~01:00)
+        -- この場合、範囲外となる区間は [end, start) で連続している。
+        -- よって、範囲内はその否定、つまり t が [end, start) に入っていない場合。
           not (end <= t && t < start)
 
 -- 時間が区間に含まれるかどうかを判定
@@ -92,7 +91,6 @@ timeRangesIntersect s1 e1 s2 e2
 
     -- iStartから見て、e1がe2より先にくる（つまりiStart->e1->e2の順序）かどうかを判定するヘルパー関数
     isFirstEnd x y = isWithinTimeOfDay iStart y x
-
 
 -- TimeOfDayとLocalTimeの交差部分をMaybe LocalTimeで返す関数
 intersectTimeRangesWithLocalTime ::

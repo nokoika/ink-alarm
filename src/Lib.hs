@@ -27,7 +27,8 @@ main = do
 
   scheduleCache :: SplaApi.Cached.ScheduleCache <- SplaApi.Cached.initScheduleCache
 
-  Scotty.scotty 8080 $ do    -- 
+  Scotty.scotty 8080 $ do
+    --
     Scotty.get "/api" $ handleApi scheduleCache
   where
     handleApi :: SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()

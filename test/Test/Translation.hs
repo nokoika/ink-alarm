@@ -2,8 +2,8 @@ module Test.Translation (test) where
 
 import qualified Query as Q
 import qualified SplaApi as S
-import qualified TestUtil as TU
 import Test.Hspec (describe, hspec, it, shouldBe)
+import qualified TestUtil as TU
 import qualified Translation (showCalendarDescription, showCalendarSummary)
 import Prelude (IO, ($))
 
@@ -26,8 +26,7 @@ test = hspec $ do
         (S.Rule S.TurfWar "")
         [S.Stage {S.id = 1, S.name = "", S.image = ""}, S.Stage {S.id = 2, S.name = "", S.image = ""}]
         (TU.createZonedTime (2021, 1, 1, 21, 0) (9, ""), TU.createZonedTime (2021, 1, 1, 23, 0) (9, ""))
-        `shouldBe`
-        "21:00から23:00までナワバリバトルの予定があります。\n・レギュラーマッチ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区"
+        `shouldBe` "21:00から23:00までナワバリバトルの予定があります。\n・レギュラーマッチ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区"
 
     it "returns a description of the english calendar" $ do
       Translation.showCalendarDescription
@@ -36,5 +35,4 @@ test = hspec $ do
         (S.Rule S.TurfWar "")
         [S.Stage {S.id = 1, S.name = "", S.image = ""}, S.Stage {S.id = 2, S.name = "", S.image = ""}]
         (TU.createZonedTime (2021, 1, 1, 21, 0) (9, ""), TU.createZonedTime (2021, 1, 1, 23, 0) (9, ""))
-        `shouldBe`
-        "There is a scheduled Turf War from 21:00 to 23:00.\n- Regular Battle\n- Stages: Scorch Gorge, Eeltail Alley"
+        `shouldBe` "There is a scheduled Turf War from 21:00 to 23:00.\n- Regular Battle\n- Stages: Scorch Gorge, Eeltail Alley"

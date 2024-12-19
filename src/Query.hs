@@ -95,8 +95,7 @@ instance A.FromJSON Rule where
     _invalid -> fail $ "Invalid Rule: " ++ show t
 
 -- フィルタ条件
-data FilterCondition
-  = FilterCondition
+data FilterCondition = FilterCondition
   { matchType :: MatchType,
     stages :: Maybe StageFilter,
     rules :: Maybe [Rule],
@@ -116,12 +115,12 @@ data StageFilter = StageFilter
 
 instance A.FromJSON StageFilter
 
-newtype TimeSlotDayOfWeek = TimeSlotDayOfWeek { dayOfWeek :: C.DayOfWeek }
+newtype TimeSlotDayOfWeek = TimeSlotDayOfWeek {dayOfWeek :: C.DayOfWeek}
   deriving (Eq, Show)
 
 -- FromJSON インスタンスの実装
 instance A.FromJSON TimeSlotDayOfWeek where
-  parseJSON = A.withText "TimeSlotDayOfWeek" $ \t -> 
+  parseJSON = A.withText "TimeSlotDayOfWeek" $ \t ->
     case Text.toLower t of
       "mon" -> pure $ TimeSlotDayOfWeek C.Monday
       "tue" -> pure $ TimeSlotDayOfWeek C.Tuesday

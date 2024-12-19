@@ -1,8 +1,8 @@
 module Test.Filter.Internal.ICal (test) where
 
 import qualified Data.Time as T
-import qualified Filter.Internal.Schedule as FS
 import qualified Filter.Internal.ICal as FI
+import qualified Filter.Internal.Schedule as FS
 import qualified ICal as I
 import qualified Query as Q
 import qualified SplaApi as S

@@ -89,7 +89,8 @@ showMatchType Q.English Q.Regular = "Regular Battle"
 -- 例: 【ガチエリア】バンカラマッチ(オープン) / ユノハナ大渓谷, ゴンズイ地区
 showCalendarSummary :: Q.Language -> Q.MatchType -> S.Rule -> [S.Stage] -> String
 showCalendarSummary language matchType rule stages =
-  intercalate ""
+  intercalate
+    ""
     [ "【" ++ showRuleName language rule ++ "】", -- ex: 【ガチエリア】
       showMatchType language matchType, -- ex: バンカラマッチ(オープン)
       " / ",

@@ -1,7 +1,7 @@
 module Test.Date (test) where
 
 import qualified Data.Time as T
-import qualified Date as D (changeTimeZone, hasTimeRangesIntersect, isWithinTimeOfDay, isWithinTimeRange, timeOfDayFromString, timeRangesIntersect, timeZoneFromOffsetString, intersectTimeRangesWithLocalTime)
+import qualified Date as D (changeTimeZone, hasTimeRangesIntersect, intersectTimeRangesWithLocalTime, isWithinTimeOfDay, isWithinTimeRange, timeOfDayFromString, timeRangesIntersect, timeZoneFromOffsetString)
 import Test.Hspec (describe, hspec, it, shouldBe)
 import qualified TestUtil as TU
 import Prelude (Bool (..), IO, Maybe (Just, Nothing), ($))

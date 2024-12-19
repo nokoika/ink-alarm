@@ -12,8 +12,8 @@ import qualified SplaApi
     RuleKey (..),
     Stage (..),
   )
-import qualified TestUtil as TU
 import Test.Hspec (describe, hspec, it, shouldBe)
+import qualified TestUtil as TU
 import Prelude (Bool (False), Either (Right), IO, Maybe (Just), String, ($))
 
 test :: IO ()
