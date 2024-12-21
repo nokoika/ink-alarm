@@ -1,0 +1,52 @@
+name: "Production Deploy"
+
+on:
+  push:
+    branches:
+      - "main"
+  # push:
+  #   tags:
+  #     - 'v*'
+
+jobs:
+  deploy:
+    name: "Deploy"
+    runs-on: "ubuntu-latest"
+    environment: "production"
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Authenticate with Google Cloud"
+        uses: "google-github-actions/auth@v2"
+        with:
+          project_id: "${{ secrets.GCP_PROJECT }}"
+          workload_identity_provider: "${{ secrets.GCP_IDENTITY_PROVIDER }}"
+          service_account: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
+
+      - name: "Setup Google Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v2"
+
+      - name: "Configure Docker"
+        run: "gcloud auth configure-docker asia-northeast1-docker.pkg.dev"
+
+      - name: "Build Image"
+        uses: "docker/build-push-action@v6"
+        with:
+          push: true
+          tags: "${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.CONTAINER_NAME }}:${{ github.sha }}"
+          file: "hs-api/Dockerfile"
+          cache-from: "type=registry,ref=${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.CONTAINER_NAME }}:cache"
+          cache-to: "type=inline,mode=max"
+          platforms: "linux/amd64"
+          provenance: false
+
+      - name: "Deploy to Cloud Run"
+        uses: "google-github-actions/deploy-cloudrun@v2"
+        with:
+          service: "${{ secrets.RUN_SERVICE_NAME }}"
+          region: "asia-northeast1"
+          image: "${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.CONTAINER_NAME }}:${{ github.sha }}"
