@@ -19,6 +19,16 @@ jobs:
     steps:
       - name: "Checkout"
         uses: "actions/checkout@v4"
+      - name: "Cache stack's global packages"
+        uses: "actions/cache@v4"
+        with:
+          path: "~/.stack"
+          key: "\
+            ${{ runner.os }}-stack\
+            -${{ hashFiles('**/stack.yaml.lock') }}\
+            -${{ hashFiles('**/package.yaml') }}\
+          "
+          restore-keys: "${{ runner.os }}-stack-"
       - name: "Setup GHC and stack"
         uses: "haskell-actions/setup@v2"
         with:
