@@ -1,0 +1,5 @@
+[[check]]
+# StrictData 拡張を導入しているにも関わらず、なぜか指摘されてしまうため除外
+type = "Exclude"
+id = "STAN-0206"
+scope = "all"

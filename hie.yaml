@@ -1,0 +1,10 @@
+cradle:
+  stack:
+    stackYaml: "./api/stack.yaml"
+    components:
+      - path: "./api/src"
+        component: "spla-ical:lib"
+      - path: "./api/app"
+        component: "spla-ical:exe:spla-ical-exe"
+      - path: "./api/test"
+        component: "spla-ical:test:spla-ical-test"
