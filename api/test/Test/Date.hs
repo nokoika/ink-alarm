@@ -1,7 +1,7 @@
 module Test.Date (test) where
 
 import qualified Data.Time as T
-import qualified Date as D (changeTimeZone, hasTimeRangesIntersect, intersectTimeRangesWithLocalTime, isWithinTimeOfDay, isWithinTimeRange, timeOfDayFromString, timeRangesIntersect, timeZoneFromOffsetString)
+import qualified Date as D (changeTimeZone, hasTimeRangesIntersect, intersectTimeRangesWithLocalTime, isWithinTimeOfDay, timeOfDayFromString, timeRangesIntersect, timeZoneFromOffsetString)
 import Test.Hspec (describe, hspec, it, shouldBe)
 import qualified TestUtil as TU
 import Prelude (Bool (..), IO, Maybe (Just, Nothing), ($))
@@ -71,30 +71,6 @@ test = hspec $ do
       let T.ZonedTime {zonedTimeZone, zonedTimeToLocalTime} = D.changeTimeZone (TU.createUTCTime 2021 1 1 0 0) (TU.createTimeZone 1.5 "")
       zonedTimeToLocalTime `shouldBe` TU.createLocalTime 2021 1 1 1 30
       zonedTimeZone `shouldBe` TU.createTimeZone 1.5 ""
-
-  describe "isWithinTimeRange" $ do
-    it "should match" $ do
-      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 0 0) `shouldBe` True
-      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 0 30) `shouldBe` True
-      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 0 59) `shouldBe` True
-      -- 日をまたぐ
-      D.isWithinTimeRange (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 23 0) `shouldBe` True
-      D.isWithinTimeRange (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 23 59) `shouldBe` True
-      D.isWithinTimeRange (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 0 0) `shouldBe` True
-      D.isWithinTimeRange (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 0 59) `shouldBe` True
-
-    it "should not match" $ do
-      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 23 59) `shouldBe` False
-      -- Range が 0:00 - 1:00 であり、end は境界を含まないので 2021/1/1 1:00 は含まれない
-      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 1 0) `shouldBe` False
-      D.isWithinTimeRange (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 1 1) `shouldBe` False
-      -- 日をまたぐ
-      D.isWithinTimeRange (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 22 59) `shouldBe` False
-      D.isWithinTimeRange (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 1 0) `shouldBe` False
-      D.isWithinTimeRange (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 1 1) `shouldBe` False
-      D.isWithinTimeRange (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (TU.createLocalTime 2021 1 1 6 0) `shouldBe` False
-      -- 25時は想定しない
-      D.isWithinTimeRange (T.TimeOfDay 23 0 0) (T.TimeOfDay 25 0 0) (TU.createLocalTime 2021 1 1 0 0) `shouldBe` False
 
   describe "isWithinTimeOfDay" $ do
     it "should match" $ do

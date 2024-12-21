@@ -2,7 +2,6 @@ module Date
   ( changeTimeZone,
     timeOfDayFromString,
     timeZoneFromOffsetString,
-    isWithinTimeRange,
     isWithinTimeOfDay,
     hasTimeRangesIntersect,
     timeRangesIntersect,
@@ -47,20 +46,6 @@ timeZoneFromOffsetString offset = case offset of
     return $ T.minutesToTimeZone $ (hours * 60 + mins) * sign
   ['Z'] -> return T.utc
   _invalidInput -> Nothing
-
--- TODO: あとで消す
--- 時間が指定の範囲内かどうかを判定。start, endはHH:mm形式(Queryのほう)。localTimeはTZ調整されたLocalTime(SplaApiのほうを調整)のイメージ
--- end は境界を含まない
-isWithinTimeRange :: LT.TimeOfDay -> LT.TimeOfDay -> T.LocalTime -> Bool
-isWithinTimeRange start end localTime =
-  let t = LT.localTimeOfDay localTime
-   in if start <= end
-        then -- 通常の日付内の場合はそのまま範囲チェック
-          start <= t && t < end
-        else -- start > end の場合、日付またぎ。(ex: 23:00~01:00)
-        -- この場合、範囲外となる区間は [end, start) で連続している。
-        -- よって、範囲内はその否定、つまり t が [end, start) に入っていない場合。
-          not (end <= t && t < start)
 
 -- 時間が区間に含まれるかどうかを判定
 -- [start, end) に t が含まれるかどうか

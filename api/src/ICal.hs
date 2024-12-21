@@ -27,7 +27,6 @@ instance Show ReminderAction where
   show Display = "DISPLAY"
   show Email = "EMAIL"
 
--- TODO: 絶対時刻も指定できるようにする
 newtype ReminderTrigger = ReminderTrigger
   { time :: Int
   }
