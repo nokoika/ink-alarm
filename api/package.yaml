@@ -2,10 +2,6 @@ name: spla-ical
 github: "github.com/nokoika/spla-ical"
 author: "nokoika"
 
-extra-source-files:
-  - README.md
-  - CHANGELOG.md
-
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
 # category:            Web

@@ -12,6 +12,9 @@ env:
 jobs:
   build-and-check:
     runs-on: "ubuntu-latest"
+    defaults:
+      run:
+        working-directory: "api/"
 
     steps:
       - name: "Checkout"
@@ -20,11 +23,10 @@ jobs:
         uses: "actions/cache@v4"
         with:
           path: "~/.stack"
-          key: "\
+          key: |
             ${{ runner.os }}-stack\
             -${{ hashFiles('**/stack.yaml.lock') }}\
             -${{ hashFiles('**/package.yaml') }}\
-          "
           restore-keys: "${{ runner.os }}-stack-"
       - name: "Setup GHC and stack"
         uses: "haskell-actions/setup@v2"
@@ -49,7 +51,6 @@ jobs:
 
           stack --system-ghc exec -- spla-ical-exe &
           API_PID=$!
-          # テストが終わったらサーバーを停止
-          trap 'kill $API_PID && echo "API server stopped"' EXIT
           sleep 1
           ./test/e2e.sh
+          kill $API_PID

@@ -1,27 +1,22 @@
-cabal-version: 2.2
+cabal-version: 1.12
 
 -- This file has been generated from package.yaml by hpack version 0.37.0.
 --
 -- see: https://github.com/sol/hpack
 
 name:           spla-ical
-version:        0.1.0.0
+version:        0.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/spla-ical#readme>
-homepage:       https://github.com/githubuser/spla-ical#readme
-bug-reports:    https://github.com/githubuser/spla-ical/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2024 Author name here
-license:        BSD-3-Clause
-license-file:   LICENSE
+homepage:       https://github.com/github.com/nokoika#readme
+bug-reports:    https://github.com/github.com/nokoika/issues
+author:         nokoika
+maintainer:     nokoika
 build-type:     Simple
-extra-source-files:
-    README.md
-    CHANGELOG.md
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/spla-ical
+  location: https://github.com/github.com/nokoika
+  subdir: spla-ical
 
 library
   exposed-modules:
@@ -36,8 +31,6 @@ library
       SplaApi.Cached
       Translation
   other-modules:
-      Paths_spla_ical
-  autogen-modules:
       Paths_spla_ical
   hs-source-dirs:
       src
@@ -87,8 +80,6 @@ library
 executable spla-ical-exe
   main-is: Main.hs
   other-modules:
-      Paths_spla_ical
-  autogen-modules:
       Paths_spla_ical
   hs-source-dirs:
       app
@@ -149,8 +140,6 @@ test-suite spla-ical-test
       Test.SplaApi
       Test.Translation
       TestUtil
-      Paths_spla_ical
-  autogen-modules:
       Paths_spla_ical
   hs-source-dirs:
       test
