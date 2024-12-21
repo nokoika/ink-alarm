@@ -36,6 +36,7 @@ jobs:
       - name: "Build Image"
         uses: "docker/build-push-action@v6"
         with:
+          context: "hs-api"
           push: true
           tags: "${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.CONTAINER_NAME }}:${{ github.sha }}"
           file: "hs-api/Dockerfile"
