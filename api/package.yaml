@@ -63,7 +63,7 @@ default-extensions:
   - OverloadedStrings
   - Arrows
   - RecursiveDo
-  - DeriveGeneric # Aesonのため
+  - DeriveGeneric # Aeson のため
 
 library:
   source-dirs: src
