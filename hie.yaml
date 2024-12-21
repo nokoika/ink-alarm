@@ -1,10 +1,10 @@
 cradle:
   stack:
-    stackYaml: "./api/stack.yaml"
+    stackYaml: "./hs-api/stack.yaml"
     components:
-      - path: "./api/src"
+      - path: "./hs-api/src"
         component: "spla-ical:lib"
-      - path: "./api/app"
+      - path: "./hs-api/app"
         component: "spla-ical:exe:spla-ical-exe"
-      - path: "./api/test"
+      - path: "./hs-api/test"
         component: "spla-ical:test:spla-ical-test"
