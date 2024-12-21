@@ -1,0 +1,33 @@
+{
+  "name": "spla-ical",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nokoika/spla-ical.git"
+  },
+  "author": "nokoika",
+  "license": "AGPL-3.0-or-later",
+  "homepage": "https://github.com/nokoika/spla-ical#readme",
+  "bugs": {
+    "url": "https://github.com/nokoika/spla-ical/issues"
+  },
+  "engines": {
+    "bun": "^1.1.42"
+  },
+  "scripts": {
+    "postinstall": "simple-git-hooks",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "lint-staged": "^15.2.11",
+    "simple-git-hooks": "^2.11.1"
+  },
+  "lint-staged": {
+    "*.hs": [
+      "stack exec -- ormolu --mode check",
+      "stack exec -- hlint"
+    ]
+  },
+  "simple-git-hooks": {
+    "pre-commit": "bunx lint-staged"
+  }
+}

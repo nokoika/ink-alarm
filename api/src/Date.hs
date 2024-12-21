@@ -1,4 +1,14 @@
-module Date (changeTimeZone, timeOfDayFromString, timeZoneFromOffsetString, isWithinTimeRange, isWithinTimeOfDay, hasTimeRangesIntersect, timeRangesIntersect, intersectTimeRangesWithLocalTime) where
+module Date
+  ( changeTimeZone,
+    timeOfDayFromString,
+    timeZoneFromOffsetString,
+    isWithinTimeRange,
+    isWithinTimeOfDay,
+    hasTimeRangesIntersect,
+    timeRangesIntersect,
+    intersectTimeRangesWithLocalTime,
+  )
+where
 
 import Control.Monad (guard)
 import qualified Data.Time as T
