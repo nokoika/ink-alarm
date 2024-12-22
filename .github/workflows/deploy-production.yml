@@ -40,8 +40,8 @@ jobs:
           push: true
           tags: "${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.CONTAINER_NAME }}:${{ github.sha }}"
           file: "hs-api/Dockerfile"
-          cache-from: "type=registry,ref=${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.CONTAINER_NAME }}:cache"
-          cache-to: "type=inline,mode=max"
+          # ビルドステージのイメージサイズが9GBくらいあってキャッシュするのが厳しいため、キャッシュしないです。
+          # deploy はめっちゃ遅いので、リリース頻度高くなったら GCS などにキャッシュするかも
           platforms: "linux/amd64"
           provenance: false
 
