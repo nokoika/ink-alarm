@@ -33,11 +33,6 @@ jobs:
       - name: "Configure Docker"
         run: "gcloud auth configure-docker asia-northeast1-docker.pkg.dev"
 
-      - name: "権限確認"
-        run: "gcloud projects get-iam-policy $GCP_PROJECT"
-        env:
-          GCP_PROJECT: "${{ secrets.GCP_PROJECT }}"
-
       - name: "Build Image"
         uses: "docker/build-push-action@v6"
         with:
