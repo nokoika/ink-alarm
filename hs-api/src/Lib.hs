@@ -3,6 +3,8 @@ module Lib (main) where
 import Control.Monad.IO.Class (liftIO)
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
+-- TODO: あとで print 等に変更
+import Debug.Trace (traceShow)
 import qualified Filter
 import qualified ICal
 import qualified Query
@@ -42,7 +44,7 @@ main = do
     handleQuery scheduleCache query = do
       -- APIからデータを取得
       apiRes <- liftIO $ SplaApi.Cached.fetchScheduleWithCache scheduleCache
-      either (const $ Scotty.text "Failed to fetch schedules") (handleSchedule query) apiRes
+      either (\e -> traceShow e (Scotty.text "Failed to fetch schedules")) (handleSchedule query) apiRes
 
     -- スケジュールデータが取得できた場合の処理
     handleSchedule :: Query.QueryRoot -> SplaApi.Root -> Scotty.ActionM ()
