@@ -40,8 +40,8 @@ jobs:
           push: true
           tags: "${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.CONTAINER_NAME }}:${{ github.sha }}"
           file: "hs-api/Dockerfile"
-          cache-from: "type=gha"
-          cache-to: "type=gha,mode=max"
+          cache-from: "type=registry,ref=${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.CONTAINER_NAME }}:cache"
+          cache-to: "type=inline,mode=max"
           platforms: "linux/amd64"
           provenance: false
 
