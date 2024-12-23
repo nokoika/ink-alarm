@@ -21,6 +21,7 @@ dependencies:
   - base64-bytestring
   - bytestring
   - http-conduit
+  - http-types
   - cache
   - hlint
   - ormolu

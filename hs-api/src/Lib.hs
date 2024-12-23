@@ -3,42 +3,49 @@ module Lib (main) where
 import Control.Monad.IO.Class (liftIO)
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
--- TODO: あとで print 等に変更
-import Debug.Trace (traceShow)
 import qualified Filter
 import qualified ICal
+import qualified Network.HTTP.Types.Status as Status
 import qualified Query
 import qualified SplaApi
 import qualified SplaApi.Cached
 import qualified Web.Scotty as Scotty
-import Prelude (IO, const, either, putStrLn, ($))
+import Prelude (IO, String, either, putStrLn, ($), (++), (.), (>>=))
 
 main :: IO ()
 main = do
   putStrLn "Starting server on port 8080"
+  scheduleCache <- SplaApi.Cached.initScheduleCache
+  startServer scheduleCache
 
-  scheduleCache :: SplaApi.Cached.ScheduleCache <- SplaApi.Cached.initScheduleCache
+startServer :: SplaApi.Cached.ScheduleCache -> IO ()
+startServer scheduleCache =
+  Scotty.scotty 8080 $
+    Scotty.get "/api" $
+      handleApi scheduleCache
 
-  Scotty.scotty 8080 $ do
-    --
-    Scotty.get "/api" $ handleApi scheduleCache
-  where
-    handleApi :: SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()
-    handleApi scheduleCache = do
-      -- クエリの取得とデコード
-      base64Uri <- Scotty.queryParam "query" :: Scotty.ActionM T.Text
-      either (const $ Scotty.text "Invalid query") (handleQuery scheduleCache) (Query.parseBase64Url base64Uri)
+-- API を受け付けて Query をパースする
+handleApi :: SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()
+handleApi scheduleCache =
+  (Scotty.queryParam "query" :: Scotty.ActionM T.Text) >>= \base64Uri ->
+    either handleClientError (processQuery scheduleCache) (Query.parseBase64Url base64Uri)
 
-    -- クエリが有効な場合の処理
-    handleQuery :: SplaApi.Cached.ScheduleCache -> Query.QueryRoot -> Scotty.ActionM ()
-    handleQuery scheduleCache query = do
-      -- APIからデータを取得
-      apiRes <- liftIO $ SplaApi.Cached.fetchScheduleWithCache scheduleCache
-      either (\e -> traceShow e (Scotty.text "Failed to fetch schedules")) (handleSchedule query) apiRes
+processQuery :: SplaApi.Cached.ScheduleCache -> Query.QueryRoot -> Scotty.ActionM ()
+processQuery scheduleCache query = do
+  liftIO (SplaApi.Cached.fetchScheduleWithCache scheduleCache)
+    >>= either handleInternalError (generateICal query)
 
-    -- スケジュールデータが取得できた場合の処理
-    handleSchedule :: Query.QueryRoot -> SplaApi.Root -> Scotty.ActionM ()
-    handleSchedule query SplaApi.Root {result} = do
-      let filteredSchedules = Filter.createIcalInput query result
-          iCalText = ICal.buildICalText filteredSchedules
-      Scotty.text $ TL.pack iCalText
+generateICal :: Query.QueryRoot -> SplaApi.Root -> Scotty.ActionM ()
+generateICal query = Scotty.text . TL.pack . ICal.buildICalText . Filter.createIcalInput query . SplaApi.result
+
+handleClientError :: String -> Scotty.ActionM ()
+handleClientError err = do
+  liftIO $ putStrLn $ "Invalid Request: " ++ err
+  Scotty.status Status.badRequest400
+  Scotty.text "Invalid request"
+
+handleInternalError :: String -> Scotty.ActionM ()
+handleInternalError err = do
+  liftIO $ putStrLn $ "Internal Server Error: " ++ err
+  Scotty.status Status.internalServerError500
+  Scotty.text "Internal server error"

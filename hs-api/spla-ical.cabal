@@ -71,6 +71,7 @@ library
     , hlint
     , hspec
     , http-conduit
+    , http-types
     , ormolu
     , scotty
     , text
@@ -120,6 +121,7 @@ executable spla-ical-exe
     , hlint
     , hspec
     , http-conduit
+    , http-types
     , ormolu
     , scotty
     , spla-ical
@@ -180,6 +182,7 @@ test-suite spla-ical-test
     , hlint
     , hspec
     , http-conduit
+    , http-types
     , ormolu
     , scotty
     , spla-ical
