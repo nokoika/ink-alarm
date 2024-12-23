@@ -6,20 +6,20 @@ type SplatoonStageScheduleQuery = {
 
 type FilterCondition =
   | {
-      matchType: "bankara_open" | "bankara_challenge" | "x";
-      stages?: {
-        matchBothStages: boolean; // 指定ステージが両方含まれている場合かどちらか含まれている場合かの条件
-        stageIds: number[]; // ステージIDのリスト。1~20の範囲で指定
-      };
-      rules?: ("TURF_WAR" | "AREA" | "LOFT" | "GOAL" | "CLAM")[]; // 試合のルール指定（複数可）
-      timeSlots?: TimeSlot[]; // 出力する時間帯指定（複数可）
-      notifications?: NotificationSetting[]; // 通知設定（複数可）
-    }
-  | {
-      matchType: "regular" | "event";
-      timeSlots?: TimeSlot[]; // 出力する時間帯指定（複数可）
-      notifications?: NotificationSetting[]; // 通知設定（複数可）
+    mode: "bankara_open" | "bankara_challenge" | "x";
+    stages?: {
+      matchBothStages: boolean; // 指定ステージが両方含まれている場合かどちらか含まれている場合かの条件
+      stageIds: number[]; // ステージIDのリスト。1~20の範囲で指定
     };
+    rules?: ("TURF_WAR" | "AREA" | "LOFT" | "GOAL" | "CLAM")[]; // 試合のルール指定（複数可）
+    timeSlots?: TimeSlot[]; // 出力する時間帯指定（複数可）
+    notifications?: NotificationSetting[]; // 通知設定（複数可）
+  }
+  | {
+    matchType: "regular" | "event";
+    timeSlots?: TimeSlot[]; // 出力する時間帯指定（複数可）
+    notifications?: NotificationSetting[]; // 通知設定（複数可）
+  };
 
 type TimeSlot = {
   start: string;
@@ -51,7 +51,7 @@ const sampleQuery: SplatoonStageScheduleQuery = {
   language: "ja",
   filters: [
     {
-      matchType: "bankara_open",
+      mode: "bankara_open",
       stages: {
         matchBothStages: false,
         stageIds: [3, 14],
@@ -67,10 +67,10 @@ const sampleQuery: SplatoonStageScheduleQuery = {
           end: "01:00",
         },
       ],
-      notifications: [{ minutesBefore: 10 }, { minutesBefore: 30 }],
+      notifications: [{minutesBefore: 10}, {minutesBefore: 30}],
     },
     {
-      matchType: "x",
+      mode: "x",
       rules: ["AREA", "CLAM"],
       timeSlots: [
         {
@@ -82,17 +82,17 @@ const sampleQuery: SplatoonStageScheduleQuery = {
           end: "20:00",
         },
       ],
-      notifications: [{ minutesBefore: 15 }],
+      notifications: [{minutesBefore: 15}],
     },
     {
-      matchType: "event",
+      mode: "event",
       timeSlots: [
         {
           start: "08:00",
           end: "10:00",
         },
       ],
-      notifications: [{ minutesBefore: 5 }, { minutesBefore: 20 }],
+      notifications: [{minutesBefore: 5}, {minutesBefore: 20}],
     },
   ],
 };
@@ -106,7 +106,7 @@ const sampleICalEvents: ICalEvent[] = [
     start: "2022-09-14T13:00:00+09:00",
     end: "2022-09-14T15:00:00+09:00",
     url: "https://xxxxxxxx",
-    reminders: [{ trigger: "-PT10M" }, { trigger: "-PT30M" }],
+    reminders: [{trigger: "-PT10M"}, {trigger: "-PT30M"}],
   },
   {
     summary: "イベントマッチ - タラポートショッピングパーク",
@@ -115,7 +115,7 @@ const sampleICalEvents: ICalEvent[] = [
     start: "2022-09-16T08:00:00+09:00",
     end: "2022-09-16T10:00:00+09:00",
     url: "https://xxxxxxxx",
-    reminders: [{ trigger: "-PT10M" }, { trigger: "-PT30M" }],
+    reminders: [{trigger: "-PT10M"}, {trigger: "-PT30M"}],
   },
 ];
 

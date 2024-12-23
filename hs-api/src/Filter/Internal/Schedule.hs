@@ -63,11 +63,11 @@ inRules S.Rule {key = apiRuleKey} rules = apiRuleKey `elem` ruleKeys
     convertRule Q.Rainmaker = S.Rainmaker
     convertRule Q.ClamBlitz = S.ClamBlitz
 
-filterDefaultSchedule :: Q.FilterCondition -> S.DefaultSchedule -> T.TimeZone -> Q.MatchType -> Bool
-filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.DefaultSchedule {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset apiMatchType =
+filterDefaultSchedule :: Q.FilterCondition -> S.DefaultSchedule -> T.TimeZone -> Q.Mode -> Bool
+filterDefaultSchedule Q.FilterCondition {mode, stages, rules, timeSlots} S.DefaultSchedule {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset apiMode =
   and
     [ not apiIsFest, -- フェスの場合はデフォルトスケジュールのルールで遊ぶことができない
-      matchType == apiMatchType, -- マッチタイプ(オープンかXマッチか等)が一致するか
+      mode == apiMode, -- モード(オープンかXマッチか等)が一致するか
       maybeTrue (inTimeSlots apiStartTime apiEndTime utcOffset) timeSlots, -- 時間帯が通知設定にかぶっているか。未指定の場合は任意の時間でマッチ
       maybeTrue (inMaybeStages apiStages) stages, -- 選んだステージがスケジュールに含まれているか。未指定の場合は任意のステージでマッチ
       maybeTrue (inMaybeRules apiRule) rules -- ルールが指定したものに含まれるか。未指定の場合は任意のルールでマッチ
@@ -79,10 +79,10 @@ filterDefaultSchedule Q.FilterCondition {matchType, stages, rules, timeSlots} S.
     inMaybeRules apiRule' selectedRules = maybeTrue (`inRules` selectedRules) apiRule'
 
 filterEventMatch :: Q.FilterCondition -> S.EventMatch -> T.TimeZone -> Bool
-filterEventMatch Q.FilterCondition {stages, rules, timeSlots, matchType} S.EventMatch {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset =
+filterEventMatch Q.FilterCondition {stages, rules, timeSlots, mode} S.EventMatch {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset =
   and
     [ not apiIsFest, -- フェスの場合にイベントマッチが来ることはない
-      matchType == Q.Event, -- マッチタイプがイベントであること
+      mode == Q.Event, -- モードがイベントであること
       maybeTrue (inTimeSlots apiStartTime apiEndTime utcOffset) timeSlots, -- 時間帯が通知設定にかぶっているか。未指定の場合は任意の時間でマッチ
       maybeTrue (inStage apiStages) stages, -- 選んだステージがスケジュールに含まれているか。未指定の場合は任意のステージでマッチ
       maybeTrue (inRules apiRule) rules -- ルールが指定したものに含まれるか。未指定の場合は任意のルールでマッチ

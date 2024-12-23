@@ -84,25 +84,25 @@ showRuleName Q.English S.Rule {key} = case key of
   S.ClamBlitz -> "Clam Blitz"
   S.TurfWar -> "Turf War"
 
-showMatchType :: Q.Language -> Q.MatchType -> String
-showMatchType Q.Japanese Q.BankaraOpen = "バンカラオープン"
-showMatchType Q.Japanese Q.BankaraChallenge = "バンカラチャレンジ"
-showMatchType Q.Japanese Q.XMatch = "Xマッチ"
-showMatchType Q.Japanese Q.Regular = "レギュラーマッチ"
-showMatchType Q.Japanese Q.Event = "イベントマッチ"
-showMatchType Q.English Q.BankaraOpen = "Anarchy Battle (Open)"
-showMatchType Q.English Q.BankaraChallenge = "Anarchy Battle (Series)"
-showMatchType Q.English Q.XMatch = "X Battle"
-showMatchType Q.English Q.Event = "Challenge"
-showMatchType Q.English Q.Regular = "Regular Battle"
+showMode :: Q.Language -> Q.Mode -> String
+showMode Q.Japanese Q.BankaraOpen = "バンカラオープン"
+showMode Q.Japanese Q.BankaraChallenge = "バンカラチャレンジ"
+showMode Q.Japanese Q.XMatch = "Xマッチ"
+showMode Q.Japanese Q.Regular = "レギュラーマッチ"
+showMode Q.Japanese Q.Event = "イベントマッチ"
+showMode Q.English Q.BankaraOpen = "Anarchy Battle (Open)"
+showMode Q.English Q.BankaraChallenge = "Anarchy Battle (Series)"
+showMode Q.English Q.XMatch = "X Battle"
+showMode Q.English Q.Event = "Challenge"
+showMode Q.English Q.Regular = "Regular Battle"
 
 -- 例: 【ガチエリア】バンカラマッチ(オープン) / ユノハナ大渓谷, ゴンズイ地区
-showCalendarSummary :: Q.Language -> Q.MatchType -> S.Rule -> [S.Stage] -> String
-showCalendarSummary language matchType rule stages =
+showCalendarSummary :: Q.Language -> Q.Mode -> S.Rule -> [S.Stage] -> String
+showCalendarSummary language mode rule stages =
   intercalate
     ""
     [ "【" ++ showRuleName language rule ++ "】", -- ex: 【ガチエリア】
-      showMatchType language matchType, -- ex: バンカラマッチ(オープン)
+      showMode language mode, -- ex: バンカラマッチ(オープン)
       " / ",
       intercalate ", " $ map (showStageName language) stages -- ex: ユノハナ大渓谷, ゴンズイ地区
     ]
@@ -118,18 +118,18 @@ showZonedTime = T.formatTime T.defaultTimeLocale "%H:%M"
 -- There is a Splat Zones schedule from 21:00 to 23:00.
 -- - Bankara Match
 -- - Stages: Scorch Gorge, Eeltail Alley
-showCalendarDescription :: Q.Language -> Q.MatchType -> S.Rule -> [S.Stage] -> (T.ZonedTime, T.ZonedTime) -> String
-showCalendarDescription Q.Japanese matchType rule stages (startTime, endTime) =
+showCalendarDescription :: Q.Language -> Q.Mode -> S.Rule -> [S.Stage] -> (T.ZonedTime, T.ZonedTime) -> String
+showCalendarDescription Q.Japanese mode rule stages (startTime, endTime) =
   intercalate
     "\n"
     [ showZonedTime startTime ++ "から" ++ showZonedTime endTime ++ "まで" ++ showRuleName Q.Japanese rule ++ "の予定があります。",
-      "・" ++ showMatchType Q.Japanese matchType,
+      "・" ++ showMode Q.Japanese mode,
       "・ステージ: " ++ intercalate ", " (map (showStageName Q.Japanese) stages)
     ]
-showCalendarDescription Q.English matchType rule stages (startTime, endTime) =
+showCalendarDescription Q.English mode rule stages (startTime, endTime) =
   intercalate
     "\n"
     [ "There is a scheduled " ++ showRuleName Q.English rule ++ " from " ++ showZonedTime startTime ++ " to " ++ showZonedTime endTime ++ ".",
-      "- " ++ showMatchType Q.English matchType,
+      "- " ++ showMode Q.English mode,
       "- Stages: " ++ intercalate ", " (map (showStageName Q.English) stages)
     ]

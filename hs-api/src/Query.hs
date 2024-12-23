@@ -8,7 +8,7 @@ module Query
     TimeSlotTimeOfDay (..),
     TimeSlotDayOfWeek (..),
     Language (..),
-    MatchType (..),
+    Mode (..),
     Rule (..),
     parseBase64Url,
   )
@@ -58,8 +58,8 @@ instance A.FromJSON UtcOffsetTimeZone where
     Just timeZone -> pure $ UtcOffsetTimeZone timeZone
     Nothing -> fail $ "Invalid UtcOffsetTimeZone: " ++ show t
 
--- matchType (オープン, チャレンジ, X, レギュラー, イベント)
-data MatchType
+-- mode (オープン, チャレンジ, X, レギュラー, イベント)
+data Mode
   = BankaraOpen
   | BankaraChallenge
   | XMatch
@@ -67,14 +67,14 @@ data MatchType
   | Event
   deriving (Show, Eq, Generic, Enum, Bounded)
 
-instance A.FromJSON MatchType where
-  parseJSON = A.withText "MatchType" $ \t -> case t of
+instance A.FromJSON Mode where
+  parseJSON = A.withText "Mode" $ \t -> case t of
     "bankara_open" -> pure BankaraOpen
     "bankara_challenge" -> pure BankaraChallenge
     "x" -> pure XMatch
     "regular" -> pure Regular
     "event" -> pure Event
-    _invalid -> fail $ "Invalid MatchType: " ++ show t
+    _invalid -> fail $ "Invalid Mode: " ++ show t
 
 -- ルール(ガチエリア, ガチヤグラ, ガチホコ, ガチアサリ, ナワバリ)
 data Rule
@@ -96,7 +96,7 @@ instance A.FromJSON Rule where
 
 -- フィルタ条件
 data FilterCondition = FilterCondition
-  { matchType :: MatchType,
+  { mode :: Mode,
     stages :: Maybe StageFilter,
     rules :: Maybe [Rule],
     timeSlots :: Maybe [TimeSlot],

@@ -20,11 +20,11 @@ convertNotificationsToReminders notifications =
     | Q.NotificationSetting {Q.minutesBefore} <- notifications
   ]
 
-createICalEventsFromDefaultSchedules :: Q.QueryRoot -> [S.DefaultSchedule] -> Q.MatchType -> [I.ICalEvent]
-createICalEventsFromDefaultSchedules Q.QueryRoot {utcOffset, filters, language} defaultSchedules matchType =
+createICalEventsFromDefaultSchedules :: Q.QueryRoot -> [S.DefaultSchedule] -> Q.Mode -> [I.ICalEvent]
+createICalEventsFromDefaultSchedules Q.QueryRoot {utcOffset, filters, language} defaultSchedules mode =
   [ I.ICalEvent
-      { I.summary = Translation.showCalendarSummary language matchType apiRule apiStages,
-        I.description = Translation.showCalendarDescription language matchType apiRule apiStages timeRange,
+      { I.summary = Translation.showCalendarSummary language mode apiRule apiStages,
+        I.description = Translation.showCalendarDescription language mode apiRule apiStages timeRange,
         I.start = startTime,
         I.end = endTime,
         I.reminders = convertNotificationsToReminders (M.fromMaybe [] (Q.notifications filter))
@@ -33,7 +33,7 @@ createICalEventsFromDefaultSchedules Q.QueryRoot {utcOffset, filters, language} 
       let Q.UtcOffsetTimeZone utcOffset' = utcOffset
           timeRange = (Date.changeTimeZone startTime utcOffset', Date.changeTimeZone endTime utcOffset'),
       filter <- filters,
-      FS.filterDefaultSchedule filter defaultSchedule utcOffset' matchType
+      FS.filterDefaultSchedule filter defaultSchedule utcOffset' mode
   ]
 
 createICalEventsFromEventMatches :: Q.QueryRoot -> [S.EventMatch] -> [I.ICalEvent]

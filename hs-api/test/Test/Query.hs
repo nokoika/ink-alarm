@@ -6,7 +6,7 @@ import qualified Data.Time.LocalTime as LT
 import qualified Query
   ( FilterCondition (..),
     Language (..),
-    MatchType (..),
+    Mode (..),
     NotificationSetting (..),
     QueryRoot (..),
     Rule (..),
@@ -34,7 +34,7 @@ test = hspec $ do
                     Query.utcOffset = Query.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                     Query.filters =
                       [ Query.FilterCondition
-                          { Query.matchType = Query.BankaraOpen,
+                          { Query.mode = Query.BankaraOpen,
                             Query.stages =
                               Just
                                 ( Query.StageFilter
