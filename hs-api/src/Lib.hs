@@ -13,16 +13,6 @@ import qualified SplaApi.Cached
 import qualified Web.Scotty as Scotty
 import Prelude (IO, const, either, putStrLn, ($))
 
--- - (できた) リクエスト内容の受理
--- - (できた) 全スケジュールを確認するために Spla API を叩く
---   - (まだ) リクエストした内容は cloudrun 内にキャッシュする。有効期限も 30 分程度でセットする
---   - (まだ) インメモリキャッシュがある場合はリクエスト自体スキップ
--- - (できた) 必要なスケジュールだけになるよう filter する
---   - request query によって、ステージ名、ルール名、時間帯を絞る
---   - 条件は複雑なので base64URL でエンコードしてリクエストする
--- - (できた) iCal 形式のテキストを生成する
--- - response を返す
-
 main :: IO ()
 main = do
   putStrLn "Starting server on port 8080"
