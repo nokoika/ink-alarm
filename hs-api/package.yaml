@@ -23,6 +23,8 @@ dependencies:
   - http-conduit
   - http-types
   - cache
+  - memory
+  - cryptonite
   - hlint
   - ormolu
 

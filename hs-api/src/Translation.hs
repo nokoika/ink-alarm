@@ -1,10 +1,20 @@
-module Translation (showCalendarSummary, showCalendarDescription) where
+module Translation (showCalendarSummary, showCalendarDescription, showApplicationName, showICalProdId) where
 
 import Data.List (intercalate)
 import qualified Data.Time as T
 import qualified Query as Q
 import qualified SplaApi as S
 import Prelude (String, map, ($), (++))
+
+-- TODO: 正式なサービス名が決まったら変更する
+showApplicationName :: Q.Language -> String
+showApplicationName Q.Japanese = "spla-ical"
+showApplicationName Q.English = "spla-ical"
+
+-- PRODID:-//組織名//製品名//言語
+showICalProdId :: Q.Language -> String
+showICalProdId Q.Japanese = "-//nokoika//" ++ showApplicationName Q.Japanese ++ " github.com/nokoika/spla-ical//JA"
+showICalProdId Q.English = "-//nokoika//" ++ showApplicationName Q.English ++ " github.com/nokoika/spla-ical//EN"
 
 showStageName :: Q.Language -> S.Stage -> String
 showStageName Q.Japanese S.Stage {id} = case id of

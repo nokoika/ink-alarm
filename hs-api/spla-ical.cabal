@@ -24,6 +24,7 @@ library
       Filter
       Filter.Internal.ICal
       Filter.Internal.Schedule
+      Hash
       ICal
       Lib
       Query
@@ -68,10 +69,12 @@ library
     , base64-bytestring
     , bytestring
     , cache
+    , cryptonite
     , hlint
     , hspec
     , http-conduit
     , http-types
+    , memory
     , ormolu
     , scotty
     , text
@@ -118,10 +121,12 @@ executable spla-ical-exe
     , base64-bytestring
     , bytestring
     , cache
+    , cryptonite
     , hlint
     , hspec
     , http-conduit
     , http-types
+    , memory
     , ormolu
     , scotty
     , spla-ical
@@ -136,6 +141,7 @@ test-suite spla-ical-test
       Test.Date
       Test.Filter.Internal.ICal
       Test.Filter.Internal.Schedule
+      Test.Hash
       Test.ICal
       Test.Lib
       Test.Query
@@ -179,10 +185,12 @@ test-suite spla-ical-test
     , base64-bytestring
     , bytestring
     , cache
+    , cryptonite
     , hlint
     , hspec
     , http-conduit
     , http-types
+    , memory
     , ormolu
     , scotty
     , spla-ical

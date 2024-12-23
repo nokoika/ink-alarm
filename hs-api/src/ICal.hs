@@ -3,8 +3,10 @@ module ICal (ICalInput (..), ICalEvent (..), Reminder (..), ReminderTrigger (..)
 import qualified Data.Char as C
 import Data.List (intercalate)
 import qualified Data.Time as T
+import qualified Hash
 import qualified Query as Q
-import Prelude (Enum, Eq, Int, Show (show), String, concatMap, filter, (++), (.))
+import qualified Translation
+import Prelude (Enum, Eq, Int, Show (show), String, concatMap, filter, ($), (++), (.), (==))
 
 data ICalInput = ICalInput
   { language :: Q.Language,
@@ -44,10 +46,6 @@ data Reminder = Reminder
 convertUTCTimeToLocalTime :: T.UTCTime -> T.LocalTime
 convertUTCTimeToLocalTime = T.utcToLocalTime T.utc
 
-showLanguage :: Q.Language -> String
-showLanguage Q.Japanese = "JA"
-showLanguage Q.English = "EN"
-
 -- 20231207T120000Z <- 2023-12-07T12:00:00Z
 toICalTime :: T.UTCTime -> String
 toICalTime utcTime = day ++ "T" ++ dayTime ++ "Z"
@@ -63,12 +61,17 @@ buildICalText ICalInput {language, events} =
     "\n"
     [ "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//Splatoon 3//" ++ showLanguage language,
+      "PRODID:" ++ Translation.showICalProdId language,
+      "METHOD:PUBLISH",
+      "CALSCALE:GREGORIAN",
+      "X-WR-CALNAME:" ++ Translation.showApplicationName language,
+      -- ※本当はDTSTAMPもrequiredだが、セットすべき値は慎重に検討すべきであるため暫定的に省略
       aggregate
-        ( \ICalEvent {summary, description, start, end, reminders} ->
+        ( \icalEvent@ICalEvent {summary, description, start, end, reminders} ->
             [ "BEGIN:VEVENT",
+              "UID:" ++ eventId icalEvent,
               "SUMMARY:" ++ summary,
-              "DESCRIPTION:" ++ description,
+              "DESCRIPTION:" ++ escapeNewLine description,
               "DTSTART:" ++ toICalTime start,
               "DTEND:" ++ toICalTime end,
               aggregate
@@ -76,6 +79,7 @@ buildICalText ICalInput {language, events} =
                     [ "BEGIN:VALARM",
                       "TRIGGER:" ++ show trigger,
                       "ACTION:" ++ show action,
+                      "DESCRIPTION:" ++ summary, -- ※通知文言を凝ってもよい気がするが、今後VALARM自体を消すかもしれないので暫定的にsummaryを設定
                       "END:VALARM"
                     ]
                 )
@@ -89,3 +93,9 @@ buildICalText ICalInput {language, events} =
   where
     aggregate :: (a -> [String]) -> [a] -> String
     aggregate f = intercalate "\n" . concatMap f
+    escapeNewLine :: String -> String
+    escapeNewLine = concatMap (\c -> if c == '\n' then "\\n" else [c])
+    eventId :: ICalEvent -> String
+    eventId ICalEvent {summary, start, end, reminders} =
+      Hash.sha256Hash $
+        show start ++ show end ++ summary ++ concatMap show reminders

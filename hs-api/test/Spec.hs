@@ -1,6 +1,7 @@
 import qualified Test.Date (test)
 import qualified Test.Filter.Internal.ICal (test)
 import qualified Test.Filter.Internal.Schedule (test)
+import qualified Test.Hash (test)
 import qualified Test.ICal (test)
 import qualified Test.Lib (test)
 import qualified Test.Query (test)
@@ -14,6 +15,7 @@ main = do
   Test.ICal.test
   Test.SplaApi.test
   Test.Query.test
+  Test.Hash.test
   Test.Date.test
   Test.Filter.Internal.ICal.test
   Test.Filter.Internal.Schedule.test
