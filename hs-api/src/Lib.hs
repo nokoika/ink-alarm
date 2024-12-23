@@ -16,10 +16,6 @@ main :: IO ()
 main = do
   putStrLn "Starting server on port 8080"
   scheduleCache <- SplaApi.Cached.initScheduleCache
-  startServer scheduleCache
-
-startServer :: SplaApi.Cached.ScheduleCache -> IO ()
-startServer scheduleCache =
   Scotty.scotty 8080 $
     Scotty.get "/api" $
       handleApi scheduleCache
@@ -31,7 +27,7 @@ handleApi scheduleCache =
     either handleClientError (processQuery scheduleCache) (Query.parseBase64Url base64Uri)
 
 processQuery :: SplaApi.Cached.ScheduleCache -> Query.QueryRoot -> Scotty.ActionM ()
-processQuery scheduleCache query = do
+processQuery scheduleCache query =
   liftIO (SplaApi.Cached.fetchScheduleWithCache scheduleCache)
     >>= either handleInternalError (generateICal query)
 
