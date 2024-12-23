@@ -1,6 +1,7 @@
 module Lib (main) where
 
 import Control.Monad.IO.Class (liftIO)
+import Data.Function ((&)) -- js でいうところの pipeline operator
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import qualified Filter
@@ -10,7 +11,7 @@ import qualified Query
 import qualified SplaApi
 import qualified SplaApi.Cached
 import qualified Web.Scotty as Scotty
-import Prelude (IO, String, either, putStrLn, ($), (++), (.), (>>=))
+import Prelude (IO, String, either, putStrLn, ($), (++), (>>=))
 
 main :: IO ()
 main = do
@@ -32,7 +33,12 @@ processQuery scheduleCache query =
     >>= either handleInternalError (generateICal query)
 
 generateICal :: Query.QueryRoot -> SplaApi.Root -> Scotty.ActionM ()
-generateICal query = Scotty.text . TL.pack . ICal.buildICalText . Filter.createIcalInput query . SplaApi.result
+generateICal query root =
+  SplaApi.result root
+    & Filter.createIcalInput query
+    & ICal.buildICalText
+    & TL.pack
+    & Scotty.text
 
 handleClientError :: String -> Scotty.ActionM ()
 handleClientError err = do
