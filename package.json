@@ -22,12 +22,18 @@
     "simple-git-hooks": "^2.11.1"
   },
   "lint-staged": {
-    "*.hs": [
-      "stack exec -- ormolu --mode check",
+    "hs-api/**/*.hs": [
+      "stack exec -- ormolu --mode inplace",
       "stack exec -- hlint"
+    ],
+    "front/**/*.{js,ts,tsx,json,md,css,html,yml,yaml}": [
+      "bun precommit.mjs"
     ]
   },
   "simple-git-hooks": {
     "pre-commit": "bunx lint-staged"
-  }
+  },
+  "workspaces": [
+    "front"
+  ]
 }

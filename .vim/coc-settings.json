@@ -2,10 +2,7 @@
   "languageserver": {
     "haskell": {
       "command": "haskell-language-server-wrapper",
-      "args": [
-        "--lsp",
-        "--debug"
-      ],
+      "args": ["--lsp", "--debug"],
       "rootPatterns": [
         "hie.yaml",
         "*.cabal",
@@ -13,10 +10,7 @@
         "cabal.project",
         "package.yaml"
       ],
-      "filetypes": [
-        "haskell",
-        "lhaskell"
-      ],
+      "filetypes": ["haskell", "lhaskell"],
       "settings": {
         "haskell": {
           "checkParents": "CheckOnSave",
@@ -39,5 +33,9 @@
   "codeLens.enable": true,
   "inlayHint.display": true,
   "inlayHint.enableParameter": true,
-  "inlayHint.enable": true
+  "inlayHint.enable": true,
+  "prettier.enable": true,
+  "[javascript,typescript,typescriptreact,json,yaml,markdown,css,html,haskell]": {
+    "coc.preferences.formatOnSave": true
+  }
 }
