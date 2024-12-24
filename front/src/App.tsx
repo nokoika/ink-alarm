@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
 
-function App() {
+const App: FC = () => {
   const [count, setCount] = useState(0);
 
   return (
@@ -31,6 +31,6 @@ function App() {
       <h1 className="text-3xl font-bold underline">Hello world!</h1>
     </>
   );
-}
+};
 
 export default App;

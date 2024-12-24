@@ -12,8 +12,10 @@ const compat = new FlatCompat({
   baseDirectory: import.meta.dirname,
 });
 
-// 型があってないけどドキュメントを見る限りこれであってるらしい
-/** @type {any} */
+/**
+ * 型があわないけどドキュメントを見る限りこれでいいらしい
+ * @type {any}
+ */
 const pluginReactConfig = pluginReact.configs.flat?.recommended;
 
 export default pluginTseslint.config(
@@ -21,7 +23,17 @@ export default pluginTseslint.config(
     ignores: ['**/dist'],
   },
   pluginJs.configs.recommended,
-  ...pluginTseslint.configs.recommended,
+  ...pluginTseslint.configs.recommendedTypeChecked,
+  {
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ['*.js', '*.mjs'],
+        },
+      },
+    },
+  },
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   pluginReactConfig,
   ...fixupConfigRules(compat.extends('plugin:react-hooks/recommended')),
   reactRefresh.configs.recommended,
@@ -30,6 +42,12 @@ export default pluginTseslint.config(
     rules: {
       // 昔のReactのバージョンで必要だったものなので、最新のReactでは不要
       'react/react-in-jsx-scope': 'off',
+
+      // await 漏れをエラーにする
+      '@typescript-eslint/no-floating-promises': 'error',
+
+      // export する関数は型を明示する
+      '@typescript-eslint/explicit-module-boundary-types': 'error',
     },
     settings: {
       react: {
