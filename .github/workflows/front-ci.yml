@@ -1,0 +1,36 @@
+name: "Front CI"
+
+on:
+  pull_request: null
+  push:
+    branches:
+      - "main"
+
+jobs:
+  build-and-check:
+    runs-on: "ubuntu-latest"
+    defaults:
+      run:
+        working-directory: "front/"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+      - name: "Cache node_modules"
+        uses: "actions/cache@v4"
+        with:
+          path: '**/node_modules'
+          key: "\
+            ${{ runner.os }}-node_modules\
+            -${{ hashFiles('**/bun.lockb') }}\
+          "
+        restore-keys: "${{ runner.os }}-node_modules-"
+      - name: "Install dependencies"
+        run: "bun install"
+      - name: "Lint"
+        run: "bun eslint . --report-unused-disable-directives --max-warnings 0"
+      - name: "Format check"
+        run: "bun prettier --check ."
+      - name: "Build"
+        run: "bun build"
+

@@ -32,7 +32,7 @@ const filterLintTarget = (files) => {
 };
 
 await exec(
-  ["eslint", "--fix", "--max-warnings", "0", ...filterLintTarget(files)],
+  ["bun", "eslint", "--fix", "--max-warnings", "0", ...filterLintTarget(files)],
   "front"
 );
-//await exec(["prettier", "--write", ...files], "front");
+await exec(["bun", "prettier", "--write", ...files], "front");

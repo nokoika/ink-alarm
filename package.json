@@ -31,9 +31,6 @@
     ]
   },
   "simple-git-hooks": {
-    "pre-commit": "bunx lint-staged"
-  },
-  "workspaces": [
-    "front"
-  ]
+    "pre-commit": "bun lint-staged"
+  }
 }
