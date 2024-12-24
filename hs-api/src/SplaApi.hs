@@ -15,7 +15,7 @@ import Control.Exception (SomeException, try)
 import Data.Aeson ((.:), (.:?))
 import qualified Data.Aeson as A
 import qualified Data.ByteString.Lazy.Char8 as L8
-import Data.Time as T
+import qualified Data.Time as T
 import GHC.Generics (Generic)
 import qualified Network.HTTP.Conduit as H (simpleHttp)
 import Prelude (Bool, Bounded, Either (Left, Right), Enum, Eq, IO, Int, Maybe, Show, String, fail, pure, return, show, ($), (++), (<$>), (<*>))

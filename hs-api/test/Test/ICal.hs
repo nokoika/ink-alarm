@@ -16,7 +16,8 @@ test = hspec $ do
               { ICal.language = Q.Japanese,
                 ICal.events =
                   [ ICal.ICalEvent
-                      { summary = "バンカラマッチ(オープン) - ヤガラ市場 / チョウザメ造船 - ガチヤグラ",
+                      { id = "ID1",
+                        summary = "バンカラマッチ(オープン) - ヤガラ市場 / チョウザメ造船 - ガチヤグラ",
                         description = "ルール: ガチヤグラ\\nステージ: ヤガラ市場, チョウザメ造船",
                         start = TU.createUTCTime 2022 9 14 4 0,
                         end = TU.createUTCTime 2022 9 14 6 0,
@@ -32,7 +33,8 @@ test = hspec $ do
                           ]
                       },
                     ICal.ICalEvent
-                      { summary = "イベントマッチ - タラポートショッピングパーク",
+                      { id = "ID2",
+                        summary = "イベントマッチ - タラポートショッピングパーク",
                         description = "イベント名: 新シーズン開幕記念カップ\\nステージ: タラポートショッピングパーク",
                         start = TU.createUTCTime 2022 9 16 23 0,
                         end = TU.createUTCTime 2022 9 17 1 0,
@@ -56,12 +58,12 @@ test = hspec $ do
               "\n"
               [ "BEGIN:VCALENDAR",
                 "VERSION:2.0",
-                "PRODID:-//nokoika//spla-ical github.com/nokoika/spla-ical//JA",
+                "PRODID:-//nokoika//ガチアラーム github.com/nokoika/spla-ical//JA",
                 "METHOD:PUBLISH",
                 "CALSCALE:GREGORIAN",
-                "X-WR-CALNAME:spla-ical",
+                "X-WR-CALNAME:ガチアラーム",
                 "BEGIN:VEVENT",
-                "UID:92ece2f6eead6f4cf3ac0f10760715c05bdcf1074d951c81e5685ab9d0b1db4e",
+                "UID:ID1",
                 "SUMMARY:バンカラマッチ(オープン) - ヤガラ市場 / チョウザメ造船 - ガチヤグラ",
                 "DESCRIPTION:ルール: ガチヤグラ\\nステージ: ヤガラ市場, チョウザメ造船",
                 "DTSTART:20220914T040000Z",
@@ -78,7 +80,7 @@ test = hspec $ do
                 "END:VALARM",
                 "END:VEVENT",
                 "BEGIN:VEVENT",
-                "UID:be505599f42512709bf112bf147c3e8f6671dd8041f4550b78e7aa96e2832950",
+                "UID:ID2",
                 "SUMMARY:イベントマッチ - タラポートショッピングパーク",
                 "DESCRIPTION:イベント名: 新シーズン開幕記念カップ\\nステージ: タラポートショッピングパーク",
                 "DTSTART:20220916T230000Z",

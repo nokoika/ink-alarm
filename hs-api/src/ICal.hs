@@ -3,10 +3,9 @@ module ICal (ICalInput (..), ICalEvent (..), Reminder (..), ReminderTrigger (..)
 import qualified Data.Char as C
 import Data.List (intercalate)
 import qualified Data.Time as T
-import qualified Hash
 import qualified Query as Q
 import qualified Translation
-import Prelude (Enum, Eq, Int, Show (show), String, concatMap, filter, ($), (++), (.), (==))
+import Prelude (Enum, Eq, Int, Show (show), String, concatMap, filter, (++), (.), (==))
 
 data ICalInput = ICalInput
   { language :: Q.Language,
@@ -15,7 +14,8 @@ data ICalInput = ICalInput
   deriving (Show, Eq)
 
 data ICalEvent = ICalEvent
-  { summary :: String,
+  { id :: String,
+    summary :: String,
     description :: String,
     start :: T.UTCTime,
     end :: T.UTCTime,
@@ -67,9 +67,9 @@ buildICalText ICalInput {language, events} =
       "X-WR-CALNAME:" ++ Translation.showApplicationName language,
       -- ※本当はDTSTAMPもrequiredだが、セットすべき値は慎重に検討すべきであるため暫定的に省略
       aggregate
-        ( \icalEvent@ICalEvent {summary, description, start, end, reminders} ->
+        ( \ICalEvent {id, summary, description, start, end, reminders} ->
             [ "BEGIN:VEVENT",
-              "UID:" ++ eventId icalEvent,
+              "UID:" ++ id,
               "SUMMARY:" ++ summary,
               "DESCRIPTION:" ++ escapeNewLine description,
               "DTSTART:" ++ toICalTime start,
@@ -95,7 +95,3 @@ buildICalText ICalInput {language, events} =
     aggregate f = intercalate "\n" . concatMap f
     escapeNewLine :: String -> String
     escapeNewLine = concatMap (\c -> if c == '\n' then "\\n" else [c])
-    eventId :: ICalEvent -> String
-    eventId ICalEvent {summary, start, end, reminders} =
-      Hash.sha256Hash $
-        show start ++ show end ++ summary ++ concatMap show reminders

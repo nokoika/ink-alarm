@@ -141,7 +141,8 @@ test = hspec $ do
           { I.language = Q.Japanese,
             I.events =
               [ I.ICalEvent
-                  { I.summary = "【ガチホコバトル】バンカラチャレンジ / マサバ海峡大橋, ヒラメが丘団地",
+                  { I.id = "89e3991a59f5b7d831a72aff3388e3d84c50edf4ffa27a4b8f600edcf7f3e5c9",
+                    I.summary = "【ガチホコバトル】バンカラチャレンジ / マサバ海峡大橋, ヒラメが丘団地",
                     I.description = "21:00から23:00までガチホコバトルの予定があります。\n・バンカラチャレンジ\n・ステージ: マサバ海峡大橋, ヒラメが丘団地",
                     I.start = TU.createUTCTime 2024 11 17 12 0,
                     I.end = TU.createUTCTime 2024 11 17 14 0,
@@ -280,7 +281,8 @@ test = hspec $ do
           { I.language = Q.English,
             I.events =
               [ I.ICalEvent
-                  { I.summary = "【Rainmaker】Anarchy Battle (Series) / Hammerhead Bridge, Flounder Heights",
+                  { I.id = "e9102e0ae9e81af20f4096fcf88b63c58ef84b9e8780362ffcefbd4df8c9d7f7",
+                    I.summary = "【Rainmaker】Anarchy Battle (Series) / Hammerhead Bridge, Flounder Heights",
                     I.description = "There is a scheduled Rainmaker from 04:00 to 06:00.\n- Anarchy Battle (Series)\n- Stages: Hammerhead Bridge, Flounder Heights",
                     I.start = TU.createUTCTime 2024 11 17 12 0,
                     I.end = TU.createUTCTime 2024 11 17 14 0,
@@ -914,7 +916,8 @@ test = hspec $ do
       let icalEvents = FI.createICalEventsFromDefaultSchedules queryRoot defaultSchedules Q.BankaraChallenge
       icalEvents
         `shouldBe` [ I.ICalEvent
-                       { I.summary = "【ガチアサリ】バンカラチャレンジ / ユノハナ大渓谷, ゴンズイ地区",
+                       { I.id = "9dc6153ff5856e45822c5a79ba67069677857f0f6fda1bb41599f244697367e1",
+                         I.summary = "【ガチアサリ】バンカラチャレンジ / ユノハナ大渓谷, ゴンズイ地区",
                          I.description = "13:00から15:00までガチアサリの予定があります。\n・バンカラチャレンジ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区",
                          I.start = TU.createUTCTime 2021 1 1 4 0,
                          I.end = TU.createUTCTime 2021 1 1 6 0,
@@ -976,7 +979,8 @@ test = hspec $ do
       let icalEvents = FI.createICalEventsFromEventMatches queryRoot eventMatches
       icalEvents
         `shouldBe` [ I.ICalEvent
-                       { I.summary = "イカダッシュバトル【ガチアサリ】イベントマッチ / ユノハナ大渓谷, ゴンズイ地区",
+                       { I.id = "dcda66e4466a52e30587b8cdca693fea06f959236b5f378037158e89a555dac8",
+                         I.summary = "イカダッシュバトル【ガチアサリ】イベントマッチ / ユノハナ大渓谷, ゴンズイ地区",
                          I.description = "イカダッシュ速度アップ！ イカやタコでステージを泳ぎ回れ！\n\n13:00から15:00までガチアサリの予定があります。\n・イベントマッチ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区",
                          I.start = TU.createUTCTime 2021 1 1 4 0,
                          I.end = TU.createUTCTime 2021 1 1 6 0,
@@ -1028,7 +1032,8 @@ test = hspec $ do
       let icalEvents = FI.createICalEventsFromEventMatches queryRoot eventMatches
       icalEvents
         `shouldBe` [ I.ICalEvent
-                       { I.summary = "【Clam Blitz】Challenge / Scorch Gorge, Eeltail Alley / イカダッシュバトル",
+                       { I.id = "06819575b20f5fb52eec62309dcf7f61c4aa862ddd22d9a4baa40c19ee2c45a7",
+                         I.summary = "【Clam Blitz】Challenge / Scorch Gorge, Eeltail Alley / イカダッシュバトル",
                          I.description = "There is a scheduled Clam Blitz from 13:00 to 15:00.\n- Challenge\n- Stages: Scorch Gorge, Eeltail Alley\n\nイカダッシュ速度アップ！ イカやタコでステージを泳ぎ回れ！",
                          I.start = TU.createUTCTime 2021 1 1 4 0,
                          I.end = TU.createUTCTime 2021 1 1 6 0,
