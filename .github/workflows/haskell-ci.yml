@@ -44,7 +44,7 @@ jobs:
           find app/ src/ test/ -name "*.hs" | xargs -n1 stack exec -- ormolu --mode check
       - name: "Build"
         run: "stack --system-ghc build"
-      - name: "Unit Test"
+      - name: "Unit test"
         run: "stack --system-ghc test"
       - name: "E2E Test"
         run: |
