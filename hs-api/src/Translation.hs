@@ -6,10 +6,9 @@ import qualified Query as Q
 import qualified SplaApi as S
 import Prelude (String, map, ($), (++))
 
--- TODO: 正式なサービス名が決まったら変更する
 showApplicationName :: Q.Language -> String
-showApplicationName Q.Japanese = "spla-ical"
-showApplicationName Q.English = "spla-ical"
+showApplicationName Q.Japanese = "ガチアラーム"
+showApplicationName Q.English = "Ink Alarm"
 
 -- PRODID:-//組織名//製品名//言語
 showICalProdId :: Q.Language -> String
