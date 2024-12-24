@@ -36,5 +36,5 @@ jobs:
       - name: "Format check"
         run: "bun prettier --check ."
       - name: "Build"
-        run: "bun build"
+        run: "bun run build"
 
