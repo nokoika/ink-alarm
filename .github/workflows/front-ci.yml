@@ -24,7 +24,7 @@ jobs:
             ${{ runner.os }}-node_modules\
             -${{ hashFiles('**/bun.lockb') }}\
           "
-        restore-keys: "${{ runner.os }}-node_modules-"
+          restore-keys: "${{ runner.os }}-node_modules-"
       - name: "Install dependencies"
         run: "bun install"
       - name: "Lint"
