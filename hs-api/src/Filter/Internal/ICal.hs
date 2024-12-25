@@ -5,7 +5,6 @@ module Filter.Internal.ICal
   )
 where
 
-import Data.Time as T
 import qualified Date
 import qualified Filter.Internal.Schedule as FS
 import qualified Hash
@@ -15,14 +14,14 @@ import qualified SplaApi as S
 import qualified Translation
 import Prelude (Maybe (Just), String, show, ($), (++), (==))
 
-eventId :: Q.Language -> Q.Mode -> S.Rule -> [S.Stage] -> T.UTCTime -> T.UTCTime -> String
-eventId language mode apiRule apiStages start end =
-  Hash.sha256Hash $ show start ++ show end ++ show apiRule ++ show apiStages ++ show language ++ show mode
+eventId :: Q.Language -> Q.Mode -> S.Rule -> [S.Stage] -> Date.UTCTimeRange -> String
+eventId language mode apiRule apiStages utcTimeRange =
+  Hash.sha256Hash $ show utcTimeRange ++ show apiRule ++ show apiStages ++ show language ++ show mode
 
 createICalEventsFromDefaultSchedules :: Q.QueryRoot -> [S.DefaultSchedule] -> Q.Mode -> [I.ICalEvent]
 createICalEventsFromDefaultSchedules Q.QueryRoot {utcOffset, filters, language} defaultSchedules mode =
   [ I.ICalEvent
-      { I.id = eventId language mode apiRule apiStages startTime endTime,
+      { I.id = eventId language mode apiRule apiStages (startTime, endTime),
         I.summary = Translation.showCalendarSummary language mode apiRule apiStages,
         I.description = Translation.showCalendarDescription language mode apiRule apiStages timeRange,
         I.start = startTime,
@@ -30,7 +29,7 @@ createICalEventsFromDefaultSchedules Q.QueryRoot {utcOffset, filters, language} 
       }
     | defaultSchedule@S.DefaultSchedule {startTime, endTime, rule = Just apiRule, stages = Just apiStages} <- defaultSchedules,
       let Q.UtcOffsetTimeZone utcOffset' = utcOffset
-          timeRange = (Date.changeTimeZone startTime utcOffset', Date.changeTimeZone endTime utcOffset'),
+          timeRange = Date.convertRangedUTCTimeToZonedTime utcOffset' (startTime, endTime),
       filter <- filters,
       FS.filterDefaultSchedule filter defaultSchedule utcOffset' mode
   ]
@@ -39,7 +38,7 @@ createICalEventsFromEventMatches :: Q.QueryRoot -> [S.EventMatch] -> [I.ICalEven
 createICalEventsFromEventMatches Q.QueryRoot {utcOffset, filters, language} eventMatches =
   [ I.ICalEvent
       { -- API では日本語のイベント名しか手に入らないので、日本語以外の場合は末尾にイベント名を追加する。descも同様
-        I.id = eventId language Q.Event apiRule apiStages startTime endTime,
+        I.id = eventId language Q.Event apiRule apiStages (startTime, endTime),
         I.summary =
           if language == Q.Japanese
             then eventName ++ baseSummary
@@ -60,7 +59,7 @@ createICalEventsFromEventMatches Q.QueryRoot {utcOffset, filters, language} even
         } <-
         eventMatches,
       let Q.UtcOffsetTimeZone utcOffset' = utcOffset
-          timeRange = (Date.changeTimeZone startTime utcOffset', Date.changeTimeZone endTime utcOffset')
+          timeRange = Date.convertRangedUTCTimeToZonedTime utcOffset' (startTime, endTime)
           baseSummary = Translation.showCalendarSummary language Q.Event apiRule apiStages
           baseDescription = Translation.showCalendarDescription language Q.Event apiRule apiStages timeRange,
       filter <- filters,

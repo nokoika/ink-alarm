@@ -10,6 +10,7 @@ module Query
     Mode (..),
     Rule (..),
     parseBase64Url,
+    convertTimeSlotToTimeOfDayRange,
   )
 where
 
@@ -146,6 +147,10 @@ data TimeSlot = TimeSlot
   deriving (Show, Eq, Generic)
 
 instance A.FromJSON TimeSlot
+
+convertTimeSlotToTimeOfDayRange :: TimeSlot -> (LT.TimeOfDay, LT.TimeOfDay)
+convertTimeSlotToTimeOfDayRange TimeSlot {start = TimeSlotTimeOfDay start', end = TimeSlotTimeOfDay end'} =
+  (start', end')
 
 parseBase64Url :: Text.Text -> Either String QueryRoot
 parseBase64Url base64Url = case decodeBase64UriToJson $ TE.encodeUtf8 base64Url of

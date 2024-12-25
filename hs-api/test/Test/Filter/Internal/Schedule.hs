@@ -21,7 +21,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
               }
-      FS.inTimeSlot apiStartTime apiEndTime utcOffset timeSlot `shouldBe` True
+      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` True
     it "API: [23:00 (金), 01:00(土)), TimeSlot: [16:00, 00:00), 金 のとき、マッチする" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 14 0 -- 日本では2021年1月1日23時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 16 0 -- 日本では2021年1月2日1時 土曜日
@@ -32,7 +32,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
               }
-      FS.inTimeSlot apiStartTime apiEndTime utcOffset timeSlot `shouldBe` True
+      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` True
     it "API: [23:00 (金), 01:00(土)), TimeSlot: [00:00, 01:00), 土 のとき、マッチする" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 14 0 -- 日本では2021年1月1日23時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 16 0 -- 日本では2021年1月2日1時 土曜日
@@ -43,7 +43,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 1 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Saturday
               }
-      FS.inTimeSlot apiStartTime apiEndTime utcOffset timeSlot `shouldBe` True
+      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` True
     it "API: [13:00 (金), 15:00(金)), TimeSlot: [12:00, 16:00), 土 のとき、マッチしない" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 4 0 -- 日本では2021年1月1日13時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 6 0 -- 日本では2021年1月1日15時
@@ -54,7 +54,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Saturday
               }
-      FS.inTimeSlot apiStartTime apiEndTime utcOffset timeSlot `shouldBe` False
+      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` False
     it "API: [13:00 (金), 15:00(金)), TimeSlot: [00:00, 00:00), 金 のとき、マッチする" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 4 0 -- 日本では2021年1月1日13時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 6 0 -- 日本では2021年1月1日15時
@@ -65,7 +65,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
               }
-      FS.inTimeSlot apiStartTime apiEndTime utcOffset timeSlot `shouldBe` False
+      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` False
 
   describe "inStage" $ do
     let createStage :: Int -> S.Stage

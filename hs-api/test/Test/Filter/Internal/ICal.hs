@@ -140,7 +140,7 @@ test = hspec $ do
           { I.language = Q.Japanese,
             I.events =
               [ I.ICalEvent
-                  { I.id = "89e3991a59f5b7d831a72aff3388e3d84c50edf4ffa27a4b8f600edcf7f3e5c9",
+                  { I.id = "9864650fe1bd4d9a8fba92577fd4b7cd395cdeeddf78f052f1cfec2fb65df705",
                     I.summary = "【ガチホコバトル】バンカラチャレンジ / マサバ海峡大橋, ヒラメが丘団地",
                     I.description = "21:00から23:00までガチホコバトルの予定があります。\n・バンカラチャレンジ\n・ステージ: マサバ海峡大橋, ヒラメが丘団地",
                     I.start = TU.createUTCTime 2024 11 17 12 0,
@@ -275,7 +275,7 @@ test = hspec $ do
           { I.language = Q.English,
             I.events =
               [ I.ICalEvent
-                  { I.id = "e9102e0ae9e81af20f4096fcf88b63c58ef84b9e8780362ffcefbd4df8c9d7f7",
+                  { I.id = "bb2afcd5dbc30d5027e6b196459d8eddc0e99af5108e4f87456826b77c282884",
                     I.summary = "【Rainmaker】Anarchy Battle (Series) / Hammerhead Bridge, Flounder Heights",
                     I.description = "There is a scheduled Rainmaker from 04:00 to 06:00.\n- Anarchy Battle (Series)\n- Stages: Hammerhead Bridge, Flounder Heights",
                     I.start = TU.createUTCTime 2024 11 17 12 0,
@@ -295,7 +295,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
               }
-      FS.inTimeSlot apiStartTime apiEndTime utcOffset timeSlot `shouldBe` True
+      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` True
     it "API: [23:00 (金), 01:00(土)), TimeSlot: [16:00, 00:00), 金 のとき、マッチする" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 14 0 -- 日本では2021年1月1日23時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 16 0 -- 日本では2021年1月2日1時 土曜日
@@ -306,7 +306,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
               }
-      FS.inTimeSlot apiStartTime apiEndTime utcOffset timeSlot `shouldBe` True
+      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` True
     it "API: [23:00 (金), 01:00(土)), TimeSlot: [00:00, 01:00), 土 のとき、マッチする" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 14 0 -- 日本では2021年1月1日23時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 16 0 -- 日本では2021年1月2日1時 土曜日
@@ -317,7 +317,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 1 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Saturday
               }
-      FS.inTimeSlot apiStartTime apiEndTime utcOffset timeSlot `shouldBe` True
+      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` True
     it "API: [13:00 (金), 15:00(金)), TimeSlot: [12:00, 16:00), 土 のとき、マッチしない" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 4 0 -- 日本では2021年1月1日13時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 6 0 -- 日本では2021年1月1日15時
@@ -328,7 +328,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Saturday
               }
-      FS.inTimeSlot apiStartTime apiEndTime utcOffset timeSlot `shouldBe` False
+      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` False
     it "API: [13:00 (金), 15:00(金)), TimeSlot: [00:00, 00:00), 金 のとき、マッチする" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 4 0 -- 日本では2021年1月1日13時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 6 0 -- 日本では2021年1月1日15時
@@ -339,7 +339,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
               }
-      FS.inTimeSlot apiStartTime apiEndTime utcOffset timeSlot `shouldBe` False
+      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` False
 
   describe "inStage" $ do
     let createStage :: Int -> S.Stage
@@ -890,7 +890,7 @@ test = hspec $ do
       let icalEvents = FI.createICalEventsFromDefaultSchedules queryRoot defaultSchedules Q.BankaraChallenge
       icalEvents
         `shouldBe` [ I.ICalEvent
-                       { I.id = "9dc6153ff5856e45822c5a79ba67069677857f0f6fda1bb41599f244697367e1",
+                       { I.id = "13bd55fa792ff7180be0f964ca83029891cac218359fafd756a864a8addabbda",
                          I.summary = "【ガチアサリ】バンカラチャレンジ / ユノハナ大渓谷, ゴンズイ地区",
                          I.description = "13:00から15:00までガチアサリの予定があります。\n・バンカラチャレンジ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区",
                          I.start = TU.createUTCTime 2021 1 1 4 0,
@@ -948,7 +948,7 @@ test = hspec $ do
       let icalEvents = FI.createICalEventsFromEventMatches queryRoot eventMatches
       icalEvents
         `shouldBe` [ I.ICalEvent
-                       { I.id = "dcda66e4466a52e30587b8cdca693fea06f959236b5f378037158e89a555dac8",
+                       { I.id = "3cd804136689020fd443d62339a32a5ca1375daa7be1327782050d0675bca85e",
                          I.summary = "イカダッシュバトル【ガチアサリ】イベントマッチ / ユノハナ大渓谷, ゴンズイ地区",
                          I.description = "イカダッシュ速度アップ！ イカやタコでステージを泳ぎ回れ！\n\n13:00から15:00までガチアサリの予定があります。\n・イベントマッチ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区",
                          I.start = TU.createUTCTime 2021 1 1 4 0,
@@ -996,7 +996,7 @@ test = hspec $ do
       let icalEvents = FI.createICalEventsFromEventMatches queryRoot eventMatches
       icalEvents
         `shouldBe` [ I.ICalEvent
-                       { I.id = "06819575b20f5fb52eec62309dcf7f61c4aa862ddd22d9a4baa40c19ee2c45a7",
+                       { I.id = "d220020d5918000e7063b463a61882defa847a9d509650d68e39228a5c36f408",
                          I.summary = "【Clam Blitz】Challenge / Scorch Gorge, Eeltail Alley / イカダッシュバトル",
                          I.description = "There is a scheduled Clam Blitz from 13:00 to 15:00.\n- Challenge\n- Stages: Scorch Gorge, Eeltail Alley\n\nイカダッシュ速度アップ！ イカやタコでステージを泳ぎ回れ！",
                          I.start = TU.createUTCTime 2021 1 1 4 0,

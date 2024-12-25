@@ -74,24 +74,24 @@ test = hspec $ do
 
   describe "isWithinTimeOfDay" $ do
     it "should match" $ do
-      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 0 0 0) `shouldBe` True
-      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 0 30 0) `shouldBe` True
-      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 0 59 0) `shouldBe` True
+      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0, T.TimeOfDay 1 0 0) (T.TimeOfDay 0 0 0) `shouldBe` True
+      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0, T.TimeOfDay 1 0 0) (T.TimeOfDay 0 30 0) `shouldBe` True
+      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0, T.TimeOfDay 1 0 0) (T.TimeOfDay 0 59 0) `shouldBe` True
       -- 日をまたぐ
-      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 23 0 0) `shouldBe` True
-      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 23 59 0) `shouldBe` True
-      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 0 0 0) `shouldBe` True
-      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 0 59 0) `shouldBe` True
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0, T.TimeOfDay 1 0 0) (T.TimeOfDay 23 0 0) `shouldBe` True
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0, T.TimeOfDay 1 0 0) (T.TimeOfDay 23 59 0) `shouldBe` True
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0, T.TimeOfDay 1 0 0) (T.TimeOfDay 0 0 0) `shouldBe` True
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0, T.TimeOfDay 1 0 0) (T.TimeOfDay 0 59 0) `shouldBe` True
 
     it "should not match" $ do
-      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 1 0 0) `shouldBe` False
-      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 1 1 0) `shouldBe` False
+      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0, T.TimeOfDay 1 0 0) (T.TimeOfDay 1 0 0) `shouldBe` False
+      D.isWithinTimeOfDay (T.TimeOfDay 0 0 0, T.TimeOfDay 1 0 0) (T.TimeOfDay 1 1 0) `shouldBe` False
       -- 日をまたぐ
-      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 1 0 0) `shouldBe` False
-      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 1 1 0) `shouldBe` False
-      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 1 0 0) (T.TimeOfDay 6 0 0) `shouldBe` False
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0, T.TimeOfDay 1 0 0) (T.TimeOfDay 1 0 0) `shouldBe` False
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0, T.TimeOfDay 1 0 0) (T.TimeOfDay 1 1 0) `shouldBe` False
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0, T.TimeOfDay 1 0 0) (T.TimeOfDay 6 0 0) `shouldBe` False
       -- 25時は想定しない
-      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0) (T.TimeOfDay 25 0 0) (T.TimeOfDay 0 0 0) `shouldBe` False
+      D.isWithinTimeOfDay (T.TimeOfDay 23 0 0, T.TimeOfDay 25 0 0) (T.TimeOfDay 0 0 0) `shouldBe` False
 
   let d1 = T.TimeOfDay 3 0 0
   let d2 = T.TimeOfDay 5 0 0
@@ -156,167 +156,167 @@ test = hspec $ do
 
   describe "hasTimeRangesIntersect" $ do
     it "Case A." $ do
-      D.hasTimeRangesIntersect d2 d3 d1 d4 `shouldBe` True
+      D.hasTimeRangesIntersect (d2, d3) (d1, d4) `shouldBe` True
     it "Case B." $ do
-      D.hasTimeRangesIntersect d1 d4 d1 d4 `shouldBe` True
+      D.hasTimeRangesIntersect (d1, d4) (d1, d4) `shouldBe` True
     it "Case C." $ do
-      D.hasTimeRangesIntersect d2 d4 d1 d4 `shouldBe` True
+      D.hasTimeRangesIntersect (d2, d4) (d1, d4) `shouldBe` True
     it "Case D." $ do
-      D.hasTimeRangesIntersect d1 d3 d1 d4 `shouldBe` True
+      D.hasTimeRangesIntersect (d1, d3) (d1, d4) `shouldBe` True
     it "Case E." $ do
-      D.hasTimeRangesIntersect d1 d4 d2 d3 `shouldBe` True
+      D.hasTimeRangesIntersect (d1, d4) (d2, d3) `shouldBe` True
     it "Case F." $ do
-      D.hasTimeRangesIntersect d1 d4 d2 d4 `shouldBe` True
+      D.hasTimeRangesIntersect (d1, d4) (d2, d4) `shouldBe` True
     it "Case G." $ do
-      D.hasTimeRangesIntersect d1 d4 d1 d3 `shouldBe` True
+      D.hasTimeRangesIntersect (d1, d4) (d1, d3) `shouldBe` True
     it "Case H." $ do
-      D.hasTimeRangesIntersect d1 d3 d2 d4 `shouldBe` True
+      D.hasTimeRangesIntersect (d1, d3) (d2, d4) `shouldBe` True
     it "Case I." $ do
-      D.hasTimeRangesIntersect d1 d2 d2 d4 `shouldBe` False
+      D.hasTimeRangesIntersect (d1, d2) (d2, d4) `shouldBe` False
     it "Case J." $ do
-      D.hasTimeRangesIntersect d1 d2 d3 d4 `shouldBe` False
+      D.hasTimeRangesIntersect (d1, d2) (d3, d4) `shouldBe` False
     it "Case K." $ do
-      D.hasTimeRangesIntersect d2 d4 d1 d3 `shouldBe` True
+      D.hasTimeRangesIntersect (d2, d4) (d1, d3) `shouldBe` True
     it "Case L." $ do
-      D.hasTimeRangesIntersect d2 d4 d1 d2 `shouldBe` False
+      D.hasTimeRangesIntersect (d2, d4) (d1, d2) `shouldBe` False
     it "Case M." $ do
-      D.hasTimeRangesIntersect d3 d4 d1 d2 `shouldBe` False
+      D.hasTimeRangesIntersect (d3, d4) (d1, d2) `shouldBe` False
 
     it "Case A. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d2' d3' d1' d4' `shouldBe` True
+      D.hasTimeRangesIntersect (d2', d3') (d1', d4') `shouldBe` True
     it "Case B. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d1' d4' d1' d4' `shouldBe` True
+      D.hasTimeRangesIntersect (d1', d4') (d1', d4') `shouldBe` True
     it "Case C. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d2' d4' d1' d4' `shouldBe` True
+      D.hasTimeRangesIntersect (d2', d4') (d1', d4') `shouldBe` True
     it "Case D. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d1' d3' d1' d4' `shouldBe` True
+      D.hasTimeRangesIntersect (d1', d3') (d1', d4') `shouldBe` True
     it "Case E. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d1' d4' d2' d3' `shouldBe` True
+      D.hasTimeRangesIntersect (d1', d4') (d2', d3') `shouldBe` True
     it "Case F. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d1' d4' d2' d4' `shouldBe` True
+      D.hasTimeRangesIntersect (d1', d4') (d2', d4') `shouldBe` True
     it "Case G. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d1' d4' d1' d3' `shouldBe` True
+      D.hasTimeRangesIntersect (d1', d4') (d1', d3') `shouldBe` True
     it "Case H. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d1' d3' d2' d4' `shouldBe` True
+      D.hasTimeRangesIntersect (d1', d3') (d2', d4') `shouldBe` True
     it "Case I. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d1' d2' d2' d4' `shouldBe` False
+      D.hasTimeRangesIntersect (d1', d2') (d2', d4') `shouldBe` False
     it "Case J. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d1' d2' d3' d4' `shouldBe` False
+      D.hasTimeRangesIntersect (d1', d2') (d3', d4') `shouldBe` False
     it "Case K. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d2' d4' d1' d4' `shouldBe` True
+      D.hasTimeRangesIntersect (d2', d4') (d1', d4') `shouldBe` True
     it "Case L. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d2' d4' d1' d2' `shouldBe` False
+      D.hasTimeRangesIntersect (d2', d4') (d1', d2') `shouldBe` False
     it "Case M. 日をまたぐ" $ do
-      D.hasTimeRangesIntersect d3' d4' d1' d2' `shouldBe` False
+      D.hasTimeRangesIntersect (d3', d4') (d1', d2') `shouldBe` False
 
   describe "timeRangesIntersect" $ do
     it "Case A => [d2, d3)" $ do
-      D.timeRangesIntersect d2 d3 d1 d4 `shouldBe` Just (d2, d3)
+      D.timeRangesIntersect (d2, d3) (d1, d4) `shouldBe` Just (d2, d3)
     it "Case B => [d1, d4)" $ do
-      D.timeRangesIntersect d1 d4 d1 d4 `shouldBe` Just (d1, d4)
+      D.timeRangesIntersect (d1, d4) (d1, d4) `shouldBe` Just (d1, d4)
     it "Case C => [d2, d4)" $ do
-      D.timeRangesIntersect d2 d4 d1 d4 `shouldBe` Just (d2, d4)
+      D.timeRangesIntersect (d2, d4) (d1, d4) `shouldBe` Just (d2, d4)
     it "Case D => [d1, d3)" $ do
-      D.timeRangesIntersect d1 d3 d1 d4 `shouldBe` Just (d1, d3)
+      D.timeRangesIntersect (d1, d3) (d1, d4) `shouldBe` Just (d1, d3)
     it "Case E => [d2, d3)" $ do
-      D.timeRangesIntersect d1 d4 d2 d3 `shouldBe` Just (d2, d3)
+      D.timeRangesIntersect (d1, d4) (d2, d3) `shouldBe` Just (d2, d3)
     it "Case F => [d2, d4)" $ do
-      D.timeRangesIntersect d1 d4 d2 d4 `shouldBe` Just (d2, d4)
+      D.timeRangesIntersect (d1, d4) (d2, d4) `shouldBe` Just (d2, d4)
     it "Case G => [d1, d3)" $ do
-      D.timeRangesIntersect d1 d4 d1 d3 `shouldBe` Just (d1, d3)
+      D.timeRangesIntersect (d1, d4) (d1, d3) `shouldBe` Just (d1, d3)
     it "Case H => [d2, d3)" $ do
-      D.timeRangesIntersect d1 d3 d2 d4 `shouldBe` Just (d2, d3)
+      D.timeRangesIntersect (d1, d3) (d2, d4) `shouldBe` Just (d2, d3)
     it "Case I => Nothing" $ do
-      D.timeRangesIntersect d1 d2 d2 d4 `shouldBe` Nothing
+      D.timeRangesIntersect (d1, d2) (d2, d4) `shouldBe` Nothing
     it "Case J => Nothing" $ do
-      D.timeRangesIntersect d1 d2 d3 d4 `shouldBe` Nothing
+      D.timeRangesIntersect (d1, d2) (d3, d4) `shouldBe` Nothing
     it "Case K => [d2, d3)" $ do
-      D.timeRangesIntersect d2 d4 d1 d3 `shouldBe` Just (d2, d3)
+      D.timeRangesIntersect (d2, d4) (d1, d3) `shouldBe` Just (d2, d3)
     it "Case L => Nothing" $ do
-      D.timeRangesIntersect d2 d4 d1 d2 `shouldBe` Nothing
+      D.timeRangesIntersect (d2, d4) (d1, d2) `shouldBe` Nothing
     it "Case M => Nothing" $ do
-      D.timeRangesIntersect d3 d4 d1 d2 `shouldBe` Nothing
+      D.timeRangesIntersect (d3, d4) (d1, d2) `shouldBe` Nothing
 
     it "Case A, 日をまたぐ => [d2', d3')" $ do
-      D.timeRangesIntersect d2' d3' d1' d4' `shouldBe` Just (d2', d3')
+      D.timeRangesIntersect (d2', d3') (d1', d4') `shouldBe` Just (d2', d3')
     it "Case B, 日をまたぐ => [d1', d4')" $ do
-      D.timeRangesIntersect d1' d4' d1' d4' `shouldBe` Just (d1', d4')
+      D.timeRangesIntersect (d1', d4') (d1', d4') `shouldBe` Just (d1', d4')
     it "Case C, 日をまたぐ => [d2', d4')" $ do
-      D.timeRangesIntersect d2' d4' d1' d4' `shouldBe` Just (d2', d4')
+      D.timeRangesIntersect (d2', d4') (d1', d4') `shouldBe` Just (d2', d4')
     it "Case D, 日をまたぐ => [d1', d3')" $ do
-      D.timeRangesIntersect d1' d3' d1' d4' `shouldBe` Just (d1', d3')
+      D.timeRangesIntersect (d1', d3') (d1', d4') `shouldBe` Just (d1', d3')
     it "Case E, 日をまたぐ => [d2', d3')" $ do
-      D.timeRangesIntersect d1' d4' d2' d3' `shouldBe` Just (d2', d3')
+      D.timeRangesIntersect (d1', d4') (d2', d3') `shouldBe` Just (d2', d3')
     it "Case F, 日をまたぐ => [d2', d4')" $ do
-      D.timeRangesIntersect d1' d4' d2' d4' `shouldBe` Just (d2', d4')
+      D.timeRangesIntersect (d1', d4') (d2', d4') `shouldBe` Just (d2', d4')
     it "Case G, 日をまたぐ => [d1', d3')" $ do
-      D.timeRangesIntersect d1' d4' d1' d3' `shouldBe` Just (d1', d3')
+      D.timeRangesIntersect (d1', d4') (d1', d3') `shouldBe` Just (d1', d3')
     it "Case H, 日をまたぐ => [d2', d3')" $ do
-      D.timeRangesIntersect d1' d3' d2' d4' `shouldBe` Just (d2', d3')
+      D.timeRangesIntersect (d1', d3') (d2', d4') `shouldBe` Just (d2', d3')
     it "Case I, 日をまたぐ => Nothing" $ do
-      D.timeRangesIntersect d1' d2' d2' d4' `shouldBe` Nothing
+      D.timeRangesIntersect (d1', d2') (d2', d4') `shouldBe` Nothing
     it "Case J, 日をまたぐ => Nothing" $ do
-      D.timeRangesIntersect d1' d2' d3' d4' `shouldBe` Nothing
+      D.timeRangesIntersect (d1', d2') (d3', d4') `shouldBe` Nothing
     it "Case K, 日をまたぐ => [d2', d3')" $ do
-      D.timeRangesIntersect d2' d4' d1' d3' `shouldBe` Just (d2', d3')
+      D.timeRangesIntersect (d2', d4') (d1', d3') `shouldBe` Just (d2', d3')
     it "Case L, 日をまたぐ => Nothing" $ do
-      D.timeRangesIntersect d2' d4' d1' d2' `shouldBe` Nothing
+      D.timeRangesIntersect (d2', d4') (d1', d2') `shouldBe` Nothing
     it "Case M, 日をまたぐ => Nothing" $ do
-      D.timeRangesIntersect d3' d4' d1' d2' `shouldBe` Nothing
+      D.timeRangesIntersect (d3', d4') (d1', d2') `shouldBe` Nothing
 
   describe "intersectTimeRangesWithLocalTime" $ do
     let ld1 = T.fromGregorian 2021 1 1
     let ld2 = T.fromGregorian 2021 1 2
     it "Case A => [d2, d3)" $ do
-      D.intersectTimeRangesWithLocalTime d2 d3 (T.LocalTime ld1 d2) (T.LocalTime ld1 d3) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d3)
+      D.intersectTimeRangesWithLocalTime (d2, d3) (T.LocalTime ld1 d2, T.LocalTime ld1 d3) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d3)
     it "Case B => [d1, d4)" $ do
-      D.intersectTimeRangesWithLocalTime d1 d4 (T.LocalTime ld1 d1) (T.LocalTime ld1 d4) `shouldBe` Just (T.LocalTime ld1 d1, T.LocalTime ld1 d4)
+      D.intersectTimeRangesWithLocalTime (d1, d4) (T.LocalTime ld1 d1, T.LocalTime ld1 d4) `shouldBe` Just (T.LocalTime ld1 d1, T.LocalTime ld1 d4)
     it "Case C => [d2, d4)" $ do
-      D.intersectTimeRangesWithLocalTime d2 d4 (T.LocalTime ld1 d2) (T.LocalTime ld1 d4) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d4)
+      D.intersectTimeRangesWithLocalTime (d2, d4) (T.LocalTime ld1 d2, T.LocalTime ld1 d4) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d4)
     it "Case D => [d1, d3)" $ do
-      D.intersectTimeRangesWithLocalTime d1 d3 (T.LocalTime ld1 d1) (T.LocalTime ld1 d4) `shouldBe` Just (T.LocalTime ld1 d1, T.LocalTime ld1 d3)
+      D.intersectTimeRangesWithLocalTime (d1, d3) (T.LocalTime ld1 d1, T.LocalTime ld1 d4) `shouldBe` Just (T.LocalTime ld1 d1, T.LocalTime ld1 d3)
     it "Case E => [d2, d3)" $ do
-      D.intersectTimeRangesWithLocalTime d1 d4 (T.LocalTime ld1 d2) (T.LocalTime ld1 d3) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d3)
+      D.intersectTimeRangesWithLocalTime (d1, d4) (T.LocalTime ld1 d2, T.LocalTime ld1 d3) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d3)
     it "Case F => [d2, d4)" $ do
-      D.intersectTimeRangesWithLocalTime d1 d4 (T.LocalTime ld1 d2) (T.LocalTime ld1 d4) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d4)
+      D.intersectTimeRangesWithLocalTime (d1, d4) (T.LocalTime ld1 d2, T.LocalTime ld1 d4) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d4)
     it "Case G => [d1, d3)" $ do
-      D.intersectTimeRangesWithLocalTime d1 d4 (T.LocalTime ld1 d1) (T.LocalTime ld1 d3) `shouldBe` Just (T.LocalTime ld1 d1, T.LocalTime ld1 d3)
+      D.intersectTimeRangesWithLocalTime (d1, d4) (T.LocalTime ld1 d1, T.LocalTime ld1 d3) `shouldBe` Just (T.LocalTime ld1 d1, T.LocalTime ld1 d3)
     it "Case H => [d2, d3)" $ do
-      D.intersectTimeRangesWithLocalTime d1 d3 (T.LocalTime ld1 d2) (T.LocalTime ld1 d4) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d3)
+      D.intersectTimeRangesWithLocalTime (d1, d3) (T.LocalTime ld1 d2, T.LocalTime ld1 d4) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d3)
     it "Case I => Nothing" $ do
-      D.intersectTimeRangesWithLocalTime d1 d2 (T.LocalTime ld1 d2) (T.LocalTime ld1 d4) `shouldBe` Nothing
+      D.intersectTimeRangesWithLocalTime (d1, d2) (T.LocalTime ld1 d2, T.LocalTime ld1 d4) `shouldBe` Nothing
     it "Case J => Nothing" $ do
-      D.intersectTimeRangesWithLocalTime d1 d2 (T.LocalTime ld1 d3) (T.LocalTime ld1 d4) `shouldBe` Nothing
+      D.intersectTimeRangesWithLocalTime (d1, d2) (T.LocalTime ld1 d3, T.LocalTime ld1 d4) `shouldBe` Nothing
     it "Case K => [d2, d3)" $ do
-      D.intersectTimeRangesWithLocalTime d2 d4 (T.LocalTime ld1 d2) (T.LocalTime ld1 d3) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d3)
+      D.intersectTimeRangesWithLocalTime (d2, d4) (T.LocalTime ld1 d2, T.LocalTime ld1 d3) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d3)
     it "Case L => Nothing" $ do
-      D.intersectTimeRangesWithLocalTime d2 d4 (T.LocalTime ld1 d1) (T.LocalTime ld1 d2) `shouldBe` Nothing
+      D.intersectTimeRangesWithLocalTime (d2, d4) (T.LocalTime ld1 d1, T.LocalTime ld1 d2) `shouldBe` Nothing
     it "Case M => Nothing" $ do
-      D.intersectTimeRangesWithLocalTime d3 d4 (T.LocalTime ld1 d1) (T.LocalTime ld1 d2) `shouldBe` Nothing
+      D.intersectTimeRangesWithLocalTime (d3, d4) (T.LocalTime ld1 d1, T.LocalTime ld1 d2) `shouldBe` Nothing
 
     it "Case A, 日をまたぐ => [d2', d3')" $ do
-      D.intersectTimeRangesWithLocalTime d2' d3' (T.LocalTime ld1 d2') (T.LocalTime ld1 d3') `shouldBe` Just (T.LocalTime ld1 d2', T.LocalTime ld2 d3')
+      D.intersectTimeRangesWithLocalTime (d2', d3') (T.LocalTime ld1 d2', T.LocalTime ld1 d3') `shouldBe` Just (T.LocalTime ld1 d2', T.LocalTime ld2 d3')
     it "Case B, 日をまたぐ => [d1', d4')" $ do
-      D.intersectTimeRangesWithLocalTime d1' d4' (T.LocalTime ld1 d1') (T.LocalTime ld1 d4') `shouldBe` Just (T.LocalTime ld1 d1', T.LocalTime ld2 d4')
+      D.intersectTimeRangesWithLocalTime (d1', d4') (T.LocalTime ld1 d1', T.LocalTime ld1 d4') `shouldBe` Just (T.LocalTime ld1 d1', T.LocalTime ld2 d4')
     it "Case C, 日をまたぐ => [d2', d4')" $ do
-      D.intersectTimeRangesWithLocalTime d2' d4' (T.LocalTime ld1 d2') (T.LocalTime ld1 d4') `shouldBe` Just (T.LocalTime ld1 d2', T.LocalTime ld2 d4')
+      D.intersectTimeRangesWithLocalTime (d2', d4') (T.LocalTime ld1 d2', T.LocalTime ld1 d4') `shouldBe` Just (T.LocalTime ld1 d2', T.LocalTime ld2 d4')
     it "Case D, 日をまたぐ => [d1', d3')" $ do
-      D.intersectTimeRangesWithLocalTime d1' d3' (T.LocalTime ld1 d1') (T.LocalTime ld1 d4') `shouldBe` Just (T.LocalTime ld1 d1', T.LocalTime ld2 d3')
+      D.intersectTimeRangesWithLocalTime (d1', d3') (T.LocalTime ld1 d1', T.LocalTime ld1 d4') `shouldBe` Just (T.LocalTime ld1 d1', T.LocalTime ld2 d3')
     it "Case E, 日をまたぐ => [d2', d3')" $ do
-      D.intersectTimeRangesWithLocalTime d1' d4' (T.LocalTime ld1 d2') (T.LocalTime ld1 d3') `shouldBe` Just (T.LocalTime ld1 d2', T.LocalTime ld2 d3')
+      D.intersectTimeRangesWithLocalTime (d1', d4') (T.LocalTime ld1 d2', T.LocalTime ld1 d3') `shouldBe` Just (T.LocalTime ld1 d2', T.LocalTime ld2 d3')
     it "Case F, 日をまたぐ => [d2', d4')" $ do
-      D.intersectTimeRangesWithLocalTime d1' d4' (T.LocalTime ld1 d2') (T.LocalTime ld1 d4') `shouldBe` Just (T.LocalTime ld1 d2', T.LocalTime ld2 d4')
+      D.intersectTimeRangesWithLocalTime (d1', d4') (T.LocalTime ld1 d2', T.LocalTime ld1 d4') `shouldBe` Just (T.LocalTime ld1 d2', T.LocalTime ld2 d4')
     it "Case G, 日をまたぐ => [d1', d3')" $ do
-      D.intersectTimeRangesWithLocalTime d1' d4' (T.LocalTime ld1 d1') (T.LocalTime ld1 d3') `shouldBe` Just (T.LocalTime ld1 d1', T.LocalTime ld2 d3')
+      D.intersectTimeRangesWithLocalTime (d1', d4') (T.LocalTime ld1 d1', T.LocalTime ld1 d3') `shouldBe` Just (T.LocalTime ld1 d1', T.LocalTime ld2 d3')
     it "Case H, 日をまたぐ => [d2', d3')" $ do
-      D.intersectTimeRangesWithLocalTime d1' d3' (T.LocalTime ld1 d2') (T.LocalTime ld1 d4') `shouldBe` Just (T.LocalTime ld1 d2', T.LocalTime ld2 d3')
+      D.intersectTimeRangesWithLocalTime (d1', d3') (T.LocalTime ld1 d2', T.LocalTime ld1 d4') `shouldBe` Just (T.LocalTime ld1 d2', T.LocalTime ld2 d3')
     it "Case I, 日をまたぐ => Nothing" $ do
-      D.intersectTimeRangesWithLocalTime d1' d2' (T.LocalTime ld1 d2') (T.LocalTime ld1 d4') `shouldBe` Nothing
+      D.intersectTimeRangesWithLocalTime (d1', d2') (T.LocalTime ld1 d2', T.LocalTime ld1 d4') `shouldBe` Nothing
     it "Case J, 日をまたぐ => Nothing" $ do
-      D.intersectTimeRangesWithLocalTime d1' d2' (T.LocalTime ld1 d3') (T.LocalTime ld1 d4') `shouldBe` Nothing
+      D.intersectTimeRangesWithLocalTime (d1', d2') (T.LocalTime ld1 d3', T.LocalTime ld1 d4') `shouldBe` Nothing
     it "Case K, 日をまたぐ => [d2', d3')" $ do
-      D.intersectTimeRangesWithLocalTime d2' d4' (T.LocalTime ld1 d2') (T.LocalTime ld1 d3') `shouldBe` Just (T.LocalTime ld1 d2', T.LocalTime ld2 d3')
+      D.intersectTimeRangesWithLocalTime (d2', d4') (T.LocalTime ld1 d2', T.LocalTime ld1 d3') `shouldBe` Just (T.LocalTime ld1 d2', T.LocalTime ld2 d3')
     it "Case L, 日をまたぐ => Nothing" $ do
-      D.intersectTimeRangesWithLocalTime d2' d4' (T.LocalTime ld1 d1') (T.LocalTime ld1 d2') `shouldBe` Nothing
+      D.intersectTimeRangesWithLocalTime (d2', d4') (T.LocalTime ld1 d1', T.LocalTime ld1 d2') `shouldBe` Nothing
     it "Case M, 日をまたぐ => Nothing" $ do
-      D.intersectTimeRangesWithLocalTime d3' d4' (T.LocalTime ld1 d1') (T.LocalTime ld1 d2') `shouldBe` Nothing
+      D.intersectTimeRangesWithLocalTime (d3', d4') (T.LocalTime ld1 d1', T.LocalTime ld1 d2') `shouldBe` Nothing
