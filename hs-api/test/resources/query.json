@@ -7,24 +7,15 @@
     {
       "mode": "bankara_open",
       "stages": {
-        "stageIds": [
-          22
-        ],
+        "stageIds": [22],
         "matchBothStages": true
       },
-      "rules": [
-        "nawabari"
-      ],
+      "rules": ["nawabari"],
       "timeSlots": [
         {
           "start": "00:00",
           "end": "06:00",
           "dayOfWeek": "sun"
-        }
-      ],
-      "notifications": [
-        {
-          "minutesBefore": 90
         }
       ]
     }

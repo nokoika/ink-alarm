@@ -1,17 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "NotificationSetting": {
-      "type": "object",
-      "properties": {
-        "minutesBefore": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "minutesBefore"
-      ]
-    },
     "TimeSlot": {
       "type": "object",
       "properties": {
@@ -25,21 +14,10 @@
         },
         "dayOfWeek": {
           "type": "string",
-          "enum": [
-            "sun",
-            "mon",
-            "tue",
-            "wed",
-            "thu",
-            "fri",
-            "sat"
-          ]
+          "enum": ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
         }
       },
-      "required": [
-        "start",
-        "end"
-      ]
+      "required": ["start", "end"]
     },
     "StageFilter": {
       "type": "object",
@@ -54,23 +32,14 @@
           }
         }
       },
-      "required": [
-        "matchBothStages",
-        "stageIds"
-      ]
+      "required": ["matchBothStages", "stageIds"]
     },
     "FilterCondition": {
       "type": "object",
       "properties": {
         "mode": {
           "type": "string",
-          "enum": [
-            "bankara_open",
-            "bankara_challenge",
-            "x",
-            "regular",
-            "event"
-          ]
+          "enum": ["bankara_open", "bankara_challenge", "x", "regular", "event"]
         },
         "stages": {
           "$ref": "#/definitions/StageFilter"
@@ -79,13 +48,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": [
-              "nawabari",
-              "area",
-              "yagura",
-              "hoko",
-              "asari"
-            ]
+            "enum": ["nawabari", "area", "yagura", "hoko", "asari"]
           }
         },
         "timeSlots": {
@@ -93,27 +56,16 @@
           "items": {
             "$ref": "#/definitions/TimeSlot"
           }
-        },
-        "notifications": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/NotificationSetting"
-          }
         }
       },
-      "required": [
-        "mode"
-      ]
+      "required": ["mode"]
     }
   },
   "type": "object",
   "properties": {
     "language": {
       "type": "string",
-      "enum": [
-        "ja",
-        "en"
-      ]
+      "enum": ["ja", "en"]
     },
     "utcOffset": {
       "type": "string",
@@ -126,8 +78,5 @@
       }
     }
   },
-  "required": [
-    "language",
-    "filters"
-  ]
+  "required": ["language", "filters"]
 }

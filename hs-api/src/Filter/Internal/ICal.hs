@@ -5,7 +5,6 @@ module Filter.Internal.ICal
   )
 where
 
-import qualified Data.Maybe as M
 import Data.Time as T
 import qualified Date
 import qualified Filter.Internal.Schedule as FS
@@ -15,12 +14,6 @@ import qualified Query as Q
 import qualified SplaApi as S
 import qualified Translation
 import Prelude (Maybe (Just), String, show, ($), (++), (==))
-
-convertNotificationsToReminders :: [Q.NotificationSetting] -> [I.Reminder]
-convertNotificationsToReminders notifications =
-  [ I.Reminder {I.trigger = I.ReminderTrigger {I.time = minutesBefore}, I.action = I.Display}
-    | Q.NotificationSetting {Q.minutesBefore} <- notifications
-  ]
 
 eventId :: Q.Language -> Q.Mode -> S.Rule -> [S.Stage] -> T.UTCTime -> T.UTCTime -> String
 eventId language mode apiRule apiStages start end =
@@ -33,8 +26,7 @@ createICalEventsFromDefaultSchedules Q.QueryRoot {utcOffset, filters, language} 
         I.summary = Translation.showCalendarSummary language mode apiRule apiStages,
         I.description = Translation.showCalendarDescription language mode apiRule apiStages timeRange,
         I.start = startTime,
-        I.end = endTime,
-        I.reminders = convertNotificationsToReminders (M.fromMaybe [] (Q.notifications filter))
+        I.end = endTime
       }
     | defaultSchedule@S.DefaultSchedule {startTime, endTime, rule = Just apiRule, stages = Just apiStages} <- defaultSchedules,
       let Q.UtcOffsetTimeZone utcOffset' = utcOffset
@@ -57,8 +49,7 @@ createICalEventsFromEventMatches Q.QueryRoot {utcOffset, filters, language} even
             then eventDescription ++ "\n\n" ++ baseDescription
             else baseDescription ++ "\n\n" ++ eventDescription,
         I.start = startTime,
-        I.end = endTime,
-        I.reminders = convertNotificationsToReminders (M.fromMaybe [] (Q.notifications filter))
+        I.end = endTime
       }
     | eventMatch@S.EventMatch
         { S.startTime,

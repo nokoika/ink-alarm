@@ -1,6 +1,5 @@
 module Query
   ( FilterCondition (..),
-    NotificationSetting (..),
     QueryRoot (..),
     UtcOffsetTimeZone (..),
     StageFilter (..),
@@ -99,8 +98,7 @@ data FilterCondition = FilterCondition
   { mode :: Mode,
     stages :: Maybe StageFilter,
     rules :: Maybe [Rule],
-    timeSlots :: Maybe [TimeSlot],
-    notifications :: Maybe [NotificationSetting]
+    timeSlots :: Maybe [TimeSlot]
   }
   deriving (Show, Eq, Generic)
 
@@ -148,15 +146,6 @@ data TimeSlot = TimeSlot
   deriving (Show, Eq, Generic)
 
 instance A.FromJSON TimeSlot
-
--- 通知設定
-newtype NotificationSetting = NotificationSetting
-  { minutesBefore :: Int
-  -- TODO: 毎日何時、みたいな設定もできるようにする
-  }
-  deriving (Show, Eq, Generic)
-
-instance A.FromJSON NotificationSetting
 
 parseBase64Url :: Text.Text -> Either String QueryRoot
 parseBase64Url base64Url = case decodeBase64UriToJson $ TE.encodeUtf8 base64Url of

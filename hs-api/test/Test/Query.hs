@@ -7,7 +7,6 @@ import qualified Query
   ( FilterCondition (..),
     Language (..),
     Mode (..),
-    NotificationSetting (..),
     QueryRoot (..),
     Rule (..),
     StageFilter (..),
@@ -49,12 +48,6 @@ test = hspec $ do
                                     { Query.start = Query.TimeSlotTimeOfDay $ LT.TimeOfDay 0 0 0,
                                       Query.end = Query.TimeSlotTimeOfDay $ LT.TimeOfDay 6 0 0,
                                       Query.dayOfWeek = Just $ Query.TimeSlotDayOfWeek C.Sunday
-                                    }
-                                ],
-                            Query.notifications =
-                              Just
-                                [ Query.NotificationSetting
-                                    { Query.minutesBefore = 90
                                     }
                                 ]
                           }

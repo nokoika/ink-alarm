@@ -1,11 +1,11 @@
-module ICal (ICalInput (..), ICalEvent (..), Reminder (..), ReminderTrigger (..), ReminderAction (..), buildICalText) where
+module ICal (ICalInput (..), ICalEvent (..), buildICalText) where
 
 import qualified Data.Char as C
 import Data.List (intercalate)
 import qualified Data.Time as T
 import qualified Query as Q
 import qualified Translation
-import Prelude (Enum, Eq, Int, Show (show), String, concatMap, filter, (++), (.), (==))
+import Prelude (Eq, Show (show), String, concatMap, filter, (++), (.), (==))
 
 data ICalInput = ICalInput
   { language :: Q.Language,
@@ -18,28 +18,7 @@ data ICalEvent = ICalEvent
     summary :: String,
     description :: String,
     start :: T.UTCTime,
-    end :: T.UTCTime,
-    reminders :: [Reminder]
-  }
-  deriving (Show, Eq)
-
-data ReminderAction = Display | Email deriving (Eq, Enum)
-
-instance Show ReminderAction where
-  show Display = "DISPLAY"
-  show Email = "EMAIL"
-
-newtype ReminderTrigger = ReminderTrigger
-  { time :: Int
-  }
-  deriving (Eq)
-
-instance Show ReminderTrigger where
-  show ReminderTrigger {time} = "-PT" ++ show time ++ "M"
-
-data Reminder = Reminder
-  { trigger :: ReminderTrigger,
-    action :: ReminderAction
+    end :: T.UTCTime
   }
   deriving (Show, Eq)
 
@@ -67,23 +46,13 @@ buildICalText ICalInput {language, events} =
       "X-WR-CALNAME:" ++ Translation.showApplicationName language,
       -- ※本当はDTSTAMPもrequiredだが、セットすべき値は慎重に検討すべきであるため暫定的に省略
       aggregate
-        ( \ICalEvent {id, summary, description, start, end, reminders} ->
+        ( \ICalEvent {id, summary, description, start, end} ->
             [ "BEGIN:VEVENT",
               "UID:" ++ id,
               "SUMMARY:" ++ summary,
               "DESCRIPTION:" ++ escapeNewLine description,
               "DTSTART:" ++ toICalTime start,
               "DTEND:" ++ toICalTime end,
-              aggregate
-                ( \Reminder {trigger, action} ->
-                    [ "BEGIN:VALARM",
-                      "TRIGGER:" ++ show trigger,
-                      "ACTION:" ++ show action,
-                      "DESCRIPTION:" ++ summary, -- ※通知文言を凝ってもよい気がするが、今後VALARM自体を消すかもしれないので暫定的にsummaryを設定
-                      "END:VALARM"
-                    ]
-                )
-                reminders,
               "END:VEVENT"
             ]
         )

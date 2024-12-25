@@ -172,8 +172,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` True
 
@@ -203,8 +202,7 @@ test = hspec $ do
                       { Q.matchBothStages = True, -- 片方しかマッチしてないから結果は False になるはず
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` False
 
@@ -234,8 +232,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.TowerControl], -- マッチしないルール
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.TowerControl] -- マッチしないルール
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` False
 
@@ -265,8 +262,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` False
 
@@ -296,8 +292,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` False
 
@@ -327,8 +322,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.XMatch `shouldBe` False
 
@@ -346,8 +340,7 @@ test = hspec $ do
               { Q.mode = Q.BankaraChallenge,
                 Q.timeSlots = Nothing,
                 Q.stages = Nothing,
-                Q.rules = Nothing,
-                Q.notifications = Nothing
+                Q.rules = Nothing
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` True
 
@@ -365,8 +358,7 @@ test = hspec $ do
               { Q.mode = Q.BankaraChallenge,
                 Q.timeSlots = Nothing,
                 Q.stages = Nothing,
-                Q.rules = Nothing,
-                Q.notifications = Nothing
+                Q.rules = Nothing
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.XMatch `shouldBe` False
 
@@ -398,8 +390,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` True
 
@@ -430,8 +421,7 @@ test = hspec $ do
                       { Q.matchBothStages = True, -- 片方しかマッチしてないから結果は False になるはず
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
 
@@ -462,8 +452,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.TowerControl], -- マッチしないルール
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.TowerControl] -- マッチしないルール
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
 
@@ -494,8 +483,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
 
@@ -526,8 +514,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
 
@@ -558,8 +545,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
 
@@ -578,7 +564,6 @@ test = hspec $ do
               { Q.mode = Q.Event,
                 Q.timeSlots = Nothing,
                 Q.stages = Nothing,
-                Q.rules = Nothing,
-                Q.notifications = Nothing
+                Q.rules = Nothing
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` True

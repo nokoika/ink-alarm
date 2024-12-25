@@ -129,8 +129,7 @@ test = hspec $ do
                               { Q.matchBothStages = False,
                                 Q.stageIds = [10, 4]
                               },
-                        Q.rules = Just [Q.Rainmaker],
-                        Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                        Q.rules = Just [Q.Rainmaker]
                       }
                   ]
               }
@@ -145,11 +144,7 @@ test = hspec $ do
                     I.summary = "【ガチホコバトル】バンカラチャレンジ / マサバ海峡大橋, ヒラメが丘団地",
                     I.description = "21:00から23:00までガチホコバトルの予定があります。\n・バンカラチャレンジ\n・ステージ: マサバ海峡大橋, ヒラメが丘団地",
                     I.start = TU.createUTCTime 2024 11 17 12 0,
-                    I.end = TU.createUTCTime 2024 11 17 14 0,
-                    I.reminders =
-                      [ I.Reminder {I.trigger = I.ReminderTrigger {I.time = 10}, I.action = I.Display},
-                        I.Reminder {I.trigger = I.ReminderTrigger {I.time = 20}, I.action = I.Display}
-                      ]
+                    I.end = TU.createUTCTime 2024 11 17 14 0
                   }
               ]
           }
@@ -269,8 +264,7 @@ test = hspec $ do
                               { Q.matchBothStages = False,
                                 Q.stageIds = [10, 4]
                               },
-                        Q.rules = Just [Q.Rainmaker],
-                        Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                        Q.rules = Just [Q.Rainmaker]
                       }
                   ]
               }
@@ -285,11 +279,7 @@ test = hspec $ do
                     I.summary = "【Rainmaker】Anarchy Battle (Series) / Hammerhead Bridge, Flounder Heights",
                     I.description = "There is a scheduled Rainmaker from 04:00 to 06:00.\n- Anarchy Battle (Series)\n- Stages: Hammerhead Bridge, Flounder Heights",
                     I.start = TU.createUTCTime 2024 11 17 12 0,
-                    I.end = TU.createUTCTime 2024 11 17 14 0,
-                    I.reminders =
-                      [ I.Reminder {I.trigger = I.ReminderTrigger {I.time = 10}, I.action = I.Display},
-                        I.Reminder {I.trigger = I.ReminderTrigger {I.time = 20}, I.action = I.Display}
-                      ]
+                    I.end = TU.createUTCTime 2024 11 17 14 0
                   }
               ]
           }
@@ -456,8 +446,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` True
 
@@ -487,8 +476,7 @@ test = hspec $ do
                       { Q.matchBothStages = True, -- 片方しかマッチしてないから結果は False になるはず
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` False
 
@@ -518,8 +506,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.TowerControl], -- マッチしないルール
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.TowerControl] -- マッチしないルール
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` False
 
@@ -549,8 +536,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` False
 
@@ -580,8 +566,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` False
 
@@ -611,8 +596,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.XMatch `shouldBe` False
 
@@ -630,8 +614,7 @@ test = hspec $ do
               { Q.mode = Q.BankaraChallenge,
                 Q.timeSlots = Nothing,
                 Q.stages = Nothing,
-                Q.rules = Nothing,
-                Q.notifications = Nothing
+                Q.rules = Nothing
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` True
 
@@ -649,8 +632,7 @@ test = hspec $ do
               { Q.mode = Q.BankaraChallenge,
                 Q.timeSlots = Nothing,
                 Q.stages = Nothing,
-                Q.rules = Nothing,
-                Q.notifications = Nothing
+                Q.rules = Nothing
               }
       FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.XMatch `shouldBe` False
 
@@ -682,8 +664,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` True
 
@@ -714,8 +695,7 @@ test = hspec $ do
                       { Q.matchBothStages = True, -- 片方しかマッチしてないから結果は False になるはず
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
 
@@ -746,8 +726,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.TowerControl], -- マッチしないルール
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.TowerControl] -- マッチしないルール
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
 
@@ -778,8 +757,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
 
@@ -810,8 +788,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
 
@@ -842,8 +819,7 @@ test = hspec $ do
                       { Q.matchBothStages = False,
                         Q.stageIds = [1, 4]
                       },
-                Q.rules = Just [Q.ClamBlitz],
-                Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                Q.rules = Just [Q.ClamBlitz]
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
 
@@ -862,8 +838,7 @@ test = hspec $ do
               { Q.mode = Q.Event,
                 Q.timeSlots = Nothing,
                 Q.stages = Nothing,
-                Q.rules = Nothing,
-                Q.notifications = Nothing
+                Q.rules = Nothing
               }
       FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` True
 
@@ -890,8 +865,7 @@ test = hspec $ do
                               { Q.matchBothStages = False,
                                 Q.stageIds = [1, 4]
                               },
-                        Q.rules = Just [Q.ClamBlitz],
-                        Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                        Q.rules = Just [Q.ClamBlitz]
                       }
                   ]
               }
@@ -920,11 +894,7 @@ test = hspec $ do
                          I.summary = "【ガチアサリ】バンカラチャレンジ / ユノハナ大渓谷, ゴンズイ地区",
                          I.description = "13:00から15:00までガチアサリの予定があります。\n・バンカラチャレンジ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区",
                          I.start = TU.createUTCTime 2021 1 1 4 0,
-                         I.end = TU.createUTCTime 2021 1 1 6 0,
-                         I.reminders =
-                           [ I.Reminder {I.trigger = I.ReminderTrigger {I.time = 10}, I.action = I.Display},
-                             I.Reminder {I.trigger = I.ReminderTrigger {I.time = 20}, I.action = I.Display}
-                           ]
+                         I.end = TU.createUTCTime 2021 1 1 6 0
                        }
                    ]
 
@@ -951,8 +921,7 @@ test = hspec $ do
                               { Q.matchBothStages = False,
                                 Q.stageIds = [1, 4]
                               },
-                        Q.rules = Just [Q.ClamBlitz],
-                        Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                        Q.rules = Just [Q.ClamBlitz]
                       }
                   ]
               }
@@ -983,11 +952,7 @@ test = hspec $ do
                          I.summary = "イカダッシュバトル【ガチアサリ】イベントマッチ / ユノハナ大渓谷, ゴンズイ地区",
                          I.description = "イカダッシュ速度アップ！ イカやタコでステージを泳ぎ回れ！\n\n13:00から15:00までガチアサリの予定があります。\n・イベントマッチ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区",
                          I.start = TU.createUTCTime 2021 1 1 4 0,
-                         I.end = TU.createUTCTime 2021 1 1 6 0,
-                         I.reminders =
-                           [ I.Reminder {I.trigger = I.ReminderTrigger {I.time = 10}, I.action = I.Display},
-                             I.Reminder {I.trigger = I.ReminderTrigger {I.time = 20}, I.action = I.Display}
-                           ]
+                         I.end = TU.createUTCTime 2021 1 1 6 0
                        }
                    ]
 
@@ -1013,8 +978,7 @@ test = hspec $ do
                               { Q.matchBothStages = False,
                                 Q.stageIds = [1, 4]
                               },
-                        Q.rules = Just [Q.ClamBlitz],
-                        Q.notifications = Just [Q.NotificationSetting 10, Q.NotificationSetting 20]
+                        Q.rules = Just [Q.ClamBlitz]
                       }
                   ]
               }
@@ -1036,10 +1000,6 @@ test = hspec $ do
                          I.summary = "【Clam Blitz】Challenge / Scorch Gorge, Eeltail Alley / イカダッシュバトル",
                          I.description = "There is a scheduled Clam Blitz from 13:00 to 15:00.\n- Challenge\n- Stages: Scorch Gorge, Eeltail Alley\n\nイカダッシュ速度アップ！ イカやタコでステージを泳ぎ回れ！",
                          I.start = TU.createUTCTime 2021 1 1 4 0,
-                         I.end = TU.createUTCTime 2021 1 1 6 0,
-                         I.reminders =
-                           [ I.Reminder {I.trigger = I.ReminderTrigger {I.time = 10}, I.action = I.Display},
-                             I.Reminder {I.trigger = I.ReminderTrigger {I.time = 20}, I.action = I.Display}
-                           ]
+                         I.end = TU.createUTCTime 2021 1 1 6 0
                        }
                    ]
