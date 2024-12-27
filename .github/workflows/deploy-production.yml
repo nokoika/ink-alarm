@@ -7,8 +7,8 @@ on:
   #     - 'v*'
 
 jobs:
-  deploy:
-    name: "Deploy"
+  cloud-run:
+    name: "Deploy to Cloud Run"
     runs-on: "ubuntu-latest"
     environment: "production"
     permissions:
@@ -49,3 +49,33 @@ jobs:
           service: "${{ secrets.RUN_SERVICE_NAME }}"
           region: "asia-northeast1"
           image: "${{ secrets.ARTIFACT_REGISTRY }}/${{ secrets.CONTAINER_NAME }}:${{ github.sha }}"
+
+  cloudflare-pages:
+    name: "Deploy to Cloudflare Pages"
+    needs: "cloud-run"
+    runs-on: "ubuntu-latest"
+    environment: "production"
+    defaults:
+      run:
+        working-directory: "front/"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Setup bun"
+        uses: "oven-sh/setup-bun@v2"
+        with:
+          bun-version-file: ".bun-version"
+
+      - name: "Install dependencies"
+        run: "bun install"
+
+      - name: "Build"
+        run: "bun run build"
+
+      - name: "Deploy to Cloudflare Pages"
+        uses: "cloudflare/wrangler-action@3"
+        with:
+          apiToken: "${{ secrets.CLOUDFLARE_API_TOKEN }}"
+          command: "pages deploy dist --project-name=ink-alarm"
