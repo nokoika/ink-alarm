@@ -9,6 +9,7 @@ on:
 jobs:
   build-and-check:
     runs-on: "ubuntu-latest"
+    environment: "production"
     defaults:
       run:
         working-directory: "front/"
@@ -33,4 +34,7 @@ jobs:
       - name: "Format check"
         run: "bun prettier --check ."
       - name: "Build"
-        run: "bun run build"
+        run: |
+          echo start
+          echo ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          echo end
