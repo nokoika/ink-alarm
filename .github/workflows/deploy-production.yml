@@ -52,7 +52,6 @@ jobs:
 
   cloudflare-pages:
     name: "Deploy to Cloudflare Pages"
-    needs: "cloud-run"
     runs-on: "ubuntu-latest"
     environment: "production"
     defaults:
