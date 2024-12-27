@@ -24,14 +24,14 @@ createICalEventsFromDefaultSchedules Q.QueryRoot {utcOffset, filters, language} 
       { I.id = eventId language mode apiRule apiStages (startTime, endTime),
         I.summary = Translation.showCalendarSummary language mode apiRule apiStages,
         I.description = Translation.showCalendarDescription language mode apiRule apiStages timeRange,
-        I.start = startTime,
-        I.end = endTime
+        I.start = intersectStart,
+        I.end = intersectEnd
       }
     | defaultSchedule@S.DefaultSchedule {startTime, endTime, rule = Just apiRule, stages = Just apiStages} <- defaultSchedules,
-      let Q.UtcOffsetTimeZone utcOffset' = utcOffset
-          timeRange = Date.convertRangedUTCTimeToZonedTime utcOffset' (startTime, endTime),
+      let Q.UtcOffsetTimeZone utcOffset' = utcOffset,
+      let timeRange = Date.convertRangedUTCTimeToZonedTime utcOffset' (startTime, endTime),
       filter <- filters,
-      FS.filterDefaultSchedule filter defaultSchedule utcOffset' mode
+      (intersectStart, intersectEnd) <- FS.getMatchedTimeRangesFromDefaultSchedule filter defaultSchedule utcOffset' mode
   ]
 
 createICalEventsFromEventMatches :: Q.QueryRoot -> [S.EventMatch] -> [I.ICalEvent]
@@ -47,8 +47,8 @@ createICalEventsFromEventMatches Q.QueryRoot {utcOffset, filters, language} even
           if language == Q.Japanese
             then eventDescription ++ "\n\n" ++ baseDescription
             else baseDescription ++ "\n\n" ++ eventDescription,
-        I.start = startTime,
-        I.end = endTime
+        I.start = intersectStart,
+        I.end = intersectEnd
       }
     | eventMatch@S.EventMatch
         { S.startTime,
@@ -58,12 +58,12 @@ createICalEventsFromEventMatches Q.QueryRoot {utcOffset, filters, language} even
           eventSummary = S.EventSummary {name = eventName, desc = eventDescription}
         } <-
         eventMatches,
-      let Q.UtcOffsetTimeZone utcOffset' = utcOffset
-          timeRange = Date.convertRangedUTCTimeToZonedTime utcOffset' (startTime, endTime)
-          baseSummary = Translation.showCalendarSummary language Q.Event apiRule apiStages
-          baseDescription = Translation.showCalendarDescription language Q.Event apiRule apiStages timeRange,
+      let Q.UtcOffsetTimeZone utcOffset' = utcOffset,
+      let timeRange = Date.convertRangedUTCTimeToZonedTime utcOffset' (startTime, endTime),
+      let baseSummary = Translation.showCalendarSummary language Q.Event apiRule apiStages,
+      let baseDescription = Translation.showCalendarDescription language Q.Event apiRule apiStages timeRange,
       filter <- filters,
-      FS.filterEventMatch filter eventMatch utcOffset'
+      (intersectStart, intersectEnd) <- FS.getMatchedTimeRangesFromEventMatch filter eventMatch utcOffset'
   ]
 
 createIcalInput :: Q.QueryRoot -> S.Result -> I.ICalInput

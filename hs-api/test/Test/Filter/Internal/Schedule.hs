@@ -10,7 +10,7 @@ import Prelude (Bool (..), IO, Int, Maybe (Just, Nothing), ($))
 
 test :: IO ()
 test = hspec $ do
-  describe "inTimeSlot" $ do
+  describe "timeSlotIntersection" $ do
     it "API: [13:00 (金), 15:00(金)), TimeSlot: [12:00, 16:00), 金 のとき、マッチする" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 4 0 -- 日本では2021年1月1日13時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 6 0 -- 日本では2021年1月1日15時
@@ -21,7 +21,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
               }
-      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` True
+      FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Just (TU.createLocalTime 2021 1 1 13 0, TU.createLocalTime 2021 1 1 15 0)
     it "API: [23:00 (金), 01:00(土)), TimeSlot: [16:00, 00:00), 金 のとき、マッチする" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 14 0 -- 日本では2021年1月1日23時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 16 0 -- 日本では2021年1月2日1時 土曜日
@@ -32,7 +32,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
               }
-      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` True
+      FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Just (TU.createLocalTime 2021 1 1 23 0, TU.createLocalTime 2021 1 2 0 0)
     it "API: [23:00 (金), 01:00(土)), TimeSlot: [00:00, 01:00), 土 のとき、マッチする" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 14 0 -- 日本では2021年1月1日23時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 16 0 -- 日本では2021年1月2日1時 土曜日
@@ -43,7 +43,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 1 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Saturday
               }
-      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` True
+      FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Just (TU.createLocalTime 2021 1 2 0 0, TU.createLocalTime 2021 1 2 1 0)
     it "API: [13:00 (金), 15:00(金)), TimeSlot: [12:00, 16:00), 土 のとき、マッチしない" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 4 0 -- 日本では2021年1月1日13時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 6 0 -- 日本では2021年1月1日15時
@@ -54,7 +54,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Saturday
               }
-      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` False
+      FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Nothing
     it "API: [13:00 (金), 15:00(金)), TimeSlot: [00:00, 00:00), 金 のとき、マッチする" $ do
       let apiStartTime = TU.createUTCTime 2021 1 1 4 0 -- 日本では2021年1月1日13時 金曜日
       let apiEndTime = TU.createUTCTime 2021 1 1 6 0 -- 日本では2021年1月1日15時
@@ -65,7 +65,7 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
                 dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
               }
-      FS.inTimeSlot (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` False
+      FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Nothing
 
   describe "inStage" $ do
     let createStage :: Int -> S.Stage
@@ -145,7 +145,7 @@ test = hspec $ do
       let rules = []
       FS.inRules apiRule rules `shouldBe` False
 
-  describe "filterDefaultSchedule" $ do
+  describe "getMatchedTimeRangesFromDefaultSchedule" $ do
     it "条件全指定 マッチ" $ do
       let defaultSchedule =
             S.DefaultSchedule
@@ -174,7 +174,7 @@ test = hspec $ do
                       },
                 Q.rules = Just [Q.ClamBlitz]
               }
-      FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` True
+      FS.getMatchedTimeRangesFromDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` [(TU.createUTCTime 2021 1 1 4 0, TU.createUTCTime 2021 1 1 6 0)]
 
     it "条件全指定 ステージがマッチしない" $ do
       let defaultSchedule =
@@ -204,7 +204,7 @@ test = hspec $ do
                       },
                 Q.rules = Just [Q.ClamBlitz]
               }
-      FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` False
+      FS.getMatchedTimeRangesFromDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` []
 
     it "条件全指定 ルールがマッチしない" $ do
       let defaultSchedule =
@@ -234,7 +234,7 @@ test = hspec $ do
                       },
                 Q.rules = Just [Q.TowerControl] -- マッチしないルール
               }
-      FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` False
+      FS.getMatchedTimeRangesFromDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` []
 
     it "条件全指定 時間帯がマッチしない" $ do
       let defaultSchedule =
@@ -264,7 +264,7 @@ test = hspec $ do
                       },
                 Q.rules = Just [Q.ClamBlitz]
               }
-      FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` False
+      FS.getMatchedTimeRangesFromDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` []
 
     it "条件全指定 フェスの場合はマッチしない" $ do
       let defaultSchedule =
@@ -294,7 +294,7 @@ test = hspec $ do
                       },
                 Q.rules = Just [Q.ClamBlitz]
               }
-      FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` False
+      FS.getMatchedTimeRangesFromDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` []
 
     it "条件全指定 モードが違う" $ do
       let defaultSchedule =
@@ -324,7 +324,7 @@ test = hspec $ do
                       },
                 Q.rules = Just [Q.ClamBlitz]
               }
-      FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.XMatch `shouldBe` False
+      FS.getMatchedTimeRangesFromDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.XMatch `shouldBe` []
 
     it "条件最小限 マッチ" $ do
       let defaultSchedule =
@@ -342,7 +342,7 @@ test = hspec $ do
                 Q.stages = Nothing,
                 Q.rules = Nothing
               }
-      FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` True
+      FS.getMatchedTimeRangesFromDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` [(TU.createUTCTime 2021 1 1 4 0, TU.createUTCTime 2021 1 1 6 0)]
 
     it "条件最小限 マッチしない" $ do
       let defaultSchedule =
@@ -360,9 +360,9 @@ test = hspec $ do
                 Q.stages = Nothing,
                 Q.rules = Nothing
               }
-      FS.filterDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.XMatch `shouldBe` False
+      FS.getMatchedTimeRangesFromDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.XMatch `shouldBe` []
 
-  describe "filterEventMatch" $ do
+  describe "getMatchedTimeRangesFromEventMatch" $ do
     it "条件全指定 マッチ" $ do
       let eventMatch =
             S.EventMatch
@@ -392,7 +392,7 @@ test = hspec $ do
                       },
                 Q.rules = Just [Q.ClamBlitz]
               }
-      FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` True
+      FS.getMatchedTimeRangesFromEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` [(TU.createUTCTime 2021 1 1 4 0, TU.createUTCTime 2021 1 1 6 0)]
 
     it "条件全指定 ステージがマッチしない" $ do
       let eventMatch =
@@ -418,12 +418,12 @@ test = hspec $ do
                 Q.stages =
                   Just
                     Q.StageFilter
-                      { Q.matchBothStages = True, -- 片方しかマッチしてないから結果は False になるはず
+                      { Q.matchBothStages = True, -- 片方しかマッチしてないから drop されるはず
                         Q.stageIds = [1, 4]
                       },
                 Q.rules = Just [Q.ClamBlitz]
               }
-      FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
+      FS.getMatchedTimeRangesFromEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` []
 
     it "条件全指定 ルールがマッチしない" $ do
       let eventMatch =
@@ -454,7 +454,7 @@ test = hspec $ do
                       },
                 Q.rules = Just [Q.TowerControl] -- マッチしないルール
               }
-      FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
+      FS.getMatchedTimeRangesFromEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` []
 
     it "条件全指定 時間帯がマッチしない" $ do
       let eventMatch =
@@ -485,7 +485,7 @@ test = hspec $ do
                       },
                 Q.rules = Just [Q.ClamBlitz]
               }
-      FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
+      FS.getMatchedTimeRangesFromEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` []
 
     it "条件全指定 フェスの場合はマッチしない" $ do
       let eventMatch =
@@ -516,7 +516,7 @@ test = hspec $ do
                       },
                 Q.rules = Just [Q.ClamBlitz]
               }
-      FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
+      FS.getMatchedTimeRangesFromEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` []
 
     it "条件全指定 モードが違う" $ do
       let eventMatch =
@@ -547,7 +547,7 @@ test = hspec $ do
                       },
                 Q.rules = Just [Q.ClamBlitz]
               }
-      FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` False
+      FS.getMatchedTimeRangesFromEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` []
 
     it "条件最小限 マッチ" $ do
       let eventMatch =
@@ -566,4 +566,44 @@ test = hspec $ do
                 Q.stages = Nothing,
                 Q.rules = Nothing
               }
-      FS.filterEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` True
+      FS.getMatchedTimeRangesFromEventMatch query eventMatch (TU.createTimeZone 9 "") `shouldBe` [(TU.createUTCTime 2021 1 1 4 0, TU.createUTCTime 2021 1 1 6 0)]
+
+    it "1つのスケジュールに対して複数のTimeSlotがマッチする場合、複数の区間を返却する" $ do
+      let eventMatch =
+            S.EventMatch
+              { S.startTime = TU.createUTCTime 2021 1 1 4 0, -- 13~15時
+                S.endTime = TU.createUTCTime 2021 1 1 6 0,
+                S.rule = S.Rule {key = S.ClamBlitz, name = ""},
+                S.stages = [S.Stage 1 "" "", S.Stage 2 "" ""],
+                S.eventSummary = S.EventSummary "id" "name" "desc",
+                S.isFest = False
+              }
+      let query =
+            Q.FilterCondition
+              { Q.mode = Q.Event,
+                Q.timeSlots =
+                  Just
+                    [ Q.TimeSlot
+                        { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 30 0,
+                          Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 13 4 0,
+                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                        },
+                      Q.TimeSlot
+                        { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 13 4 0,
+                          Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 13 6 0,
+                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                        },
+                      Q.TimeSlot
+                        { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 13 5 0, -- これは↑と結合してEventを作成してもよいのだが、現状は別のEventとして扱う
+                          Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 13 8 0,
+                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                        }
+                    ],
+                Q.stages = Nothing,
+                Q.rules = Nothing
+              }
+      FS.getMatchedTimeRangesFromEventMatch query eventMatch (TU.createTimeZone 9 "")
+        `shouldBe` [ (TU.createUTCTime 2021 1 1 4 0, TU.createUTCTime 2021 1 1 4 4),
+                     (TU.createUTCTime 2021 1 1 4 4, TU.createUTCTime 2021 1 1 4 6),
+                     (TU.createUTCTime 2021 1 1 4 5, TU.createUTCTime 2021 1 1 4 8)
+                   ]

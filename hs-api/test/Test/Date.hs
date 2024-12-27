@@ -267,6 +267,8 @@ test = hspec $ do
   describe "intersectTimeRangesWithLocalTime" $ do
     let ld1 = T.fromGregorian 2021 1 1
     let ld2 = T.fromGregorian 2021 1 2
+
+    -- TODO: テストケースがA~Mの13パターンに即してないため要修正
     it "Case A => [d2, d3)" $ do
       D.intersectTimeRangesWithLocalTime (d2, d3) (T.LocalTime ld1 d2, T.LocalTime ld1 d3) `shouldBe` Just (T.LocalTime ld1 d2, T.LocalTime ld1 d3)
     it "Case B => [d1, d4)" $ do

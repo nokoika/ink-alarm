@@ -10,9 +10,10 @@ module Date
     UTCTimeRange,
     LocalTimeRange,
     TimeOfDayRange,
-    convertRangedUTCTimeToZonedTime,
     convertRangedLocalTimeToTimeOfDay,
+    convertRangedLocalTimeToUTCTime,
     convertRangedZonedTimeToLocalTime,
+    convertRangedUTCTimeToZonedTime,
     convertRangedUTCTimeToLocalTime,
   )
 where
@@ -136,6 +137,9 @@ type TimeOfDayRange = (LT.TimeOfDay, LT.TimeOfDay)
 
 convertRangedLocalTimeToTimeOfDay :: LocalTimeRange -> TimeOfDayRange
 convertRangedLocalTimeToTimeOfDay (start, end) = (LT.localTimeOfDay start, LT.localTimeOfDay end)
+
+convertRangedLocalTimeToUTCTime :: T.TimeZone -> LocalTimeRange -> UTCTimeRange
+convertRangedLocalTimeToUTCTime timeZone (start, end) = (LT.localTimeToUTC timeZone start, LT.localTimeToUTC timeZone end)
 
 convertRangedZonedTimeToLocalTime :: ZonedTimeRange -> LocalTimeRange
 convertRangedZonedTimeToLocalTime (start, end) = (LT.zonedTimeToLocalTime start, LT.zonedTimeToLocalTime end)
