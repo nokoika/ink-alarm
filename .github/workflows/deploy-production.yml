@@ -74,7 +74,7 @@ jobs:
         run: "bun run build"
 
       - name: "Deploy to Cloudflare Pages"
-        uses: "cloudflare/wrangler-action@3"
+        uses: "cloudflare/wrangler-action@v3"
         with:
           apiToken: "${{ secrets.CLOUDFLARE_API_TOKEN }}"
           command: "pages deploy dist --project-name=ink-alarm"
