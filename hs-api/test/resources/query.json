@@ -1,6 +1,6 @@
 {
   "// 注意事項": "このファイルをbase64URLエンコードしたものがquery-base64url.txtになります。cat query.json | basenc --base64url -w 0 > query-base64url.txt",
-  "$schema": "../../query-schema.json",
+  "$schema": "../../../query-schema.json",
   "language": "ja",
   "utcOffset": "+09:00",
   "filters": [
