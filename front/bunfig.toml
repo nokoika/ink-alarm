@@ -1,0 +1,7 @@
+[install.lockfile]
+# レビューのためだけに bun.lockb 生成時に yarn.lock も生成する
+print = "yarn"
+
+[run]
+# bun 経由のコマンド実行で node ではなく bun を使う (= bun --bun)
+bun = true
