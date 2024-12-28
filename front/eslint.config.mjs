@@ -55,4 +55,11 @@ export default pluginTseslint.config(
       },
     },
   },
+  {
+    files: ['src/contexts/**/*.ts', 'src/contexts/**/*.tsx'],
+    rules: {
+      // Context の場合は Provider Component と Hook を export したいため off
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 );

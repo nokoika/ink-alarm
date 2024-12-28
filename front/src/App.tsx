@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { useTranslation, type TranslationKey } from './hooks/useTranslation';
 
 const RulesFilter: FC = () => {
   return (
@@ -64,7 +65,7 @@ const TimeSlotFilter: FC = () => {
               className="sr-only peer"
               // onChangeなどのイベントはあえて入れずに状態管理を排除
             />
-            <span className="block px-3 py-1 text-gray-700 bg-gray-200 rounded peer-checked:bg-blue-500 peer-checked:text-white hover:bg-gray-100 transition-colors">
+            <span className="block px-3 py-2 text-gray-700 bg-gray-200 rounded peer-checked:bg-blue-500 peer-checked:text-white hover:bg-gray-100 transition-colors">
               {day}
             </span>
           </label>
@@ -75,33 +76,14 @@ const TimeSlotFilter: FC = () => {
 };
 
 const StageFilter: FC = () => {
-  // ステージID -> ステージ名 のマッピングを配列で定義
-  const stages = [
-    { id: 1, name: 'ユノハナ大渓谷' },
-    { id: 2, name: 'ゴンズイ地区' },
-    { id: 3, name: 'ヤガラ市場' },
-    { id: 4, name: 'マテガイ放水路' },
-    { id: 5, name: 'ナンプラー遺跡' },
-    { id: 6, name: 'ナメロウ金属' },
-    { id: 7, name: 'クサヤ温泉' },
-    { id: 8, name: 'タラポートショッピングパーク' },
-    { id: 9, name: 'ヒラメが丘団地' },
-    { id: 10, name: 'マサバ海峡大橋' },
-    { id: 11, name: 'キンメダイ美術館' },
-    { id: 12, name: 'マヒマヒリゾート＆スパ' },
-    { id: 13, name: '海女美術大学' },
-    { id: 14, name: 'チョウザメ造船' },
-    { id: 15, name: 'ザトウマーケット' },
-    { id: 16, name: 'スメーシーワールド' },
-    { id: 17, name: 'コンブトラック' },
-    { id: 18, name: 'マンタマリア号' },
-    { id: 19, name: 'タカアシ経済特区' },
-    { id: 20, name: 'オヒョウ海運' },
-    { id: 21, name: 'バイガイ亭' },
-    { id: 22, name: 'ネギトロ炭鉱' },
-    { id: 23, name: 'カジキ空港' },
-    { id: 24, name: 'リュウグウターミナル' },
-  ];
+  const stages: Array<{ id: number; name: TranslationKey }> = Array.from(
+    { length: 24 },
+    (_, index) => ({
+      id: index + 1,
+      name: `stage.${index + 1}` as TranslationKey,
+    }),
+  );
+  const { t } = useTranslation();
 
   return (
     <div className="grid grid-cols-4 gap-2">
@@ -109,7 +91,7 @@ const StageFilter: FC = () => {
         <label key={stage.id} className="relative cursor-pointer">
           <input type="checkbox" className="sr-only peer" />
           <span className="block px-3 py-2 text-sm text-center text-gray-700 bg-gray-200 rounded peer-checked:bg-blue-500 peer-checked:text-white hover:bg-gray-300 transition-colors">
-            {stage.name}
+            {t(stage.name)}
           </span>
         </label>
       ))}
