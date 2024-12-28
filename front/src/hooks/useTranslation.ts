@@ -1,7 +1,7 @@
 // 現状は複雑な翻訳を用意する必要がないため、react-i18next などを使ってません。
 // 複雑になってから検討する
 
-import { useTranslationLanguageContext } from '../contexts/translationLanguageContext'
+import { useTranslationLanguageContext } from '~/contexts/translationLanguageContext'
 
 export type TranslationKey =
   | 'app.name'

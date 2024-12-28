@@ -1,8 +1,8 @@
 import React from 'react'
 import reactDom from 'react-dom/client'
-import { App } from './App.tsx'
+import { App } from '~/App.tsx'
 import './index.css'
-import { TranslationLanguageProvider } from './contexts/translationLanguageContext'
+import { TranslationLanguageProvider } from '~/contexts/translationLanguageContext'
 
 const root = document.getElementById('root')
 

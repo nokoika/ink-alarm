@@ -5,5 +5,8 @@
     "@tsconfig/vite-react/tsconfig.json"
   ],
   "include": ["src"],
-  "compilerOptions": {}
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "~/*": ["src/*"] }
+  }
 }

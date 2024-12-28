@@ -6,6 +6,10 @@ import { defineConfig } from 'vite'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: { port: 40000 },
+  resolve: {
+    alias: { '~/': `${__dirname}/src/` },
+  },
   build: {
     rollupOptions: {
       input: {
