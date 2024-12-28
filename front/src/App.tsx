@@ -1,12 +1,12 @@
-import { FC } from 'react';
-import { useTranslation, type TranslationKey } from './hooks/useTranslation';
+import type { FC } from 'react'
+import { type TranslationKey, useTranslation } from './hooks/useTranslation.ts'
 
 const RulesFilter: FC = () => {
   return (
     <div className="flex gap-2">
       {['ガチエリア', 'ガチヤグラ', 'ガチホコバトル', 'ガチアサリ'].map(
-        (option, index) => (
-          <label key={index} className="relative cursor-pointer">
+        (option) => (
+          <label key={option} className="relative cursor-pointer">
             <input type="checkbox" className="sr-only peer" />
             <span className="block px-4 py-2 text-gray-700 bg-gray-200 rounded peer-checked:bg-blue-500 peer-checked:text-white transition-colors duration-200 hover:bg-gray-300">
               {option}
@@ -15,8 +15,8 @@ const RulesFilter: FC = () => {
         ),
       )}
     </div>
-  );
-};
+  )
+}
 
 const ModesFilter: FC = () => {
   return (
@@ -27,8 +27,8 @@ const ModesFilter: FC = () => {
         'バンカラマッチ (オープン)',
         'バンカラマッチ (チャレンジ)',
         'レギュラーマッチ',
-      ].map((option, index) => (
-        <label key={index} className="relative cursor-pointer">
+      ].map((option) => (
+        <label key={option} className="relative cursor-pointer">
           <input type="checkbox" className="sr-only peer" />
           <span className="block px-4 py-2 text-gray-700 bg-gray-200 rounded peer-checked:bg-blue-500 peer-checked:text-white transition-colors duration-200 hover:bg-gray-300">
             {option}
@@ -36,11 +36,11 @@ const ModesFilter: FC = () => {
         </label>
       ))}
     </div>
-  );
-};
+  )
+}
 
 const TimeSlotFilter: FC = () => {
-  const daysOfWeek = ['月', '火', '水', '木', '金', '土', '日'];
+  const daysOfWeek = ['月', '火', '水', '木', '金', '土', '日']
   return (
     <div className="flex gap-4">
       <div className="flex items-center gap-2">
@@ -57,8 +57,8 @@ const TimeSlotFilter: FC = () => {
         />
       </div>
       <div className="flex flex-wrap gap-2">
-        {daysOfWeek.map((day, index) => (
-          <label key={index} className="cursor-pointer">
+        {daysOfWeek.map((day) => (
+          <label key={day} className="cursor-pointer">
             {/* 実際のチェックボックスは視覚的に隠して、状態によって見た目を変える */}
             <input
               type="checkbox"
@@ -72,8 +72,8 @@ const TimeSlotFilter: FC = () => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
 const StageFilter: FC = () => {
   const stages: Array<{ id: number; name: TranslationKey }> = Array.from(
@@ -82,8 +82,8 @@ const StageFilter: FC = () => {
       id: index + 1,
       name: `stage.${index + 1}` as TranslationKey,
     }),
-  );
-  const { t } = useTranslation();
+  )
+  const { t } = useTranslation()
 
   return (
     <div className="grid grid-cols-4 gap-2">
@@ -96,10 +96,10 @@ const StageFilter: FC = () => {
         </label>
       ))}
     </div>
-  );
-};
+  )
+}
 
-const App: FC = () => {
+export const App: FC = () => {
   return (
     <div className="space-y-2">
       <RulesFilter />
@@ -107,7 +107,5 @@ const App: FC = () => {
       <TimeSlotFilter />
       <StageFilter />
     </div>
-  );
-};
-
-export default App;
+  )
+}

@@ -1,7 +1,7 @@
 // 現状は複雑な翻訳を用意する必要がないため、react-i18next などを使ってません。
 // 複雑になってから検討する
 
-import { useTranslationLanguageContext } from '../contexts/TranslationLanguageContext';
+import { useTranslationLanguageContext } from '../contexts/translationLanguageContext.ts'
 
 export type TranslationKey =
   | 'app.name'
@@ -45,7 +45,7 @@ export type TranslationKey =
   | 'date.thursday'
   | 'date.friday'
   | 'date.saturday'
-  | 'date.sunday';
+  | 'date.sunday'
 
 const dictionaryJa: Record<TranslationKey, string> = {
   'app.name': 'ガチアラーム',
@@ -90,7 +90,7 @@ const dictionaryJa: Record<TranslationKey, string> = {
   'date.friday': '金曜日',
   'date.saturday': '土曜日',
   'date.sunday': '日曜日',
-};
+}
 
 const dictionaryEn: Record<TranslationKey, string> = {
   'app.name': 'Ink Alarm',
@@ -135,19 +135,19 @@ const dictionaryEn: Record<TranslationKey, string> = {
   'date.friday': 'Friday',
   'date.saturday': 'Saturday',
   'date.sunday': 'Sunday',
-};
+}
 
-type Translate = (key: TranslationKey) => string;
+type Translate = (key: TranslationKey) => string
 
-type UseTranslation = { t: Translate };
+type UseTranslation = { t: Translate }
 
 export const useTranslation = (): UseTranslation => {
-  const { language } = useTranslationLanguageContext();
+  const { language } = useTranslationLanguageContext()
 
   const t: Translate = (key: TranslationKey): string => {
-    const dictionary = language === 'ja' ? dictionaryJa : dictionaryEn;
-    return dictionary[key];
-  };
+    const dictionary = language === 'ja' ? dictionaryJa : dictionaryEn
+    return dictionary[key]
+  }
 
-  return { t };
-};
+  return { t }
+}

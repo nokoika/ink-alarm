@@ -34,7 +34,10 @@
   "inlayHint.display": true,
   "inlayHint.enableParameter": true,
   "inlayHint.enable": true,
-  "prettier.enable": true,
+  "eslint.enable": false,
+  "prettier.enable": false,
+  "biome.enable": true,
+  "biome.bin": "./node_modules/.bin/biome",
   "[javascript,typescript,typescriptreact,json,yaml,markdown,css,html,haskell]": {
     "coc.preferences.formatOnSave": true
   }

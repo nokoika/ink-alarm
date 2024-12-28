@@ -18,19 +18,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "lint-staged": "^15.2.11",
+    "@biomejs/biome": "1.9.4",
     "simple-git-hooks": "^2.11.1"
   },
-  "lint-staged": {
-    "hs-api/**/*.hs": [
-      "stack exec -- ormolu --mode inplace",
-      "stack exec -- hlint"
-    ],
-    "front/**/*.{js,ts,tsx,json,md,css,html,yml,yaml}": [
-      "bun precommit.mjs"
-    ]
-  },
   "simple-git-hooks": {
-    "pre-commit": "bun lint-staged"
+    "pre-commit": "bun biome check . --staged --no-errors-on-unmatched --error-on-warnings"
   }
 }
