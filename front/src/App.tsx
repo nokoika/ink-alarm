@@ -1,5 +1,5 @@
 import type { FC } from 'react'
-import { type TranslationKey, useTranslation } from './hooks/useTranslation.ts'
+import { type TranslationKey, useTranslation } from './hooks/useTranslation'
 
 const RulesFilter: FC = () => {
   return (

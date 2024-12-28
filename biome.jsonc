@@ -17,6 +17,8 @@
       },
       "correctness": {
         "all": true,
+        // 拡張子ありで import できるような Vite の設定にしていないため off にする
+        "useImportExtensions": "off",
         // プロジェクトルートの package.json を参照しており、front/package.json を参照できていないため off にする
         "noUndeclaredDependencies": "off"
       }

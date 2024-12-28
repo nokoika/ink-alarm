@@ -4,5 +4,6 @@
     "@tsconfig/strictest/tsconfig.json",
     "@tsconfig/vite-react/tsconfig.json"
   ],
-  "include": ["src"]
+  "include": ["src"],
+  "compilerOptions": {}
 }
