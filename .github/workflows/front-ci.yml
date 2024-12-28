@@ -9,7 +9,6 @@ on:
 jobs:
   build-and-check:
     runs-on: "ubuntu-latest"
-    defaults:
 
     steps:
       - name: "Checkout"
