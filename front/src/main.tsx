@@ -2,7 +2,6 @@ import React from 'react'
 import reactDom from 'react-dom/client'
 import { App } from '~/App.tsx'
 import './index.css'
-import { TranslationLanguageProvider } from '~/contexts/translationLanguageContext'
 
 const root = document.getElementById('root')
 
@@ -12,8 +11,6 @@ if (!root) {
 
 reactDom.createRoot(root).render(
   <React.StrictMode>
-    <TranslationLanguageProvider defaultLanguage="en">
-      <App />
-    </TranslationLanguageProvider>
+    <App />
   </React.StrictMode>,
 )

@@ -1,8 +1,6 @@
-import type React from 'react'
 import {
-  type Dispatch,
+  type FC,
   type ReactNode,
-  type SetStateAction,
   createContext,
   useContext,
   useState,
@@ -10,7 +8,7 @@ import {
 
 type TranslationLanguageContextType = {
   language: 'ja' | 'en'
-  setLanguage: Dispatch<SetStateAction<'ja' | 'en'>>
+  setLanguage: (lang: 'ja' | 'en') => void
 }
 
 const TranslationLanguageContext = createContext<
@@ -18,14 +16,39 @@ const TranslationLanguageContext = createContext<
 >(undefined)
 
 type TranslationLanguageProviderProps = {
-  defaultLanguage: 'ja' | 'en'
   children: ReactNode
 }
 
-export const TranslationLanguageProvider: React.FC<
+type UseLanguage = {
+  language: 'ja' | 'en'
+  setLanguage: (lang: 'ja' | 'en') => void
+}
+
+const getDefaultLanguage = (): 'ja' | 'en' => {
+  const language = location.pathname.split('/')[1]
+  if (language === 'ja' || language === 'en') {
+    return language
+  }
+  const navigatorLanguage = navigator.language.startsWith('ja') ? 'ja' : 'en'
+  history.replaceState(null, '', `/${navigatorLanguage}`)
+  return navigatorLanguage
+}
+
+const useLanguage = (): UseLanguage => {
+  const [language, setLanguageState] = useState<'ja' | 'en'>(getDefaultLanguage)
+
+  const setLanguage = (lang: 'ja' | 'en') => {
+    setLanguageState(lang)
+    history.replaceState(null, '', `/${lang}`)
+  }
+
+  return { language, setLanguage }
+}
+
+export const TranslationLanguageProvider: FC<
   TranslationLanguageProviderProps
-> = ({ defaultLanguage, children }) => {
-  const [language, setLanguage] = useState<'ja' | 'en'>(defaultLanguage)
+> = ({ children }) => {
+  const { language, setLanguage } = useLanguage()
 
   return (
     <TranslationLanguageContext.Provider value={{ language, setLanguage }}>
