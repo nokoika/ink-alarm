@@ -130,15 +130,35 @@ const StageFilter: FC = () => {
   )
 }
 
+const AddFilter: FC = () => {
+  return (
+    <div className="flex justify-center">
+      <button
+        type="button"
+        className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 transition-colors"
+      >
+        +
+      </button>
+    </div>
+  )
+}
+
+const FilterWidget: FC = () => {
+  return (
+    <div className="space-y-2">
+      <RulesFilter />
+      <ModesFilter />
+      <TimeSlotFilter />
+      <StageFilter />
+    </div>
+  )
+}
+
 export const App: FC = () => {
   return (
     <TranslationLanguageProvider>
-      <div className="space-y-2">
-        <RulesFilter />
-        <ModesFilter />
-        <TimeSlotFilter />
-        <StageFilter />
-      </div>
+      <AddFilter />
+      <FilterWidget />
     </TranslationLanguageProvider>
   )
 }
