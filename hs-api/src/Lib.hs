@@ -34,7 +34,7 @@ processQuery scheduleCache query =
 
 generateICal :: Query.QueryRoot -> SplaApi.Root -> Scotty.ActionM ()
 generateICal query SplaApi.Root {result = apiResult} =
-  Filter.createIcalInput query apiResult
+  Filter.createICalInput query apiResult
     & ICal.buildICalText
     & sendResponse
 

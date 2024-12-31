@@ -63,11 +63,14 @@ inRules S.Rule {key = apiRuleKey} rules = apiRuleKey `elem` ruleKeys
     convertRule Q.Rainmaker = S.Rainmaker
     convertRule Q.ClamBlitz = S.ClamBlitz
 
+inMode :: Q.Mode -> [Q.Mode] -> Bool
+inMode apiMode' selectedModes = apiMode' `elem` selectedModes
+
 getMatchedTimeRangesFromDefaultSchedule :: Q.FilterCondition -> S.DefaultSchedule -> T.TimeZone -> Q.Mode -> [Date.UTCTimeRange]
-getMatchedTimeRangesFromDefaultSchedule Q.FilterCondition {mode, stages, rules, timeSlots} S.DefaultSchedule {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset apiMode =
+getMatchedTimeRangesFromDefaultSchedule Q.FilterCondition {modes, stages, rules, timeSlots} S.DefaultSchedule {startTime = apiStartTime, endTime = apiEndTime, rule = apiRule, stages = apiStages, isFest = apiIsFest} utcOffset apiMode =
   [ Date.convertRangedLocalTimeToUTCTime utcOffset intersection
     | not apiIsFest,
-      mode == apiMode,
+      maybeTrue (inMode apiMode) modes,
       maybeTrue (inMaybeStages apiStages) stages,
       maybeTrue (inMaybeRules apiRule) rules,
       let intersections :: [Date.LocalTimeRange] = case timeSlots of
@@ -82,10 +85,10 @@ getMatchedTimeRangesFromDefaultSchedule Q.FilterCondition {mode, stages, rules, 
     inMaybeRules apiRule' selectedRules = maybeTrue (`inRules` selectedRules) apiRule'
 
 getMatchedTimeRangesFromEventMatch :: Q.FilterCondition -> S.EventMatch -> T.TimeZone -> [Date.UTCTimeRange]
-getMatchedTimeRangesFromEventMatch Q.FilterCondition {mode, stages, rules, timeSlots} S.EventMatch {S.startTime = apiStartTime, S.endTime = apiEndTime, S.rule = apiRule, S.stages = apiStages, isFest = apiIsFest} utcOffset =
+getMatchedTimeRangesFromEventMatch Q.FilterCondition {modes, stages, rules, timeSlots} S.EventMatch {S.startTime = apiStartTime, S.endTime = apiEndTime, S.rule = apiRule, S.stages = apiStages, isFest = apiIsFest} utcOffset =
   [ Date.convertRangedLocalTimeToUTCTime utcOffset intersection
     | not apiIsFest,
-      mode == Q.Event,
+      maybeTrue (inMode Q.Event) modes,
       maybeTrue (inStage apiStages) stages,
       maybeTrue (inRules apiRule) rules,
       let intersections :: [Date.LocalTimeRange] = case timeSlots of

@@ -11,7 +11,7 @@ import Prelude (Bool (False), IO, Maybe (Just), ($))
 
 test :: IO ()
 test = hspec $ do
-  describe "createIcalInput" $ do
+  describe "createICalInput" $ do
     it "正常系　日本人向け" $ do
       let splaApiResult =
             S.Result
@@ -113,7 +113,7 @@ test = hspec $ do
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 Q.filters =
                   [ Q.FilterCondition
-                      { Q.mode = Q.BankaraChallenge,
+                      { Q.modes = Just [Q.BankaraChallenge],
                         Q.timeSlots =
                           Just
                             [ Q.TimeSlot
@@ -133,7 +133,7 @@ test = hspec $ do
                   ]
               }
 
-      let icalInput = FI.createIcalInput queryRoot splaApiResult
+      let icalInput = FI.createICalInput queryRoot splaApiResult
       icalInput
         `shouldBe` I.ICalInput
           { I.language = Q.Japanese,
@@ -248,7 +248,7 @@ test = hspec $ do
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone (-8) "", -- ロサンゼルスは UTC-8
                 Q.filters =
                   [ Q.FilterCondition
-                      { Q.mode = Q.BankaraChallenge,
+                      { Q.modes = Just [Q.BankaraChallenge],
                         Q.timeSlots =
                           Just
                             [ Q.TimeSlot
@@ -268,7 +268,7 @@ test = hspec $ do
                   ]
               }
 
-      let icalInput = FI.createIcalInput queryRoot splaApiResult
+      let icalInput = FI.createICalInput queryRoot splaApiResult
       icalInput
         `shouldBe` I.ICalInput
           { I.language = Q.English,
@@ -291,7 +291,7 @@ test = hspec $ do
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 Q.filters =
                   [ Q.FilterCondition
-                      { Q.mode = Q.BankaraChallenge,
+                      { Q.modes = Just [Q.BankaraChallenge],
                         Q.timeSlots =
                           Just
                             [ Q.TimeSlot
@@ -347,7 +347,7 @@ test = hspec $ do
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 Q.filters =
                   [ Q.FilterCondition
-                      { Q.mode = Q.Event,
+                      { Q.modes = Just [Q.Event],
                         Q.timeSlots =
                           Just
                             [ Q.TimeSlot
@@ -404,7 +404,7 @@ test = hspec $ do
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 Q.filters =
                   [ Q.FilterCondition
-                      { Q.mode = Q.Event,
+                      { Q.modes = Just [Q.Event],
                         Q.timeSlots =
                           Just
                             [ Q.TimeSlot

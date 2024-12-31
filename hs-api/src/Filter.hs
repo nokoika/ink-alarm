@@ -1,3 +1,3 @@
-module Filter (createIcalInput) where
+module Filter (createICalInput) where
 
-import Filter.Internal.ICal (createIcalInput)
+import Filter.Internal.ICal (createICalInput)

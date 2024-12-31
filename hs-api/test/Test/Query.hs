@@ -23,7 +23,7 @@ import Prelude (Bool (True), Either (Right), IO, Maybe (Just), ($))
 test :: IO ()
 test = hspec $ do
   describe "Query Parser" $ do
-    it "hoge" $ do
+    it "can parse base64Url json" $ do
       base64Url <- TIO.readFile "test/resources/query-base64url.txt"
       let actual = Query.parseBase64Url base64Url
       let expect =
@@ -33,7 +33,7 @@ test = hspec $ do
                     Query.utcOffset = Query.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                     Query.filters =
                       [ Query.FilterCondition
-                          { Query.mode = Query.BankaraOpen,
+                          { Query.modes = Just [Query.BankaraOpen],
                             Query.stages =
                               Just
                                 ( Query.StageFilter

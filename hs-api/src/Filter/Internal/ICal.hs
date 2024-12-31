@@ -1,5 +1,5 @@
 module Filter.Internal.ICal
-  ( createIcalInput,
+  ( createICalInput,
     createICalEventsFromDefaultSchedules,
     createICalEventsFromEventMatches,
   )
@@ -66,8 +66,8 @@ createICalEventsFromEventMatches Q.QueryRoot {utcOffset, filters, language} even
       (intersectStart, intersectEnd) <- FS.getMatchedTimeRangesFromEventMatch filter eventMatch utcOffset'
   ]
 
-createIcalInput :: Q.QueryRoot -> S.Result -> I.ICalInput
-createIcalInput queryRoot result =
+createICalInput :: Q.QueryRoot -> S.Result -> I.ICalInput
+createICalInput queryRoot result =
   I.ICalInput
     { I.language = Q.language queryRoot,
       I.events = regular ++ bankaraChallenge ++ bankaraOpen ++ x ++ event

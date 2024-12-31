@@ -6,9 +6,9 @@
  */
 
 export interface FilterCondition {
-  mode: Mode;
+  modes?: Mode[];
   stages?: StageFilter;
-  rules?: KeyNameFromDefinitionItems[];
+  rules?: Rule[];
   timeSlots?: TimeSlot[];
 }
 export interface StageFilter {
@@ -32,7 +32,7 @@ export enum Mode {
   regular = "regular",
   event = "event"
 }
-export enum KeyNameFromDefinitionItems {
+export enum Rule {
   nawabari = "nawabari",
   area = "area",
   yagura = "yagura",

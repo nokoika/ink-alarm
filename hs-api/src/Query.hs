@@ -96,7 +96,7 @@ instance A.FromJSON Rule where
 
 -- フィルタ条件
 data FilterCondition = FilterCondition
-  { mode :: Mode,
+  { modes :: Maybe [Mode],
     stages :: Maybe StageFilter,
     rules :: Maybe [Rule],
     timeSlots :: Maybe [TimeSlot]

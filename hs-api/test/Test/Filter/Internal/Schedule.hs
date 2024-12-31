@@ -157,7 +157,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.BankaraChallenge,
+              { Q.modes = Just [Q.BankaraChallenge],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
@@ -187,7 +187,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.BankaraChallenge,
+              { Q.modes = Just [Q.BankaraChallenge],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
@@ -217,7 +217,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.BankaraChallenge,
+              { Q.modes = Just [Q.BankaraChallenge],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
@@ -247,7 +247,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.BankaraChallenge,
+              { Q.modes = Just [Q.BankaraChallenge],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
@@ -277,7 +277,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.BankaraChallenge,
+              { Q.modes = Just [Q.BankaraChallenge],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
@@ -307,7 +307,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.BankaraChallenge,
+              { Q.modes = Just [Q.BankaraChallenge],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
@@ -337,30 +337,12 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.BankaraChallenge,
+              { Q.modes = Nothing,
                 Q.timeSlots = Nothing,
                 Q.stages = Nothing,
                 Q.rules = Nothing
               }
       FS.getMatchedTimeRangesFromDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.BankaraChallenge `shouldBe` [(TU.createUTCTime 2021 1 1 4 0, TU.createUTCTime 2021 1 1 6 0)]
-
-    it "条件最小限 マッチしない" $ do
-      let defaultSchedule =
-            S.DefaultSchedule
-              { S.startTime = TU.createUTCTime 2021 1 1 4 0,
-                S.endTime = TU.createUTCTime 2021 1 1 6 0,
-                S.rule = Just $ S.Rule {key = S.ClamBlitz, name = ""},
-                S.stages = Just [S.Stage 1 "" "", S.Stage 2 "" ""],
-                S.isFest = False
-              }
-      let query =
-            Q.FilterCondition
-              { Q.mode = Q.BankaraChallenge,
-                Q.timeSlots = Nothing,
-                Q.stages = Nothing,
-                Q.rules = Nothing
-              }
-      FS.getMatchedTimeRangesFromDefaultSchedule query defaultSchedule (TU.createTimeZone 9 "") Q.XMatch `shouldBe` []
 
   describe "getMatchedTimeRangesFromEventMatch" $ do
     it "条件全指定 マッチ" $ do
@@ -375,7 +357,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.Event,
+              { Q.modes = Just [Q.Event],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
@@ -406,7 +388,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.Event,
+              { Q.modes = Just [Q.Event],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
@@ -437,7 +419,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.Event,
+              { Q.modes = Just [Q.Event],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
@@ -468,7 +450,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.Event,
+              { Q.modes = Just [Q.Event],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
@@ -499,7 +481,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.Event,
+              { Q.modes = Just [Q.Event],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
@@ -530,7 +512,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.BankaraChallenge,
+              { Q.modes = Just [Q.BankaraChallenge],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
@@ -561,7 +543,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.Event,
+              { Q.modes = Nothing,
                 Q.timeSlots = Nothing,
                 Q.stages = Nothing,
                 Q.rules = Nothing
@@ -580,7 +562,7 @@ test = hspec $ do
               }
       let query =
             Q.FilterCondition
-              { Q.mode = Q.Event,
+              { Q.modes = Just [Q.Event],
                 Q.timeSlots =
                   Just
                     [ Q.TimeSlot
