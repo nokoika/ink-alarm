@@ -51,6 +51,16 @@
           }
         }
       }
+    },
+    {
+      // 自動生成されるファイルのため off にする
+      "include": ["front/src/types/querySchema.ts"],
+      "linter": {
+        "enabled": false
+      },
+      "formatter": {
+        "enabled": false
+      }
     }
   ],
   "vcs": {

@@ -24,6 +24,7 @@ jobs:
           key: "${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}"
           restore-keys: "${{ runner.os }}-bun-"
       - name: "Check bun.lockb and yarn.lock are in sync"
+        # bun.lockb と yarn.lock が同期していない場合にエラーになる
         run: |
           diff <(bun bun.lockb) yarn.lock
           diff <(bun front/bun.lockb) front/yarn.lock
@@ -33,5 +34,11 @@ jobs:
           bun install --cwd front --frozen-lockfile
       - name: "Check lint and format"
         run: "bun biome ci . --error-on-warnings"
+      - name: "Check latest codegen"
+        # 最新の JSON Schema に対する codegen がされていない場合にエラーになる
+        run: |
+          bun run --cwd front codegen:jsonschema
+          git add -AN
+          git diff HEAD --exit-code
       - name: "Build"
         run: "bun run --cwd front build"
