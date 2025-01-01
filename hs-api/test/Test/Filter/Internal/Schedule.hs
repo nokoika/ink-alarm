@@ -19,7 +19,7 @@ test = hspec $ do
             Q.TimeSlot
               { start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
               }
       FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Just (TU.createLocalTime 2021 1 1 13 0, TU.createLocalTime 2021 1 1 15 0)
     it "API: [23:00 (金), 01:00(土)), TimeSlot: [16:00, 00:00), 金 のとき、マッチする" $ do
@@ -30,7 +30,7 @@ test = hspec $ do
             Q.TimeSlot
               { start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
-                dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
               }
       FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Just (TU.createLocalTime 2021 1 1 23 0, TU.createLocalTime 2021 1 2 0 0)
     it "API: [23:00 (金), 01:00(土)), TimeSlot: [00:00, 01:00), 土 のとき、マッチする" $ do
@@ -41,7 +41,7 @@ test = hspec $ do
             Q.TimeSlot
               { start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 1 0 0,
-                dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Saturday
+                dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Saturday]
               }
       FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Just (TU.createLocalTime 2021 1 2 0 0, TU.createLocalTime 2021 1 2 1 0)
     it "API: [13:00 (金), 15:00(金)), TimeSlot: [12:00, 16:00), 土 のとき、マッチしない" $ do
@@ -52,7 +52,7 @@ test = hspec $ do
             Q.TimeSlot
               { start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Saturday
+                dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Saturday]
               }
       FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Nothing
     it "API: [13:00 (金), 15:00(金)), TimeSlot: [00:00, 00:00), 金 のとき、マッチする" $ do
@@ -63,7 +63,7 @@ test = hspec $ do
             Q.TimeSlot
               { start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
-                dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
               }
       FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Nothing
 
@@ -163,7 +163,7 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         }
                     ],
                 Q.stages =
@@ -193,7 +193,7 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         }
                     ],
                 Q.stages =
@@ -223,7 +223,7 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         }
                     ],
                 Q.stages =
@@ -253,7 +253,7 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Saturday -- 金曜日じゃない
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Saturday] -- 金曜日じゃない
                         }
                     ],
                 Q.stages =
@@ -283,7 +283,7 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         }
                     ],
                 Q.stages =
@@ -313,7 +313,7 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         }
                     ],
                 Q.stages =
@@ -363,7 +363,7 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         }
                     ],
                 Q.stages =
@@ -394,7 +394,7 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         }
                     ],
                 Q.stages =
@@ -425,7 +425,7 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         }
                     ],
                 Q.stages =
@@ -456,7 +456,7 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Saturday -- 金曜日じゃない
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Saturday] -- 金曜日じゃない
                         }
                     ],
                 Q.stages =
@@ -487,7 +487,7 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         }
                     ],
                 Q.stages =
@@ -518,7 +518,7 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         }
                     ],
                 Q.stages =
@@ -568,17 +568,17 @@ test = hspec $ do
                     [ Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 30 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 13 4 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         },
                       Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 13 4 0,
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 13 6 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         },
                       Q.TimeSlot
                         { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 13 5 0, -- これは↑と結合してEventを作成してもよいのだが、現状は別のEventとして扱う
                           Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 13 8 0,
-                          Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                          Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                         }
                     ],
                 Q.stages = Nothing,

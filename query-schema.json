@@ -13,9 +13,13 @@
           "type": "string",
           "pattern": "^\\d{2}:\\d{2}$"
         },
-        "dayOfWeek": {
-          "type": "string",
-          "enum": ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
+        "dayOfWeeks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "title": "DayOfWeek",
+            "enum": ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
+          }
         }
       },
       "required": ["start", "end"]

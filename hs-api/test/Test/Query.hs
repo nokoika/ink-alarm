@@ -47,7 +47,7 @@ test = hspec $ do
                                 [ Query.TimeSlot
                                     { Query.start = Query.TimeSlotTimeOfDay $ LT.TimeOfDay 0 0 0,
                                       Query.end = Query.TimeSlotTimeOfDay $ LT.TimeOfDay 6 0 0,
-                                      Query.dayOfWeek = Just $ Query.TimeSlotDayOfWeek C.Sunday
+                                      Query.dayOfWeeks = Just [Query.TimeSlotDayOfWeek C.Sunday]
                                     }
                                 ]
                           }

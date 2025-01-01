@@ -23,7 +23,7 @@ export interface StageFilter {
 export interface TimeSlot {
   start: string;
   end: string;
-  dayOfWeek?: DayOfWeek;
+  dayOfWeeks?: DayOfWeek[];
 }
 
 export enum Language {

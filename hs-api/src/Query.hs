@@ -142,7 +142,7 @@ instance A.FromJSON TimeSlotTimeOfDay where
 data TimeSlot = TimeSlot
   { start :: TimeSlotTimeOfDay, -- HH:mm
     end :: TimeSlotTimeOfDay, -- HH:mm
-    dayOfWeek :: Maybe TimeSlotDayOfWeek
+    dayOfWeeks :: Maybe [TimeSlotDayOfWeek]
   }
   deriving (Show, Eq, Generic)
 

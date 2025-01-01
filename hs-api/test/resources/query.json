@@ -15,7 +15,7 @@
         {
           "start": "00:00",
           "end": "06:00",
-          "dayOfWeek": "sun"
+          "dayOfWeeks": ["sun"]
         }
       ]
     }

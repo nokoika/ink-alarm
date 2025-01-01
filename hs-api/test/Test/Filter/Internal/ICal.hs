@@ -119,7 +119,7 @@ test = hspec $ do
                             [ Q.TimeSlot
                                 { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 20 0 0,
                                   Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
-                                  Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Sunday
+                                  Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Sunday]
                                 }
                             ],
                         Q.stages =
@@ -254,7 +254,7 @@ test = hspec $ do
                             [ Q.TimeSlot
                                 { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 3 0 0,
                                   Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 5 0 0,
-                                  Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Sunday
+                                  Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Sunday]
                                 }
                             ],
                         Q.stages =
@@ -297,7 +297,7 @@ test = hspec $ do
                             [ Q.TimeSlot
                                 { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                                   Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                                  Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                                  Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                                 }
                             ],
                         Q.stages =
@@ -353,7 +353,7 @@ test = hspec $ do
                             [ Q.TimeSlot
                                 { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                                   Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                                  Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                                  Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                                 }
                             ],
                         Q.stages =
@@ -410,7 +410,7 @@ test = hspec $ do
                             [ Q.TimeSlot
                                 { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
                                   Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
-                                  Q.dayOfWeek = Just $ Q.TimeSlotDayOfWeek T.Friday
+                                  Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
                                 }
                             ],
                         Q.stages =

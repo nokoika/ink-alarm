@@ -13,7 +13,7 @@ import qualified Data.Time as T
 import qualified Date
 import qualified Query as Q
 import qualified SplaApi as S
-import Prelude (Bool (False, True), Maybe (Just, Nothing), and, const, elem, fst, map, not, or, (.), (<$>), (==))
+import Prelude (Bool (False, True), Maybe (Just, Nothing), and, const, elem, fst, map, not, or, (.), (<$>), (==), all)
 
 maybeTrue :: (a -> Bool) -> Maybe a -> Bool
 maybeTrue = M.maybe True
@@ -23,13 +23,11 @@ maybeTrue = M.maybe True
 -- 2. 交差の開始時刻の曜日が TimeSlot の曜日と一致するかどうか
 -- 判定のタイムゾーンは utcOffset で指定されたものを使う
 timeSlotIntersection :: Date.UTCTimeRange -> T.TimeZone -> Q.TimeSlot -> Maybe Date.LocalTimeRange
-timeSlotIntersection utcRange utcOffset timeSlot@Q.TimeSlot {dayOfWeek} =
+timeSlotIntersection utcRange utcOffset timeSlot@Q.TimeSlot {dayOfWeeks} =
   if matchDayOfWeek
     then intersect
     else Nothing
   where
-    -- M.isJust intersect && matchDayOfWeek
-
     intersect = Date.intersectTimeRangesWithLocalTime (Q.convertTimeSlotToTimeOfDayRange timeSlot) (Date.convertRangedUTCTimeToLocalTime utcOffset utcRange)
 
     -- 交差部分がある場合、交差の開始時刻の曜日がTimeSlotの曜日と一致するかどうかをチェックする
@@ -41,7 +39,9 @@ timeSlotIntersection utcRange utcOffset timeSlot@Q.TimeSlot {dayOfWeek} =
     sameDayOfWeek = case intersectStartTime of
       Just i -> (== localTimeToWeekDay i)
       Nothing -> const False
-    matchDayOfWeek = maybeTrue (sameDayOfWeek . getDayOfWeek) dayOfWeek
+    inDayOfWeek :: [Q.TimeSlotDayOfWeek] -> Bool
+    inDayOfWeek = all (sameDayOfWeek . getDayOfWeek)
+    matchDayOfWeek = maybeTrue inDayOfWeek dayOfWeeks
 
 timeSlotsIntersection :: Date.UTCTimeRange -> T.TimeZone -> [Q.TimeSlot] -> [Date.LocalTimeRange]
 timeSlotsIntersection utcRange utcOffset timeSlots = M.catMaybes [timeSlotIntersection utcRange utcOffset timeSlot | timeSlot <- timeSlots]
