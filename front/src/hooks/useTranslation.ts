@@ -5,6 +5,8 @@ import { useTranslationLanguageContext } from '~/contexts/translationLanguageCon
 
 export type TranslationKey =
   | 'app.name'
+  | 'language.ja'
+  | 'language.en'
   | 'stage.1'
   | 'stage.2'
   | 'stage.3'
@@ -46,9 +48,12 @@ export type TranslationKey =
   | 'date.friday'
   | 'date.saturday'
   | 'date.sunday'
+  | 'label.match_both_stages'
 
 const dictionaryJa: Record<TranslationKey, string> = {
   'app.name': 'ガチアラーム',
+  'language.ja': '日本語',
+  'language.en': 'English',
   'stage.1': 'ユノハナ大渓谷',
   'stage.2': 'ゴンズイ地区',
   'stage.3': 'ヤガラ市場',
@@ -90,10 +95,13 @@ const dictionaryJa: Record<TranslationKey, string> = {
   'date.friday': '金曜日',
   'date.saturday': '土曜日',
   'date.sunday': '日曜日',
+  'label.match_both_stages': '両方のステージがマッチする場合に限る',
 }
 
 const dictionaryEn: Record<TranslationKey, string> = {
   'app.name': 'Ink Alarm',
+  'language.ja': '日本語',
+  'language.en': 'English',
   'stage.1': 'Scorch Gorge',
   'stage.2': 'Eeltail Alley',
   'stage.3': 'Hagglefish Market',
@@ -135,6 +143,7 @@ const dictionaryEn: Record<TranslationKey, string> = {
   'date.friday': 'Friday',
   'date.saturday': 'Saturday',
   'date.sunday': 'Sunday',
+  'label.match_both_stages': 'Only when both stages match',
 }
 
 type Translate = (key: TranslationKey) => string

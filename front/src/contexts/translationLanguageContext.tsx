@@ -5,10 +5,11 @@ import {
   useContext,
   useState,
 } from 'react'
+import { Language } from '~/types/querySchema'
 
 type TranslationLanguageContextType = {
-  language: 'ja' | 'en'
-  setLanguage: (lang: 'ja' | 'en') => void
+  language: Language
+  setLanguage: (lang: Language) => void
 }
 
 const TranslationLanguageContext = createContext<
@@ -20,24 +21,26 @@ type TranslationLanguageProviderProps = {
 }
 
 type UseLanguage = {
-  language: 'ja' | 'en'
-  setLanguage: (lang: 'ja' | 'en') => void
+  language: Language
+  setLanguage: (lang: Language) => void
 }
 
-const getDefaultLanguage = (): 'ja' | 'en' => {
+const getDefaultLanguage = (): Language => {
   const language = location.pathname.split('/')[1]
-  if (language === 'ja' || language === 'en') {
+  if (language === Language.ja || language === Language.en) {
     return language
   }
-  const navigatorLanguage = navigator.language.startsWith('ja') ? 'ja' : 'en'
+  const navigatorLanguage = navigator.language.startsWith('ja')
+    ? Language.ja
+    : Language.en
   history.replaceState(null, '', `/${navigatorLanguage}`)
   return navigatorLanguage
 }
 
 const useLanguage = (): UseLanguage => {
-  const [language, setLanguageState] = useState<'ja' | 'en'>(getDefaultLanguage)
+  const [language, setLanguageState] = useState<Language>(getDefaultLanguage)
 
-  const setLanguage = (lang: 'ja' | 'en') => {
+  const setLanguage = (lang: Language) => {
     setLanguageState(lang)
     history.replaceState(null, '', `/${lang}`)
   }

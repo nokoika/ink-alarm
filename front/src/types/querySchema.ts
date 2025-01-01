@@ -5,6 +5,11 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
+export interface Query {
+  language: Language;
+  utcOffset?: string;
+  filters: FilterCondition[];
+}
 export interface FilterCondition {
   modes?: Mode[];
   stages?: StageFilter;
