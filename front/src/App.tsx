@@ -11,6 +11,7 @@ import {
 } from '~/contexts/translationLanguageContext'
 import { type TranslationKey, useTranslation } from '~/hooks/useTranslation'
 import {
+  DayOfWeek,
   type FilterCondition,
   Language,
   Mode,
@@ -154,64 +155,104 @@ const ModesFilter: FC<{
 const TimeSlotFilter: FC<{
   timeSlot: TimeSlotWithKey
   updateTimeSlot: (newTimeSlot: TimeSlotWithKey) => void
-  removeTimeSlot: () => void
-}> = () => {
+  removeTimeSlot?: (() => void) | undefined
+}> = ({ timeSlot, updateTimeSlot, removeTimeSlot }) => {
   const { t } = useTranslation()
-  const daysOfWeek = [
+  const contents = [
     {
-      key: 'mon',
+      key: DayOfWeek.mon,
       text: t('date.monday'),
+      enabled: timeSlot.dayOfWeeks.includes(DayOfWeek.mon),
     },
     {
-      key: 'tue',
+      key: DayOfWeek.tue,
       text: t('date.tuesday'),
+      enabled: timeSlot.dayOfWeeks.includes(DayOfWeek.tue),
     },
     {
-      key: 'wed',
+      key: DayOfWeek.wed,
       text: t('date.wednesday'),
+      enabled: timeSlot.dayOfWeeks.includes(DayOfWeek.wed),
     },
     {
-      key: 'thu',
+      key: DayOfWeek.thu,
       text: t('date.thursday'),
+      enabled: timeSlot.dayOfWeeks.includes(DayOfWeek.thu),
     },
     {
-      key: 'fri',
+      key: DayOfWeek.fri,
       text: t('date.friday'),
+      enabled: timeSlot.dayOfWeeks.includes(DayOfWeek.fri),
     },
     {
-      key: 'sat',
+      key: DayOfWeek.sat,
       text: t('date.saturday'),
+      enabled: timeSlot.dayOfWeeks.includes(DayOfWeek.sat),
     },
     {
-      key: 'sun',
+      key: DayOfWeek.sun,
       text: t('date.sunday'),
+      enabled: timeSlot.dayOfWeeks.includes(DayOfWeek.sun),
     },
   ]
+
+  const updateDayOfWeek = (dayOfWeek: DayOfWeek, enable: boolean) => {
+    updateTimeSlot({
+      ...timeSlot,
+      dayOfWeeks: enable
+        ? [...timeSlot.dayOfWeeks, dayOfWeek]
+        : timeSlot.dayOfWeeks.filter((d) => d !== dayOfWeek),
+    })
+  }
+  const updateStartTime = (start: string) => {
+    updateTimeSlot({ ...timeSlot, start })
+  }
+  const updateEndTime = (end: string) => {
+    updateTimeSlot({ ...timeSlot, end })
+  }
+
   return (
     <div className="flex gap-4">
       <div className="flex items-center gap-2">
         <input
           type="time"
           className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          defaultValue="19:00"
+          value={timeSlot.start}
+          onChange={(e) => updateStartTime(e.target.value)}
         />
         <span className="text-gray-700">~</span>
         <input
           type="time"
           className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          defaultValue="00:00"
+          value={timeSlot.end}
+          onChange={(e) => updateEndTime(e.target.value)}
         />
       </div>
       <div className="flex flex-wrap gap-2">
-        {daysOfWeek.map(({ key, text }) => (
+        {contents.map(({ key, text, enabled }) => (
           <label key={key} className="cursor-pointer">
-            <input type="checkbox" className="sr-only peer" />
+            <input
+              type="checkbox"
+              className="sr-only peer"
+              checked={enabled}
+              onChange={() => updateDayOfWeek(key, !enabled)}
+            />
             <span className="block px-3 py-2 text-gray-700 bg-gray-200 rounded peer-checked:bg-blue-500 peer-checked:text-white hover:bg-gray-100 transition-colors">
               {text}
             </span>
           </label>
         ))}
       </div>
+
+      {removeTimeSlot && (
+        <button
+          type="button"
+          className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 transition-colors"
+          onClick={removeTimeSlot}
+        >
+          -
+        </button>
+      )}
     </div>
   )
 }
@@ -292,10 +333,7 @@ const TimeSlotsFilter: FC<{
   updateTimeSlots: (timeSlots: TimeSlotWithKey[]) => void
 }> = ({ timeSlots, updateTimeSlots }) => {
   const addTimeSlot = () => {
-    updateTimeSlots([
-      ...timeSlots,
-      { key: uuidv4(), start: '19:00', end: '00:00' },
-    ])
+    updateTimeSlots([...timeSlots, generateDefaultTimeSlot()])
   }
 
   const removeTimeSlot = (key: string) => {
@@ -306,7 +344,7 @@ const TimeSlotsFilter: FC<{
     updateTimeSlots(
       timeSlots.map((timeSlot) =>
         timeSlot.key === newTimeSlot.key
-          ? { ...timeSlot, newTimeSlot }
+          ? { ...timeSlot, ...newTimeSlot }
           : timeSlot,
       ),
     )
@@ -323,7 +361,11 @@ const TimeSlotsFilter: FC<{
             key={timeSlot.key}
             timeSlot={timeSlot}
             updateTimeSlot={updateTimeSlot}
-            removeTimeSlot={() => removeTimeSlot(timeSlot.key)}
+            removeTimeSlot={
+              timeSlots.length >= 2
+                ? () => removeTimeSlot(timeSlot.key)
+                : undefined
+            }
           />
         ))}
       </div>
@@ -366,7 +408,7 @@ const RemoveFilter: FC<{ onClick: (...args: unknown[]) => unknown }> = ({
 const FilterWidget: FC<{
   filter: FilterConditionWithKey
   updateFilter: (filter: Partial<FilterConditionWithKey>) => void
-  removeFilter: () => void
+  removeFilter?: (() => void) | undefined
 }> = ({ filter, updateFilter, removeFilter }) => {
   return (
     <div className="space-y-2">
@@ -386,13 +428,13 @@ const FilterWidget: FC<{
         stages={filter.stages}
         updateStages={(stages) => updateFilter({ stages })}
       />
-      <RemoveFilter onClick={removeFilter} />
+      {removeFilter && <RemoveFilter onClick={removeFilter} />}
     </div>
   )
 }
 
 // lint/suspicious/noArrayIndexKey 対策
-type TimeSlotWithKey = TimeSlot & { key: string }
+type TimeSlotWithKey = Required<TimeSlot> & { key: string }
 type FilterConditionWithKey = Required<FilterCondition> & { key: string } & {
   timeSlots: TimeSlotWithKey[]
 }
@@ -494,7 +536,22 @@ const generateDefaultFilter = (): FilterConditionWithKey => ({
     stageIds: Array.from({ length: 24 }, (_, index) => index + 1),
   },
   rules: [Rule.area, Rule.asari, Rule.hoko, Rule.nawabari, Rule.yagura],
-  timeSlots: [],
+  timeSlots: [generateDefaultTimeSlot()],
+})
+
+const generateDefaultTimeSlot = (): TimeSlotWithKey => ({
+  key: uuidv4(),
+  start: '00:00',
+  end: '00:00',
+  dayOfWeeks: [
+    DayOfWeek.mon,
+    DayOfWeek.tue,
+    DayOfWeek.wed,
+    DayOfWeek.thu,
+    DayOfWeek.fri,
+    DayOfWeek.sat,
+    DayOfWeek.sun,
+  ],
 })
 
 const Input: FC = () => {
@@ -504,7 +561,6 @@ const Input: FC = () => {
   const [utcOffset, setUtcOffset] = useState<string>(getInitilalUtcOffset())
   const { language, setLanguage } = useTranslationLanguageContext()
 
-  // TODO: ちゃんと初期値をつくるようにする
   const addFilter = () => {
     setFilters((prev) => [...prev, generateDefaultFilter()])
   }
@@ -532,7 +588,9 @@ const Input: FC = () => {
           key={filter.key}
           filter={filter}
           updateFilter={(newFilter) => updateFilter(filter.key, newFilter)}
-          removeFilter={() => removeFilter(filter.key)}
+          removeFilter={
+            filters.length >= 2 ? () => removeFilter(filter.key) : undefined
+          }
         />
       ))}
     </div>
