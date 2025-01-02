@@ -38,6 +38,7 @@
   "prettier.enable": false,
   "biome.enable": true,
   "biome.bin": "./node_modules/.bin/biome",
+  "tsserver.tsdk": "./front/node_modules/typescript/lib",
   "[javascript,typescript,typescriptreact,json,yaml,markdown,css,html,haskell]": {
     "coc.preferences.formatOnSave": true
   }

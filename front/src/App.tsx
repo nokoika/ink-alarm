@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import { type FC, useState } from 'react'
+import { FiCheckSquare, FiSquare } from 'react-icons/fi'
 import TimezoneSelect, {
   type ITimezone,
   type ITimezoneOption,
@@ -19,6 +20,40 @@ import {
   type StageFilter,
   type TimeSlot,
 } from '~/types/querySchema'
+
+// tsx 文法の中では、arrow だと generics が使えないため function で書く
+function CheckboxList<T extends string | number>({
+  contents,
+  updateItem,
+  radio = false,
+}: {
+  contents: { key: T; text: string; enabled: boolean }[]
+  updateItem: (key: T, enabled: boolean) => void
+  radio?: boolean
+}) {
+  return (
+    <div className="grid gap-2">
+      <div className="grid gap-2 grid-cols-3">
+        {contents.map(({ key, text, enabled }) => (
+          <label key={key} className="flex items-center cursor-pointer">
+            <input
+              type={radio ? 'radio' : 'checkbox'}
+              className="hidden peer"
+              checked={enabled}
+              onChange={() => {
+                updateItem(key, !enabled)
+              }}
+            />
+            <span className="flex items-center justify-center w-5 h-5 text-gray-400 peer-checked:text-blue-500 transition-colors">
+              {enabled ? <FiCheckSquare size={20} /> : <FiSquare size={20} />}
+            </span>
+            <span className="ml-2 text-sm text-gray-700">{text}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 const RulesFilter: FC<{
   rules: Rule[]
@@ -62,27 +97,16 @@ const RulesFilter: FC<{
   }
 
   return (
-    <div className="flex gap-2">
-      {contents.map(({ key, text, enabled }) => (
-        <label key={key} className="relative cursor-pointer">
-          <input
-            type="checkbox"
-            className="sr-only peer"
-            checked={enabled}
-            onChange={() => {
-              if (enabled) {
-                removeRule(key)
-              } else {
-                addRule(key)
-              }
-            }}
-          />
-          <span className="block px-4 py-2 text-gray-700 bg-gray-200 rounded peer-checked:bg-blue-500 peer-checked:text-white transition-colors duration-200 hover:bg-gray-300">
-            {text}
-          </span>
-        </label>
-      ))}
-    </div>
+    <CheckboxList
+      contents={contents}
+      updateItem={(key, enabled) => {
+        if (enabled) {
+          addRule(key)
+        } else {
+          removeRule(key)
+        }
+      }}
+    />
   )
 }
 
@@ -128,27 +152,16 @@ const ModesFilter: FC<{
   }
 
   return (
-    <div className="flex gap-2">
-      {contents.map(({ key, text, enabled }) => (
-        <label key={key} className="relative cursor-pointer">
-          <input
-            type="checkbox"
-            className="sr-only peer"
-            checked={enabled}
-            onChange={() => {
-              if (enabled) {
-                removeMode(key)
-              } else {
-                addMode(key)
-              }
-            }}
-          />
-          <span className="block px-4 py-2 text-gray-700 bg-gray-200 rounded peer-checked:bg-blue-500 peer-checked:text-white transition-colors duration-200 hover:bg-gray-300">
-            {text}
-          </span>
-        </label>
-      ))}
-    </div>
+    <CheckboxList
+      contents={contents}
+      updateItem={(key, enabled) => {
+        if (enabled) {
+          addMode(key)
+        } else {
+          removeMode(key)
+        }
+      }}
+    />
   )
 }
 
@@ -228,21 +241,7 @@ const TimeSlotFilter: FC<{
           onChange={(e) => updateEndTime(e.target.value)}
         />
       </div>
-      <div className="flex flex-wrap gap-2">
-        {contents.map(({ key, text, enabled }) => (
-          <label key={key} className="cursor-pointer">
-            <input
-              type="checkbox"
-              className="sr-only peer"
-              checked={enabled}
-              onChange={() => updateDayOfWeek(key, !enabled)}
-            />
-            <span className="block px-3 py-2 text-gray-700 bg-gray-200 rounded peer-checked:bg-blue-500 peer-checked:text-white hover:bg-gray-100 transition-colors">
-              {text}
-            </span>
-          </label>
-        ))}
-      </div>
+      <CheckboxList contents={contents} updateItem={updateDayOfWeek} />
 
       {removeTimeSlot && (
         <button
@@ -291,40 +290,28 @@ const StagesFilter: FC<{
   }
 
   return (
-    <div className="grid gap-2">
-      <div className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(210px,1fr))]">
-        {contents.map(({ key, text, enabled }) => (
-          <label key={key} className="relative cursor-pointer">
-            <input
-              type="checkbox"
-              className="sr-only peer"
-              checked={enabled}
-              onChange={() => {
-                if (enabled) {
-                  removeStage(key)
-                } else {
-                  addStage(key)
-                }
-              }}
-            />
-            <span className="block px-3 py-2 text-sm text-center text-gray-700 bg-gray-200 rounded peer-checked:bg-blue-500 peer-checked:text-white hover:bg-gray-300 transition-colors">
-              {text}
-            </span>
-          </label>
-        ))}
-      </div>
-      <label className="cursor-pointer">
-        <input
-          type="checkbox"
-          className="sr-only peer"
-          checked={stages.matchBothStages}
-          onChange={toggleMatchBothStages}
-        />
-        <span className="block px-3 py-2 text-sm text-center text-gray-700 bg-gray-200 rounded peer-checked:bg-blue-500 peer-checked:text-white hover:bg-gray-300 transition-colors">
-          {t('label.match_both_stages')}
-        </span>
-      </label>
-    </div>
+    <>
+      <CheckboxList
+        contents={contents}
+        updateItem={(key, enabled) => {
+          if (enabled) {
+            addStage(key)
+          } else {
+            removeStage(key)
+          }
+        }}
+      />
+      <CheckboxList
+        contents={[
+          {
+            key: 'matchBothStages',
+            text: t('label.match_both_stages'),
+            enabled: stages.matchBothStages,
+          },
+        ]}
+        updateItem={() => toggleMatchBothStages()}
+      />
+    </>
   )
 }
 
@@ -445,26 +432,26 @@ const SwitchLanguage: FC<{
 }> = ({ language, setLanguage }) => {
   const { t } = useTranslation()
   return (
-    <div>
-      <input
-        type="radio"
-        id="ja"
-        name="language"
-        value="ja"
-        checked={language === Language.ja}
-        onChange={() => setLanguage(Language.ja)}
-      />
-      <label htmlFor="ja">{t('language.ja')}</label>
-      <input
-        type="radio"
-        id="en"
-        name="language"
-        value="en"
-        checked={language === Language.en}
-        onChange={() => setLanguage(Language.en)}
-      />
-      <label htmlFor="en">{t('language.en')}</label>
-    </div>
+    <CheckboxList
+      contents={[
+        {
+          key: Language.ja,
+          text: t('language.ja'),
+          enabled: language === Language.ja,
+        },
+        {
+          key: Language.en,
+          text: t('language.en'),
+          enabled: language === Language.en,
+        },
+      ]}
+      updateItem={(key, enabled) => {
+        if (enabled) {
+          setLanguage(key)
+        }
+      }}
+      radio={true}
+    />
   )
 }
 
