@@ -49,6 +49,19 @@ export type TranslationKey =
   | 'date.saturday'
   | 'date.sunday'
   | 'label.match_both_stages'
+  | 'label.match_at_least_one_stages'
+  | 'label.time_difference'
+  | 'label.schedule_filter'
+  | 'label.add_schedule_filter'
+  | 'label.remove_schedule_filter'
+  | 'label.rule_filter'
+  | 'label.mode_filter'
+  | 'label.time_filter'
+  | 'label.add_timeslot'
+  | 'label.remove_timeslot'
+  | 'label.stage_filter'
+  | 'label.general_setting'
+  | 'label.language'
 
 const dictionaryJa: Record<TranslationKey, string> = {
   'app.name': 'ガチアラーム',
@@ -96,6 +109,19 @@ const dictionaryJa: Record<TranslationKey, string> = {
   'date.saturday': '土曜日',
   'date.sunday': '日曜日',
   'label.match_both_stages': '両方のステージがマッチする場合に限る',
+  'label.match_at_least_one_stages': '片方のステージがマッチする場合も含む',
+  'label.schedule_filter': 'スケジュールの表示条件',
+  'label.add_schedule_filter': '別の条件を追加',
+  'label.remove_schedule_filter': '上記条件を削除',
+  'label.rule_filter': 'ルール',
+  'label.mode_filter': 'モード',
+  'label.time_filter': '時間指定',
+  'label.add_timeslot': '時間指定を追加',
+  'label.remove_timeslot': '時間指定の削除',
+  'label.stage_filter': 'ステージ',
+  'label.general_setting': '一般設定',
+  'label.language': '言語',
+  'label.time_difference': '時差の設定',
 }
 
 const dictionaryEn: Record<TranslationKey, string> = {
@@ -143,7 +169,20 @@ const dictionaryEn: Record<TranslationKey, string> = {
   'date.friday': 'Friday',
   'date.saturday': 'Saturday',
   'date.sunday': 'Sunday',
-  'label.match_both_stages': 'Only when both stages match',
+  'label.match_both_stages': 'Only when both stages matched',
+  'label.match_at_least_one_stages': 'Including when one of the stages matched',
+  'label.schedule_filter': 'Schedule filter',
+  'label.add_schedule_filter': 'Add another condition',
+  'label.remove_schedule_filter': 'Remove the above condition',
+  'label.rule_filter': 'Rule',
+  'label.mode_filter': 'Mode',
+  'label.time_filter': 'Time',
+  'label.add_timeslot': 'Add a time slot',
+  'label.remove_timeslot': 'Remove the time slot',
+  'label.stage_filter': 'Stage',
+  'label.general_setting': 'General setting',
+  'label.language': 'Language',
+  'label.time_difference': 'Setting the time difference',
 }
 
 type Translate = (key: TranslationKey) => string
