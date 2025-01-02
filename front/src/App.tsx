@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import { type ChangeEvent, type FC, type ReactNode, useState } from 'react'
+import type { IconType } from 'react-icons'
 import {
   FiCalendar,
   FiCheckSquare,
@@ -8,6 +9,8 @@ import {
   FiSun,
 } from 'react-icons/fi'
 import {
+  LuCalendarArrowUp,
+  LuClipboardCopy,
   LuEarth,
   LuLanguages,
   LuMountainSnow,
@@ -16,6 +19,7 @@ import {
 } from 'react-icons/lu'
 import { PiFootballBold, PiGearBold } from 'react-icons/pi'
 import { RiTimerFlashLine } from 'react-icons/ri'
+import { SiGooglecalendar } from 'react-icons/si'
 import { useTimezoneSelect } from 'react-timezone-select'
 import { v4 as uuidv4 } from 'uuid'
 import {
@@ -36,15 +40,19 @@ import {
 
 const InputBlock: FC<{
   title: string
-  icon: ReactNode
+  icon: IconType
   children: ReactNode
-}> = ({ title, icon, children }) => {
+}> = ({ title, icon: Icon, children }) => {
   return (
     <div className="grid gap-4 border-4 px-4 py-3 border-nord-1">
       <div className="flex items-center gap-2">
-        <div className="text-nord-13">{icon}</div>
+        <div className="text-nord-10">
+          <Icon />
+        </div>
         <h2 className="text-lg font-semibold text-nord-6">{title}</h2>
-        <div className="text-nord-13">{icon}</div>
+        <div className="text-nord-10">
+          <Icon />
+        </div>
       </div>
       <div>{children}</div>
     </div>
@@ -406,14 +414,14 @@ const TimeSlotsFilter: FC<{
                   updateStartTime={updateStartTime}
                   updateEndTime={updateEndTime}
                 />
-                <AddRemoveButton
-                  type="add"
+                <IconButton
+                  icon={LuSquarePlus}
                   text={t('label.add_timeslot')}
                   onClick={() => addTimeSlotAfter(timeSlot.key)}
                 />
                 {timeSlots.length >= 2 && (
-                  <AddRemoveButton
-                    type="remove"
+                  <IconButton
+                    icon={LuSquareMinus}
                     text={t('label.remove_timeslot')}
                     onClick={() => removeTimeSlot(timeSlot.key)}
                   />
@@ -433,23 +441,19 @@ const TimeSlotsFilter: FC<{
   )
 }
 
-const AddRemoveButton: FC<{
+const IconButton: FC<{
   onClick: (...args: unknown[]) => unknown
-  type: 'add' | 'remove'
+  icon: IconType
   text: string
-}> = ({ onClick, type, text }) => {
+}> = ({ onClick, icon: Icon, text }) => {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="px-3 py-2 text-white bg-nord-3 rounded-sm hover:bg-blue-600 transition-colors"
+      className="px-3 py-2 text-white bg-nord-3 rounded-sm hover:bg-nord-14 transition-colors"
     >
       <div className="flex items-center gap-2">
-        {type === 'add' ? (
-          <LuSquarePlus className="block" />
-        ) : (
-          <LuSquareMinus className="block" />
-        )}
+        <Icon className="block" />
         <p className="text-xs">{text}</p>
       </div>
     </button>
@@ -617,6 +621,7 @@ const generateIcalUrl = (
 ): {
   https: string
   webcal: string
+  googleCalendar: string
 } => {
   const json = JSON.stringify(query)
   const base64 = btoa(json)
@@ -629,6 +634,7 @@ const generateIcalUrl = (
   return {
     https: `${import.meta.env.VITE_API_URL}?query=${base64url}`,
     webcal: `${import.meta.env.VITE_WEBCAL_URL}?query=${base64url}`,
+    googleCalendar: `https://calendar.google.com/calendar/u/0/r?cid=${decodeURI(`${import.meta.env.VITE_WEBCAL_URL}?query=${base64url}`)}`,
   }
 }
 
@@ -664,20 +670,17 @@ const Input: FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto space-y-4 p-2">
-      <InputBlock title={t('label.schedule_filter')} icon={<FiCalendar />}>
+      <InputBlock title={t('label.schedule_filter')} icon={FiCalendar}>
         <div className="grid gap-10">
           {filters.map((filter) => (
             <div key={filter.key} className="space-y-2">
-              <InputBlock
-                title={t('label.rule_filter')}
-                icon={<PiFootballBold />}
-              >
+              <InputBlock title={t('label.rule_filter')} icon={PiFootballBold}>
                 <RulesFilter
                   rules={filter.rules}
                   updateRules={(rules) => updateFilter(filter.key, { rules })}
                 />
               </InputBlock>
-              <InputBlock title={t('label.mode_filter')} icon={<FiSun />}>
+              <InputBlock title={t('label.mode_filter')} icon={FiSun}>
                 <ModesFilter
                   modes={filter.modes}
                   updateModes={(modes) => updateFilter(filter.key, { modes })}
@@ -685,7 +688,7 @@ const Input: FC = () => {
               </InputBlock>
               <InputBlock
                 title={t('label.time_filter')}
-                icon={<RiTimerFlashLine />}
+                icon={RiTimerFlashLine}
               >
                 <TimeSlotsFilter
                   timeSlots={filter.timeSlots}
@@ -694,10 +697,7 @@ const Input: FC = () => {
                   }
                 />
               </InputBlock>
-              <InputBlock
-                title={t('label.stage_filter')}
-                icon={<LuMountainSnow />}
-              >
+              <InputBlock title={t('label.stage_filter')} icon={LuMountainSnow}>
                 <StagesFilter
                   stages={filter.stages}
                   updateStages={(stages) =>
@@ -707,15 +707,15 @@ const Input: FC = () => {
               </InputBlock>
 
               <div className="flex justify-center gap-4">
-                <AddRemoveButton
+                <IconButton
                   onClick={() => addFilterAfter(filter.key)}
-                  type="add"
+                  icon={LuSquarePlus}
                   text={t('label.add_schedule_filter')}
                 />
                 {filters.length >= 2 && (
-                  <AddRemoveButton
+                  <IconButton
                     onClick={() => removeFilter(filter.key)}
-                    type="remove"
+                    icon={LuSquareMinus}
                     text={t('label.remove_schedule_filter')}
                   />
                 )}
@@ -724,18 +724,46 @@ const Input: FC = () => {
           ))}
         </div>
       </InputBlock>
-      <InputBlock title={t('label.general_setting')} icon={<PiGearBold />}>
+      <InputBlock title={t('label.general_setting')} icon={PiGearBold}>
         <div className="grid grid-cols-2 gap-4">
-          <InputBlock title={t('label.language')} icon={<LuLanguages />}>
+          <InputBlock title={t('label.language')} icon={LuLanguages}>
             <SwitchLanguage language={language} setLanguage={setLanguage} />
           </InputBlock>
-          <InputBlock title={t('label.time_difference')} icon={<LuEarth />}>
+          <InputBlock title={t('label.time_difference')} icon={LuEarth}>
             <UtcOffset utcOffset={utcOffset} setUtcOffset={setUtcOffset} />
           </InputBlock>
         </div>
       </InputBlock>
-      <p>{JSON.stringify({ filters, utcOffset, language }, null, 2)}</p>
-      <p>{generateIcalUrl({ filters, utcOffset, language }).https}</p>
+      <div className="flex justify-center gap-4">
+        <IconButton
+          icon={SiGooglecalendar}
+          text={t('label.add_to_google_calendar')}
+          onClick={() => {
+            const url = generateIcalUrl({
+              filters,
+              utcOffset,
+              language,
+            }).googleCalendar
+            window.open(url, '_blank')
+          }}
+        />
+        <IconButton
+          icon={LuCalendarArrowUp}
+          text={t('label.add_to_calendar_app')}
+          onClick={() => {
+            const url = generateIcalUrl({ filters, utcOffset, language }).webcal
+            window.open(url, '_blank')
+          }}
+        />
+        <IconButton
+          icon={LuClipboardCopy}
+          text={t('label.copy_url')}
+          onClick={() => {
+            const url = generateIcalUrl({ filters, utcOffset, language }).https
+            navigator.clipboard.writeText(url)
+          }}
+        />
+      </div>
     </div>
   )
 }

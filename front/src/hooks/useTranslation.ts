@@ -62,6 +62,9 @@ export type TranslationKey =
   | 'label.stage_filter'
   | 'label.general_setting'
   | 'label.language'
+  | 'label.add_to_calendar_app'
+  | 'label.add_to_google_calendar'
+  | 'label.copy_url'
 
 const dictionaryJa: Record<TranslationKey, string> = {
   'app.name': 'ガチアラーム',
@@ -122,6 +125,9 @@ const dictionaryJa: Record<TranslationKey, string> = {
   'label.general_setting': '一般設定',
   'label.language': '言語',
   'label.time_difference': '時差の設定',
+  'label.add_to_calendar_app': 'カレンダーアプリに追加',
+  'label.add_to_google_calendar': 'Googleカレンダーに追加',
+  'label.copy_url': 'URLをコピー',
 }
 
 const dictionaryEn: Record<TranslationKey, string> = {
@@ -183,6 +189,9 @@ const dictionaryEn: Record<TranslationKey, string> = {
   'label.general_setting': 'General setting',
   'label.language': 'Language',
   'label.time_difference': 'Setting the time difference',
+  'label.add_to_calendar_app': 'Add to calendar app',
+  'label.add_to_google_calendar': 'Add to Google Calendar',
+  'label.copy_url': 'Copy URL',
 }
 
 type Translate = (key: TranslationKey) => string
