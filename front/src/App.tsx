@@ -1,5 +1,15 @@
 import { format } from 'date-fns'
-import { type ChangeEvent, type FC, type ReactNode, useState } from 'react'
+import { ja } from 'date-fns/locale'
+import ICAL from 'ical.js'
+
+import {
+  type ChangeEvent,
+  type FC,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react'
 import type { IconType } from 'react-icons'
 import {
   FiCalendar,
@@ -18,7 +28,7 @@ import {
   LuSquarePlus,
 } from 'react-icons/lu'
 import { PiFootballBold, PiGearBold } from 'react-icons/pi'
-import { RiTimerFlashLine } from 'react-icons/ri'
+import { RiImageAiLine, RiTimerFlashLine } from 'react-icons/ri'
 import { SiGooglecalendar } from 'react-icons/si'
 import { useTimezoneSelect } from 'react-timezone-select'
 import { v4 as uuidv4 } from 'uuid'
@@ -638,6 +648,78 @@ const generateIcalUrl = (
   }
 }
 
+type Event = {
+  title: string
+  start: Date
+  end: Date
+}
+
+const EventList: FC<{ events: Event[] }> = ({ events }) => {
+  const { language } = useTranslationLanguageContext()
+  const { t } = useTranslation()
+  return (
+    <div>
+      {events.length === 0 ? (
+        <p className="text-nord-5">{t('label.no_schedule')}</p>
+      ) : (
+        <div className="grid grid-cols-3 gap-2">
+          {events.map((event) => (
+            <div
+              key={JSON.stringify(event)}
+              className="px-3 py-2 bg-nord-1 transition"
+            >
+              <div className="text-sm font-semibold text-nord-9">
+                {event.title}
+              </div>
+              <p className="text-nord-5 text-xs">
+                {language === Language.ja && (
+                  <>
+                    {format(event.start, 'M/d (EEE) H:mm', { locale: ja })}~
+                    {format(event.end, 'M/d (EEE) H:mm', { locale: ja })}
+                  </>
+                )}
+                {language === Language.en && (
+                  <>
+                    {format(event.start, 'EEEE, MMMM d, H:mm')} ~{' '}
+                    {format(event.end, 'EEEE, MMMM d, H:mm')}
+                  </>
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+const useCalendar = (calendarUrl: string): Event[] => {
+  const [events, setEvents] = useState<Event[]>([])
+
+  const fetchIcalEvents = useCallback(async (): Promise<Event[]> => {
+    const response = await fetch(calendarUrl)
+    const icalData = await response.text()
+    const jcalData = ICAL.parse(icalData)
+    const comp = new ICAL.Component(jcalData)
+    const vevents = comp.getAllSubcomponents('vevent')
+
+    return vevents.map((vevent) => {
+      const event = new ICAL.Event(vevent)
+      return {
+        title: event.summary,
+        start: event.startDate.toJSDate(),
+        end: event.endDate.toJSDate(),
+      }
+    })
+  }, [calendarUrl])
+
+  useEffect(() => {
+    fetchIcalEvents().then((events) => setEvents(events))
+  }, [fetchIcalEvents])
+
+  return events
+}
+
 const Input: FC = () => {
   const [filters, setFilters] = useState<FilterConditionWithKey[]>([
     generateDefaultFilter(),
@@ -667,6 +749,9 @@ const Input: FC = () => {
   const removeFilter = (key: string) => {
     setFilters((prev) => prev.filter((f) => f.key !== key))
   }
+
+  const icalUrls = generateIcalUrl({ filters, utcOffset, language })
+  const events = useCalendar(icalUrls.https)
 
   return (
     <div className="max-w-5xl mx-auto space-y-4 p-2">
@@ -739,31 +824,30 @@ const Input: FC = () => {
           icon={SiGooglecalendar}
           text={t('label.add_to_google_calendar')}
           onClick={() => {
-            const url = generateIcalUrl({
-              filters,
-              utcOffset,
-              language,
-            }).googleCalendar
-            window.open(url, '_blank')
+            window.open(icalUrls.googleCalendar, '_blank')
           }}
         />
         <IconButton
           icon={LuCalendarArrowUp}
           text={t('label.add_to_calendar_app')}
           onClick={() => {
-            const url = generateIcalUrl({ filters, utcOffset, language }).webcal
-            window.open(url, '_blank')
+            window.open(icalUrls.webcal, '_blank')
           }}
         />
         <IconButton
           icon={LuClipboardCopy}
           text={t('label.copy_url')}
           onClick={() => {
-            const url = generateIcalUrl({ filters, utcOffset, language }).https
-            navigator.clipboard.writeText(url)
+            navigator.clipboard.writeText(icalUrls.https)
           }}
         />
       </div>
+      <InputBlock title={t('label.preview_calendar')} icon={RiImageAiLine}>
+        {events.length >= 10 && (
+          <p className="text-nord-12 mb-2">{t('label.too_many_schedule')}</p>
+        )}
+        <EventList events={events} />
+      </InputBlock>
     </div>
   )
 }
