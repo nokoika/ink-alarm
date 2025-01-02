@@ -28,6 +28,7 @@ import {
   type FilterCondition,
   Language,
   Mode,
+  type Query,
   Rule,
   type StageFilter,
   type TimeSlot,
@@ -611,6 +612,26 @@ const generateDefaultTimeSlot = (): TimeSlotWithKey => ({
   ],
 })
 
+const generateIcalUrl = (
+  query: Query,
+): {
+  https: string
+  webcal: string
+} => {
+  const json = JSON.stringify(query)
+  const base64 = btoa(json)
+  const base64url = base64
+    // biome-ignore lint/performance/useTopLevelRegex: 遅くてもいいです
+    .replace(/=+$/, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+
+  return {
+    https: `${import.meta.env.VITE_API_URL}?query=${base64url}`,
+    webcal: `${import.meta.env.VITE_WEBCAL_URL}?query=${base64url}`,
+  }
+}
+
 const Input: FC = () => {
   const [filters, setFilters] = useState<FilterConditionWithKey[]>([
     generateDefaultFilter(),
@@ -713,6 +734,8 @@ const Input: FC = () => {
           </InputBlock>
         </div>
       </InputBlock>
+      <p>{JSON.stringify({ filters, utcOffset, language }, null, 2)}</p>
+      <p>{generateIcalUrl({ filters, utcOffset, language }).https}</p>
     </div>
   )
 }

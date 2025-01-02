@@ -60,8 +60,8 @@ timeZoneFromOffsetString offset = case offset of
 -- [start, end) に t が含まれるかどうか
 isWithinTimeOfDay :: TimeOfDayRange -> LT.TimeOfDay -> Bool
 isWithinTimeOfDay (start, end) t
-  | start <= end = start <= t && t < end
-  -- start > end の場合、日付またぎ。(ex: 23:00~01:00)
+  | start < end = start <= t && t < end
+  -- start => end の場合、日付またぎ。(ex: 23:00~01:00)
   -- この場合、範囲外となる区間は [end, start) で連続している。
   -- よって、範囲内はその否定、つまり t が [end, start) に入っていない場合。
   | otherwise = not (end <= t && t < start)
@@ -106,26 +106,17 @@ intersectTimeRangesWithLocalTime todRange localRange@(sLocal, _) =
     Nothing -> Nothing
     Just (iStartTod, iEndTod) ->
       let iStartLocal = toLocalTime sLocal iStartTod
-          iEndLocal = toLocalTimeAdjust iStartLocal iEndTod
+          iEndLocal = toLocalTime iStartLocal iEndTod
        in Just (iStartLocal, iEndLocal)
   where
-    -- iStartTodをs2Localの日付を基準にローカルタイムへ変換する
-    -- もしiStartTodがs2LocalのTimeOfDayよりも小さい場合、翌日にずらす（と解釈）
+    -- timeOfDayをbaseLocalTimeの日付を基準にローカルタイムへ変換する
     toLocalTime :: LT.LocalTime -> LT.TimeOfDay -> LT.LocalTime
-    toLocalTime baseLocal iTod =
-      let baseDay = LT.localDay baseLocal
-          baseTod = LT.localTimeOfDay baseLocal
-          dayAdjust = if iTod < baseTod then 1 else 0
-       in LT.LocalTime (T.addDays dayAdjust baseDay) iTod
-
-    -- 終了時刻は開始時刻を基準に整合をとる。
-    toLocalTimeAdjust :: LT.LocalTime -> LT.TimeOfDay -> LT.LocalTime
-    toLocalTimeAdjust startLocal iEndTod =
-      let startDay = LT.localDay startLocal
-          startTod = LT.localTimeOfDay startLocal
-          -- iEndTodがiStartTodより小さい場合は翌日へ
-          dayAdjust = if iEndTod < startTod then 1 else 0
-       in LT.LocalTime (T.addDays dayAdjust startDay) iEndTod
+    toLocalTime baseLocalTime timeOfDay =
+      let baseDay = LT.localDay baseLocalTime
+          baseTod = LT.localTimeOfDay baseLocalTime
+          -- timeOfDayがbaseLocalTimeより小さい場合は翌日へ
+          dayAdjust = if timeOfDay < baseTod then 1 else 0
+       in LT.LocalTime (T.addDays dayAdjust baseDay) timeOfDay
 
 type ZonedTimeRange = (T.ZonedTime, T.ZonedTime)
 

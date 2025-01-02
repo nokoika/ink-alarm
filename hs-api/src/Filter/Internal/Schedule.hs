@@ -13,7 +13,7 @@ import qualified Data.Time as T
 import qualified Date
 import qualified Query as Q
 import qualified SplaApi as S
-import Prelude (Bool (False, True), Maybe (Just, Nothing), and, const, elem, fst, map, not, or, (.), (<$>), (==), all)
+import Prelude (Bool (False, True), Maybe (Just, Nothing), and, const, elem, fst, map, not, or, (.), (<$>), (==), any)
 
 maybeTrue :: (a -> Bool) -> Maybe a -> Bool
 maybeTrue = M.maybe True
@@ -40,7 +40,7 @@ timeSlotIntersection utcRange utcOffset timeSlot@Q.TimeSlot {dayOfWeeks} =
       Just i -> (== localTimeToWeekDay i)
       Nothing -> const False
     inDayOfWeek :: [Q.TimeSlotDayOfWeek] -> Bool
-    inDayOfWeek = all (sameDayOfWeek . getDayOfWeek)
+    inDayOfWeek = any (sameDayOfWeek . getDayOfWeek)
     matchDayOfWeek = maybeTrue inDayOfWeek dayOfWeeks
 
 timeSlotsIntersection :: Date.UTCTimeRange -> T.TimeZone -> [Q.TimeSlot] -> [Date.LocalTimeRange]

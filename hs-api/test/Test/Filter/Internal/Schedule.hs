@@ -65,7 +65,28 @@ test = hspec $ do
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
                 dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
               }
-      FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Nothing
+      FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Just (TU.createLocalTime 2021 1 1 13 0, TU.createLocalTime 2021 1 1 15 0)
+
+    it "API: [13:00 (金), 15:00(金)), TimeSlot: [00:00, 00:00), 月火水木金土日 のとき、マッチする" $ do
+      let apiStartTime = TU.createUTCTime 2021 1 1 4 0 -- 日本では2021年1月1日13時 金曜日
+      let apiEndTime = TU.createUTCTime 2021 1 1 6 0 -- 日本では2021年1月1日15時
+      let utcOffset = TU.createTimeZone 9 ""
+      let timeSlot =
+            Q.TimeSlot
+              { start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
+                end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
+                dayOfWeeks = Just
+                    [
+                      Q.TimeSlotDayOfWeek T.Sunday,
+                      Q.TimeSlotDayOfWeek T.Monday,
+                      Q.TimeSlotDayOfWeek T.Tuesday,
+                      Q.TimeSlotDayOfWeek T.Wednesday,
+                      Q.TimeSlotDayOfWeek T.Thursday,
+                      Q.TimeSlotDayOfWeek T.Friday,
+                      Q.TimeSlotDayOfWeek T.Saturday
+                    ]
+              }
+      FS.timeSlotIntersection (apiStartTime, apiEndTime) utcOffset timeSlot `shouldBe` Just (TU.createLocalTime 2021 1 1 13 0, TU.createLocalTime 2021 1 1 15 0)
 
   describe "inStage" $ do
     let createStage :: Int -> S.Stage

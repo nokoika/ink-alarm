@@ -18,7 +18,7 @@ main = do
   putStrLn "Starting server on port 8080"
   scheduleCache <- SplaApi.Cached.initScheduleCache
   Scotty.scotty 8080 $
-    Scotty.get "/api" $
+    Scotty.get "/api/ical" $
       handleApi scheduleCache
 
 -- API を受け付けて Query をパースする
