@@ -1,3 +1,4 @@
+import { TZDate } from '@date-fns/tz'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import ICAL from 'ical.js'
@@ -654,9 +655,13 @@ type Event = {
   end: Date
 }
 
-const EventList: FC<{ events: Event[] }> = ({ events }) => {
+const EventList: FC<{ events: Event[]; utcOffset: string }> = ({
+  events,
+  utcOffset,
+}) => {
   const { language } = useTranslationLanguageContext()
   const { t } = useTranslation()
+
   return (
     <div>
       {events.length === 0 ? (
@@ -674,14 +679,30 @@ const EventList: FC<{ events: Event[] }> = ({ events }) => {
               <p className="text-nord-5 text-xs">
                 {language === Language.ja && (
                   <>
-                    {format(event.start, 'M/d (EEE) H:mm', { locale: ja })}~
-                    {format(event.end, 'M/d (EEE) H:mm', { locale: ja })}
+                    {format(
+                      new TZDate(event.start, utcOffset),
+                      'M/d (EEE) H:mm',
+                      { locale: ja },
+                    )}
+                    {' ~ '}
+                    {format(
+                      new TZDate(event.end, utcOffset),
+                      'M/d (EEE) H:mm',
+                      { locale: ja },
+                    )}
                   </>
                 )}
                 {language === Language.en && (
                   <>
-                    {format(event.start, 'EEEE, MMMM d, H:mm')} ~{' '}
-                    {format(event.end, 'EEEE, MMMM d, H:mm')}
+                    {format(
+                      new TZDate(event.start, utcOffset),
+                      'EEEE, MMMM d, H:mm',
+                    )}
+                    {' ~ '}
+                    {format(
+                      new TZDate(event.end, utcOffset),
+                      'EEEE, MMMM d, H:mm',
+                    )}
                   </>
                 )}
               </p>
@@ -846,7 +867,7 @@ const Input: FC = () => {
         {events.length >= 10 && (
           <p className="text-nord-12 mb-2">{t('label.too_many_schedule')}</p>
         )}
-        <EventList events={events} />
+        <EventList events={events} utcOffset={utcOffset} />
       </InputBlock>
     </div>
   )
