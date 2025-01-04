@@ -15,6 +15,7 @@ export const useCalendar = (calendarUrl: string): Event[] => {
     return vevents.map((vevent) => {
       const event = new ICAL.Event(vevent)
       return {
+        id: event.uid,
         title: event.summary,
         start: event.startDate.toJSDate(),
         end: event.endDate.toJSDate(),
