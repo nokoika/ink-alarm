@@ -68,6 +68,7 @@ export type TranslationKey =
   | 'label.preview_calendar'
   | 'label.no_schedule'
   | 'label.too_many_schedule'
+  | 'label.apply_setting'
 
 const dictionaryJa: Record<TranslationKey, string> = {
   'app.name': 'ガチアラーム',
@@ -135,6 +136,7 @@ const dictionaryJa: Record<TranslationKey, string> = {
   'label.no_schedule': '該当するスケジュールはありません',
   'label.too_many_schedule':
     '※該当する予定が多すぎます。絞り込み条件を増やすことをおすすめします。',
+  'label.apply_setting': 'カレンダー設定を反映',
 }
 
 const dictionaryEn: Record<TranslationKey, string> = {
@@ -203,6 +205,7 @@ const dictionaryEn: Record<TranslationKey, string> = {
   'label.no_schedule': 'No schedule matched',
   'label.too_many_schedule':
     '* Too many schedules matched. We recommend adding more filter conditions.',
+  'label.apply_setting': 'Apply calendar setting',
 }
 
 type Translate = (key: TranslationKey) => string

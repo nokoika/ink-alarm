@@ -27,6 +27,7 @@ import {
   LuMountainSnow,
   LuSquareMinus,
   LuSquarePlus,
+  LuStar,
 } from 'react-icons/lu'
 import { PiFootballBold, PiGearBold } from 'react-icons/pi'
 import { RiImageAiLine, RiTimerFlashLine } from 'react-icons/ri'
@@ -75,31 +76,31 @@ function CheckboxList<T extends string | number>({
   contents,
   updateItem,
   radio = false,
+  className,
 }: {
   contents: { key: T; text: string; enabled: boolean }[]
   updateItem: (key: T, enabled: boolean) => void
   radio?: boolean
+  className?: string
 }) {
   return (
-    <div className="grid gap-2">
-      <div className="grid gap-2 grid-cols-3">
-        {contents.map(({ key, text, enabled }) => (
-          <label key={key} className="flex items-center cursor-pointer">
-            <input
-              type={radio ? 'radio' : 'checkbox'}
-              className="hidden peer"
-              checked={enabled}
-              onChange={() => {
-                updateItem(key, !enabled)
-              }}
-            />
-            <span className="flex items-center justify-center w-5 h-5 text-nord-3 peer-checked:text-nord-8 transition-colors">
-              {enabled ? <FiCheckSquare size={20} /> : <FiSquare size={20} />}
-            </span>
-            <span className="ml-2 text-sm ">{text}</span>
-          </label>
-        ))}
-      </div>
+    <div className={className}>
+      {contents.map(({ key, text, enabled }) => (
+        <label key={key} className="flex items-center cursor-pointer min-h-10">
+          <input
+            type={radio ? 'radio' : 'checkbox'}
+            className="hidden peer"
+            checked={enabled}
+            onChange={() => {
+              updateItem(key, !enabled)
+            }}
+          />
+          <span className="flex items-center justify-center w-5 h-5 text-nord-3 peer-checked:text-nord-8 transition-colors">
+            {enabled ? <FiCheckSquare size={20} /> : <FiSquare size={20} />}
+          </span>
+          <span className="ml-2 text-sm ">{text}</span>
+        </label>
+      ))}
     </div>
   )
 }
@@ -155,6 +156,7 @@ const RulesFilter: FC<{
           removeRule(key)
         }
       }}
+      className="grid gap-x-2 grid-cols-2 md:grid-cols-5"
     />
   )
 }
@@ -210,6 +212,7 @@ const ModesFilter: FC<{
           removeMode(key)
         }
       }}
+      className="grid gap-x-2 grid-cols-2 md:grid-cols-5"
     />
   )
 }
@@ -258,6 +261,7 @@ const StagesFilter: FC<{
             removeStage(key)
           }
         }}
+        className="grid gap-x-2 grid-cols-2 md:grid-cols-5"
       />
       <CheckboxList
         contents={[
@@ -274,6 +278,7 @@ const StagesFilter: FC<{
         ]}
         updateItem={() => toggleMatchBothStages()}
         radio={true}
+        className="grid gap-x-2 md:grid-cols-2"
       />
     </div>
   )
@@ -415,11 +420,11 @@ const TimeSlotsFilter: FC<{
 
   return (
     <div>
-      <div className="space-y-2">
+      <div className="space-y-10">
         {timeSlotsWithContents.map(({ timeSlot, contents }) => {
           return (
             <div key={timeSlot.key} className="space-y-4">
-              <div className="flex gap-4">
+              <div className="flex gap-4 flex-col md:flex-row">
                 <TimeRangeInput
                   timeSlot={timeSlot}
                   updateStartTime={updateStartTime}
@@ -443,6 +448,7 @@ const TimeSlotsFilter: FC<{
                 updateItem={(dayOfWeek, enable) =>
                   updateDayOfWeek(timeSlot.key, dayOfWeek, enable)
                 }
+                className="grid gap-x-2 grid-cols-2 md:grid-cols-5"
               />
             </div>
           )
@@ -454,16 +460,17 @@ const TimeSlotsFilter: FC<{
 
 const IconButton: FC<{
   onClick: (...args: unknown[]) => unknown
+  buttonClass?: string
   icon: IconType
   text: string
-}> = ({ onClick, icon: Icon, text }) => {
+}> = ({ onClick, icon: Icon, text, buttonClass }) => {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="px-3 py-2 text-white bg-nord-3 rounded-sm hover:bg-nord-14 transition-colors"
+      className={`px-3 py-2 text-white bg-nord-3 rounded-sm hover:bg-nord-10 transition-colors ${buttonClass ?? ''}`}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex justify-center gap-2">
         <Icon className="block" />
         <p className="text-xs">{text}</p>
       </div>
@@ -502,6 +509,7 @@ const SwitchLanguage: FC<{
         }
       }}
       radio={true}
+      className="grid gap-x-2 grid-cols-2"
     />
   )
 }
@@ -553,13 +561,13 @@ const UtcOffset: FC<{
   }
 
   return (
-    <div className="flex items-center gap-4">
-      <span className="text-sm font-medium">UTC {utcOffset}</span>
-      <div className="relative">
+    <div className="flex gap-4 flex-col md:items-center md:flex-row">
+      <div className="text-sm font-medium">UTC {utcOffset}</div>
+      <div className="relative border-0 border-b border-nord-3 pr-6 ">
         <select
           onChange={onChange}
           value={selected ?? 'none'}
-          className="appearance-none bg-transparent border-0 border-b border-nord-3 text-sm focus:outline-none focus:ring-0 focus:border-nord-10 pr-6 max-w-64"
+          className="appearance-none bg-transparent text-sm focus:outline-none focus:ring-0 focus:border-nord-10 max-w-40"
         >
           <option
             value="none"
@@ -667,7 +675,7 @@ const EventList: FC<{ events: Event[]; utcOffset: string }> = ({
       {events.length === 0 ? (
         <p className="text-nord-5">{t('label.no_schedule')}</p>
       ) : (
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid md:grid-cols-3 gap-2">
           {events.map((event) => (
             <div
               key={JSON.stringify(event)}
@@ -831,7 +839,7 @@ const Input: FC = () => {
         </div>
       </InputBlock>
       <InputBlock title={t('label.general_setting')} icon={PiGearBold}>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-4 md:grid-cols-2">
           <InputBlock title={t('label.language')} icon={LuLanguages}>
             <SwitchLanguage language={language} setLanguage={setLanguage} />
           </InputBlock>
@@ -840,29 +848,33 @@ const Input: FC = () => {
           </InputBlock>
         </div>
       </InputBlock>
-      <div className="flex justify-center gap-4">
-        <IconButton
-          icon={SiGooglecalendar}
-          text={t('label.add_to_google_calendar')}
-          onClick={() => {
-            window.open(icalUrls.googleCalendar, '_blank')
-          }}
-        />
-        <IconButton
-          icon={LuCalendarArrowUp}
-          text={t('label.add_to_calendar_app')}
-          onClick={() => {
-            window.open(icalUrls.webcal, '_blank')
-          }}
-        />
-        <IconButton
-          icon={LuClipboardCopy}
-          text={t('label.copy_url')}
-          onClick={() => {
-            navigator.clipboard.writeText(icalUrls.https)
-          }}
-        />
-      </div>
+      <InputBlock title={t('label.apply_setting')} icon={LuStar}>
+        <div className="flex justify-center gap-4 flex-col md:flex-row">
+          <IconButton
+            icon={SiGooglecalendar}
+            text={t('label.add_to_google_calendar')}
+            buttonClass="bg-nord-12"
+            onClick={() => {
+              window.open(icalUrls.googleCalendar, '_blank')
+            }}
+          />
+          <IconButton
+            icon={LuCalendarArrowUp}
+            text={t('label.add_to_calendar_app')}
+            buttonClass="bg-nord-15"
+            onClick={() => {
+              window.open(icalUrls.webcal, '_blank')
+            }}
+          />
+          <IconButton
+            icon={LuClipboardCopy}
+            text={t('label.copy_url')}
+            onClick={() => {
+              navigator.clipboard.writeText(icalUrls.https)
+            }}
+          />
+        </div>
+      </InputBlock>
       <InputBlock title={t('label.preview_calendar')} icon={RiImageAiLine}>
         {events.length >= 10 && (
           <p className="text-nord-12 mb-2">{t('label.too_many_schedule')}</p>
