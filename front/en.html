@@ -32,12 +32,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/empty-service-worker.js')
-          .then(() => console.log('Service Worker registered successfully.'))
-          .catch((error) => console.error('Service Worker registration failed:', error));
-      }
-    </script>
   </body>
 </html>
