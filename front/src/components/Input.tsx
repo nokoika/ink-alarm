@@ -112,7 +112,7 @@ export const Input: FC = () => {
           <IconButton
             icon={SiGooglecalendar}
             text={t('label.add_to_google_calendar')}
-            buttonClass="!bg-nord-12"
+            buttonColorClass="bg-nord-12"
             onClick={() => {
               window.open(icalUrls.googleCalendar, '_blank')
             }}
@@ -120,7 +120,7 @@ export const Input: FC = () => {
           <IconButton
             icon={LuCalendarArrowUp}
             text={t('label.add_to_calendar_app')}
-            buttonClass="!bg-nord-15"
+            buttonColorClass="bg-nord-15"
             onClick={() => {
               window.open(icalUrls.webcal, '_blank')
             }}

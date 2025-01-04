@@ -7,6 +7,7 @@ import { useTranslation } from '~/hooks/useTranslation'
 import { Language } from '~/types/querySchema'
 
 export type Event = {
+  id: string
   title: string
   start: Date
   end: Date
@@ -26,10 +27,7 @@ export const EventList: FC<{ events: Event[]; utcOffset: string }> = ({
       ) : (
         <div className="grid md:grid-cols-3 gap-2">
           {events.map((event) => (
-            <div
-              key={JSON.stringify(event)}
-              className="px-3 py-2 bg-nord-1 transition"
-            >
+            <div key={event.id} className="px-3 py-2 bg-nord-1 transition">
               <div className="text-sm font-semibold text-nord-9">
                 {event.title}
               </div>
