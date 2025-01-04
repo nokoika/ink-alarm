@@ -117,7 +117,7 @@ const dictionaryJa: Record<TranslationKey, string> = {
   'date.saturday': '土曜日',
   'date.sunday': '日曜日',
   'label.match_both_stages': '両方のステージがマッチする場合に限る',
-  'label.match_at_least_one_stages': '片方のステージがマッチする場合も含む',
+  'label.match_at_least_one_stages': '片方のステージだけがマッチする場合も含む',
   'label.schedule_filter': 'スケジュールの表示条件',
   'label.add_schedule_filter': '別の条件を追加',
   'label.remove_schedule_filter': '上記条件を削除',
