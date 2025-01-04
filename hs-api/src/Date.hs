@@ -2,8 +2,6 @@ module Date
   ( changeTimeZone,
     timeOfDayFromString,
     timeZoneFromOffsetString,
-    isWithinTimeOfDay,
-    hasTimeRangesIntersect,
     timeRangesIntersect,
     intersectTimeRangesWithLocalTime,
     ZonedTimeRange,
@@ -22,7 +20,9 @@ import Control.Monad (guard)
 import qualified Data.Time as T
 import qualified Data.Time.LocalTime as LT
 import qualified Text.Read as TR
-import Prelude (Bool, Int, Maybe (Just, Nothing), Monad (return), String, not, otherwise, ($), (&&), (*), (+), (.), (<), (<=), (==), (||))
+import Prelude (Int, Maybe (Just, Nothing), Monad (return), String, otherwise, ($), (&&), (*), (+), (.), (<), (<=), (==), max, min, map, divMod, Foldable (foldr), fst, Integral (mod), compare, head, tail, init, error)
+import qualified Prelude as P (Ordering (GT, LT, EQ))
+import Data.List (sortOn)
 
 -- UTCTime から ZonedTime に変換
 changeTimeZone :: T.UTCTime -> T.TimeZone -> T.ZonedTime
@@ -56,58 +56,113 @@ timeZoneFromOffsetString offset = case offset of
   ['Z'] -> return T.utc
   _invalidInput -> Nothing
 
--- 時間が区間に含まれるかどうかを判定
--- [start, end) に t が含まれるかどうか
-isWithinTimeOfDay :: TimeOfDayRange -> LT.TimeOfDay -> Bool
-isWithinTimeOfDay (start, end) t
-  | start < end = start <= t && t < end
-  -- start => end の場合、日付またぎ。(ex: 23:00~01:00)
-  -- この場合、範囲外となる区間は [end, start) で連続している。
-  -- よって、範囲内はその否定、つまり t が [end, start) に入っていない場合。
-  | otherwise = not (end <= t && t < start)
+-- 時間帯の交差部分を求める (日またぎがあるためめっちゃ複雑)
+timeRangesIntersect :: TimeOfDayRange -> TimeOfDayRange -> [TimeOfDayRange]
+timeRangesIntersect (start1, end1) (start2, end2) =
+  let
+      -- (1) TimeOfDay → Int
+      s1 = todToMinutes start1
+      e1 = todToMinutes end1
+      s2 = todToMinutes start2
+      e2 = todToMinutes end2
 
--- 時間が交わるかどうかを判定。A: [s1, e1) と B: [s2, e2) が交わるかどうか
--- ※環状の時刻を扱うため、s1<e2 && s2<e1 は正しくない。環状では`<`を定義できない
-hasTimeRangesIntersect :: TimeOfDayRange -> TimeOfDayRange -> Bool
-hasTimeRangesIntersect (s1, e1) (s2, e2) = isWithinTimeOfDay (s1, e1) s2 || isWithinTimeOfDay (s2, e2) s1
+      -- (2) normalizeRangeMins
+      nr1 = normalizeRangeMins (s1, e1)
+      nr2 = normalizeRangeMins (s2, e2)
 
--- 2つの時間区間の交差部分をMaybeで返す関数
--- 区間はいずれも [start, end) 形式
-timeRangesIntersect :: TimeOfDayRange -> TimeOfDayRange -> Maybe TimeOfDayRange
-timeRangesIntersect r1@(s1, e1) r2@(s2, e2)
-  | not (hasTimeRangesIntersect r1 r2) = Nothing
-  | otherwise = Just (iStart, iEnd)
+      -- (3) 交差
+      intr = intersectRangesMins nr1 nr2  -- [(Int, Int)] の複数区間
+
+      -- (4) マージ
+      merged = mergeOverlappingRanges intr
+
+      -- (5) Int → TimeOfDay
+  in
+      map (\(st, en) -> (minutesToTod st, minutesToTod en)) merged
   where
-    -- 交差している場合、開始点はs1またはs2のどちらかがもう一方の区間に含まれている。
-    iStart
-      | isWithinTimeOfDay r2 s1 = s1
-      | otherwise = s2
 
-    -- 終了点を決める:
-    -- iStartから見て、e1とe2のどちらが先に範囲外になるか比較する。
-    -- isWithinTimeOfDay (iStart, eX) eY = True の場合、
-    -- iStartから出発して eY より先に eX が来ることを意味する。
-    -- ここでやりたいのは、「iStartから見たとき、どちらが手前にある終端か」を決めること。
+  -- TimeOfDay <-> 分(Int) 変換
+  todToMinutes :: LT.TimeOfDay -> Int
+  todToMinutes t =
+    let h = LT.todHour t
+        m = LT.todMin t
+    in h * 60 + m
 
-    iEnd
-      | isFirstEnd e1 e2 = e1
-      | otherwise = e2
+  -- 一旦 0～1440 の範囲に納めて TimeOfDay を作る。
+  -- 「start > end」(翌日またぎ) はあくまで (Int,Int) の組で表す想定なので、
+  -- ここでは 0 <= x < 1440 にクランプして TimeOfDay を作るだけにする。
+  minutesToTod :: Int -> LT.TimeOfDay
+  minutesToTod totalMins =
+    let mClamped = totalMins `mod` 1440  -- 0～1440 のあいだ
+        (h, m)   = mClamped `divMod` 60
+    in LT.TimeOfDay h m 0
 
-    -- iStartから見て、e1がe2より先にくる（つまりiStart->e1->e2の順序）かどうかを判定するヘルパー関数
-    isFirstEnd x y = isWithinTimeOfDay (iStart, y) x
+  -- (start, end) を日付またぎなら2分割、そうでなければ1区間にする
+  normalizeRangeMins :: (Int, Int) -> [(Int, Int)]
+  normalizeRangeMins (start, end) = case start `compare` end of
+    P.LT -> [ (start, end) ]
+    P.GT -> [ (start, 1440), (0, end) ]
+    P.EQ -> [ (0, 1440) ]  -- start == end → フル1日扱い
+
+  -- 2つの「正規化済み区間リスト」から交差を求める (start<end のみ対象)
+  intersectRangesMins :: [(Int, Int)] -> [(Int, Int)] -> [(Int, Int)]
+  intersectRangesMins rs1 rs2 =
+    [ (mxStart, mnEnd)
+      | (s1, e1) <- rs1
+      , (s2, e2) <- rs2
+      , let mxStart = max s1 s2
+            mnEnd   = min e1 e2
+      , mxStart < mnEnd
+    ]
+
+  -- 区間をマージする
+  mergeOverlappingRanges :: [(Int, Int)] -> [(Int, Int)]
+  mergeOverlappingRanges []  = []
+  mergeOverlappingRanges [x] = [x]
+  mergeOverlappingRanges xs  =
+    -- 1) start の小さい順にソート
+    let sorted = sortOn fst xs   -- 例: [(0,60),(1380,1440)] のように並ぶ
+        -- 2) fold で上から順にマージ
+        merged = foldr step [] sorted
+        -- 3) もし "最後の区間の end=1440" & "最初の区間の start=0" なら例外的に結合
+    in case merged of
+         [] -> []
+         [y] -> [y]
+         ys  ->
+           let (fs, fe) = head ys
+               (ls, le)  = last' ys
+           in if le == 1440 && fs == 0
+                then 
+                  -- 日付またぎとして結合: (ls, fe)
+                  -- 例えば [ (0,60), ..., (1380,1440) ] => [ (1380,60), ... ]
+                  let newRange = (ls, fe)
+                      -- 先頭・末尾を除いた「中間」の要素だけ抜き出す
+                      mid = tail (init ys)
+                  in newRange : mid
+                else ys
+    where
+      -- foldr step [] で右畳み込み
+      step cur [] = [cur]
+      step (s1, e1) ((s2, e2) : rest)
+        -- 通常の重複・隣接 (例: [10,20) と [20,30) → [10,30)) 
+        | s2 <= e1 = (s1, max e1 e2) : rest
+        | otherwise = (s1, e1) : (s2, e2) : rest
+
+      -- 自前で last を安全に取り出す補助
+      last' :: [a] -> a
+      last' [z] = z
+      last' (_:zs) = last' zs
+      last' [] = error "last': empty list" -- 起こらない前提
 
 -- TimeOfDayとLocalTimeの交差部分をMaybe LocalTimeで返す関数
 intersectTimeRangesWithLocalTime ::
   TimeOfDayRange ->
   LocalTimeRange ->
-  Maybe LocalTimeRange
+  [LocalTimeRange]
 intersectTimeRangesWithLocalTime todRange localRange@(sLocal, _) =
-  case timeRangesIntersect todRange (convertRangedLocalTimeToTimeOfDay localRange) of
-    Nothing -> Nothing
-    Just (iStartTod, iEndTod) ->
-      let iStartLocal = toLocalTime sLocal iStartTod
-          iEndLocal = toLocalTime iStartLocal iEndTod
-       in Just (iStartLocal, iEndLocal)
+  let todRange' = convertRangedLocalTimeToTimeOfDay localRange
+      intersect = timeRangesIntersect todRange todRange'
+  in map (toRangedLocalTime sLocal) intersect
   where
     -- timeOfDayをbaseLocalTimeの日付を基準にローカルタイムへ変換する
     toLocalTime :: LT.LocalTime -> LT.TimeOfDay -> LT.LocalTime
@@ -117,6 +172,11 @@ intersectTimeRangesWithLocalTime todRange localRange@(sLocal, _) =
           -- timeOfDayがbaseLocalTimeより小さい場合は翌日へ
           dayAdjust = if timeOfDay < baseTod then 1 else 0
        in LT.LocalTime (T.addDays dayAdjust baseDay) timeOfDay
+    toRangedLocalTime :: LT.LocalTime -> TimeOfDayRange -> LocalTimeRange
+    toRangedLocalTime baseLocalTime (startTod, endTod) =
+      let startLocal = toLocalTime baseLocalTime startTod
+          endLocal = toLocalTime baseLocalTime endTod
+       in (startLocal, endLocal)
 
 type ZonedTimeRange = (T.ZonedTime, T.ZonedTime)
 

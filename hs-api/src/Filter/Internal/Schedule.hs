@@ -13,7 +13,7 @@ import qualified Data.Time as T
 import qualified Date
 import qualified Query as Q
 import qualified SplaApi as S
-import Prelude (Bool (False, True), Maybe (Just, Nothing), and, const, elem, fst, map, not, or, (.), (<$>), (==), any)
+import Prelude (Bool (True), Maybe (Just, Nothing), and, any, elem, fst, map, not, or, (.), (==))
 
 maybeTrue :: (a -> Bool) -> Maybe a -> Bool
 maybeTrue = M.maybe True
@@ -22,29 +22,23 @@ maybeTrue = M.maybe True
 -- 1. スケジュールの時刻が TimeSlot の時刻と交差しているかどうか
 -- 2. 交差の開始時刻の曜日が TimeSlot の曜日と一致するかどうか
 -- 判定のタイムゾーンは utcOffset で指定されたものを使う
-timeSlotIntersection :: Date.UTCTimeRange -> T.TimeZone -> Q.TimeSlot -> Maybe Date.LocalTimeRange
+timeSlotIntersection :: Date.UTCTimeRange -> T.TimeZone -> Q.TimeSlot -> [Date.LocalTimeRange]
 timeSlotIntersection utcRange utcOffset timeSlot@Q.TimeSlot {dayOfWeeks} =
-  if matchDayOfWeek
-    then intersect
-    else Nothing
-  where
-    intersect = Date.intersectTimeRangesWithLocalTime (Q.convertTimeSlotToTimeOfDayRange timeSlot) (Date.convertRangedUTCTimeToLocalTime utcOffset utcRange)
-
-    -- 交差部分がある場合、交差の開始時刻の曜日がTimeSlotの曜日と一致するかどうかをチェックする
-    intersectStartTime = fst <$> intersect
-    localTimeToWeekDay = T.dayOfWeek . T.localDay
-    getDayOfWeek :: Q.TimeSlotDayOfWeek -> T.DayOfWeek
-    getDayOfWeek (Q.TimeSlotDayOfWeek dow) = dow
-    sameDayOfWeek :: T.DayOfWeek -> Bool
-    sameDayOfWeek = case intersectStartTime of
-      Just i -> (== localTimeToWeekDay i)
-      Nothing -> const False
-    inDayOfWeek :: [Q.TimeSlotDayOfWeek] -> Bool
-    inDayOfWeek = any (sameDayOfWeek . getDayOfWeek)
-    matchDayOfWeek = maybeTrue inDayOfWeek dayOfWeeks
+  [ intersect
+    | let intersects = Date.intersectTimeRangesWithLocalTime (Q.convertTimeSlotToTimeOfDayRange timeSlot) (Date.convertRangedUTCTimeToLocalTime utcOffset utcRange),
+      -- 交差部分がある場合、交差の開始時刻の曜日がTimeSlotの曜日と一致するかどうかをチェックする
+      let localTimeToWeekDay = T.dayOfWeek . T.localDay,
+      let getDayOfWeek (Q.TimeSlotDayOfWeek dow) = dow,
+      intersect <- intersects,
+      let intersectStart = fst intersect,
+      let sameDayOfWeek = (== localTimeToWeekDay intersectStart),
+      let inDayOfWeek = any (sameDayOfWeek . getDayOfWeek),
+      let matchDayOfWeek = maybeTrue inDayOfWeek dayOfWeeks,
+      matchDayOfWeek
+  ]
 
 timeSlotsIntersection :: Date.UTCTimeRange -> T.TimeZone -> [Q.TimeSlot] -> [Date.LocalTimeRange]
-timeSlotsIntersection utcRange utcOffset timeSlots = M.catMaybes [timeSlotIntersection utcRange utcOffset timeSlot | timeSlot <- timeSlots]
+timeSlotsIntersection utcRange utcOffset timeSlots = [intersect | timeSlot <- timeSlots, intersect <- timeSlotIntersection utcRange utcOffset timeSlot]
 
 inStage :: [S.Stage] -> Q.StageFilter -> Bool
 inStage apiStages Q.StageFilter {matchBothStages, stageIds} =
