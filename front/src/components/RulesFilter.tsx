@@ -11,11 +11,6 @@ export const RulesFilter: FC<{
 
   const contents: { key: Rule; text: string; enabled: boolean }[] = [
     {
-      key: Rule.nawabari,
-      text: t('rule.turf_war'),
-      enabled: rules.includes(Rule.nawabari),
-    },
-    {
       key: Rule.area,
       text: t('rule.splat_zones'),
       enabled: rules.includes(Rule.area),
@@ -34,6 +29,11 @@ export const RulesFilter: FC<{
       key: Rule.asari,
       text: t('rule.clam_blitz'),
       enabled: rules.includes(Rule.asari),
+    },
+    {
+      key: Rule.nawabari,
+      text: t('rule.turf_war'),
+      enabled: rules.includes(Rule.nawabari),
     },
   ]
 

@@ -1,0 +1,6 @@
+.calendar-picker-indicator::-webkit-calendar-picker-indicator {
+  position: absolute;
+  width: 100px;
+  background-color: red;
+  opacity: 0;
+}

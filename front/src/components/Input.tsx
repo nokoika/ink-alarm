@@ -130,6 +130,8 @@ export const Input: FC = () => {
             text={t('label.copy_url')}
             onClick={() => {
               navigator.clipboard.writeText(icalUrls.https)
+              // TODO: toast などに変更
+              alert(t('label.copied'))
             }}
           />
         </div>

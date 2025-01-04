@@ -6,18 +6,12 @@ import { DayOfWeek, Mode, Rule } from '~/types/querySchema'
 // すべての選択肢をONにした初期値を生成
 export const generateDefaultFilter = (): FilterConditionWithKey => ({
   key: uuidv4(),
-  modes: [
-    Mode.x,
-    Mode.event,
-    Mode.bankara_open,
-    Mode.bankara_challenge,
-    Mode.regular,
-  ],
+  modes: [Mode.x],
   stages: {
     matchBothStages: false,
     stageIds: Array.from({ length: 24 }, (_, index) => index + 1),
   },
-  rules: [Rule.area, Rule.asari, Rule.hoko, Rule.nawabari, Rule.yagura],
+  rules: [Rule.area],
   timeSlots: [generateDefaultTimeSlot()],
 })
 

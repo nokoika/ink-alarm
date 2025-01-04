@@ -105,41 +105,39 @@ export const TimeSlotsFilter: FC<{
   }))
 
   return (
-    <div>
-      <div className="space-y-10">
-        {timeSlotsWithContents.map(({ timeSlot, contents }) => {
-          return (
-            <div key={timeSlot.key} className="space-y-4">
-              <div className="flex gap-4 flex-col md:flex-row">
-                <TimeRangeInput
-                  timeSlot={timeSlot}
-                  updateStartTime={updateStartTime}
-                  updateEndTime={updateEndTime}
-                />
-                <IconButton
-                  icon={LuSquarePlus}
-                  text={t('label.add_timeslot')}
-                  onClick={() => addTimeSlotAfter(timeSlot.key)}
-                />
-                {timeSlots.length >= 2 && (
-                  <IconButton
-                    icon={LuSquareMinus}
-                    text={t('label.remove_timeslot')}
-                    onClick={() => removeTimeSlot(timeSlot.key)}
-                  />
-                )}
-              </div>
-              <CheckboxList
-                contents={contents}
-                updateItem={(dayOfWeek, enable) =>
-                  updateDayOfWeek(timeSlot.key, dayOfWeek, enable)
-                }
-                className="grid gap-x-2 grid-cols-2 md:grid-cols-5"
+    <div className="space-y-10">
+      {timeSlotsWithContents.map(({ timeSlot, contents }) => {
+        return (
+          <div key={timeSlot.key} className="space-y-4">
+            <div className="flex gap-4 flex-col md:flex-row">
+              <TimeRangeInput
+                timeSlot={timeSlot}
+                updateStartTime={updateStartTime}
+                updateEndTime={updateEndTime}
               />
+              <IconButton
+                icon={LuSquarePlus}
+                text={t('label.add_timeslot')}
+                onClick={() => addTimeSlotAfter(timeSlot.key)}
+              />
+              {timeSlots.length >= 2 && (
+                <IconButton
+                  icon={LuSquareMinus}
+                  text={t('label.remove_timeslot')}
+                  onClick={() => removeTimeSlot(timeSlot.key)}
+                />
+              )}
             </div>
-          )
-        })}
-      </div>
+            <CheckboxList
+              contents={contents}
+              updateItem={(dayOfWeek, enable) =>
+                updateDayOfWeek(timeSlot.key, dayOfWeek, enable)
+              }
+              className="grid gap-x-2 grid-cols-2 md:grid-cols-5"
+            />
+          </div>
+        )
+      })}
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import type { FC } from 'react'
 import { FiChevronDown } from 'react-icons/fi'
 import type { TimeSlotWithKey } from '~/types/propTypes'
+import styles from './TimeRangeInput.module.css'
 
 export const TimeRangeInput: FC<{
   timeSlot: TimeSlotWithKey
@@ -13,7 +14,7 @@ export const TimeRangeInput: FC<{
       <div className="relative">
         <input
           type="time"
-          className="bg-transparent border-0 border-b border-nord-3 text-sm focus:outline-none focus:ring-0 focus:border-nord-10 pr-6"
+          className={`bg-transparent border-0 border-b border-nord-3 text-sm focus:outline-none focus:ring-0 focus:border-nord-10 pr-6 ${styles['calendar-picker-indicator']}`}
           value={timeSlot.start}
           onChange={(e) => updateStartTime(timeSlot.key, e.target.value)}
         />
@@ -27,7 +28,7 @@ export const TimeRangeInput: FC<{
       <div className="relative">
         <input
           type="time"
-          className="bg-transparent border-0 border-b border-nord-3 text-sm focus:outline-none focus:ring-0 focus:border-nord-10 pr-6"
+          className={`bg-transparent border-0 border-b border-nord-3 text-sm focus:outline-none focus:ring-0 focus:border-nord-10 pr-6 ${styles['calendar-picker-indicator']}`}
           value={timeSlot.end}
           onChange={(e) => updateEndTime(timeSlot.key, e.target.value)}
         />

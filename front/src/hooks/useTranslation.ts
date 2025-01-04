@@ -65,6 +65,7 @@ export type TranslationKey =
   | 'label.add_to_calendar_app'
   | 'label.add_to_google_calendar'
   | 'label.copy_url'
+  | 'label.copied'
   | 'label.preview_calendar'
   | 'label.no_schedule'
   | 'label.too_many_schedule'
@@ -132,6 +133,7 @@ const dictionaryJa: Record<TranslationKey, string> = {
   'label.add_to_calendar_app': 'カレンダーアプリに追加',
   'label.add_to_google_calendar': 'Googleカレンダーに追加',
   'label.copy_url': 'URLをコピー',
+  'label.copied': 'クリップボードにコピーしました',
   'label.preview_calendar': 'カレンダーのプレビュー',
   'label.no_schedule': '該当するスケジュールはありません',
   'label.too_many_schedule':
@@ -201,6 +203,7 @@ const dictionaryEn: Record<TranslationKey, string> = {
   'label.add_to_calendar_app': 'Add to calendar app',
   'label.add_to_google_calendar': 'Add to Google Calendar',
   'label.copy_url': 'Copy URL',
+  'label.copied': 'Copied to clipboard',
   'label.preview_calendar': 'Preview calendar',
   'label.no_schedule': 'No schedule matched',
   'label.too_many_schedule':
