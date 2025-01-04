@@ -258,4 +258,3 @@ test = hspec $ do
     it "00:00~00:00 である場合は常にマッチする" $ do
       D.intersectTimeRangesWithLocalTime (T.TimeOfDay 0 0 0, T.TimeOfDay 0 0 0) (T.LocalTime ld1 (T.TimeOfDay 2 0 0), T.LocalTime ld1 (T.TimeOfDay 4 0 0)) `shouldBe` [(T.LocalTime ld1 (T.TimeOfDay 2 0 0), T.LocalTime ld1 (T.TimeOfDay 4 0 0))]
       D.intersectTimeRangesWithLocalTime (T.TimeOfDay 0 0 0, T.TimeOfDay 0 0 0) (T.LocalTime ld1 (T.TimeOfDay 23 0 0), T.LocalTime ld1 (T.TimeOfDay 1 0 0)) `shouldBe` [(T.LocalTime ld1 (T.TimeOfDay 23 0 0), T.LocalTime ld2 (T.TimeOfDay 1 0 0))]
-

@@ -75,9 +75,9 @@ test = hspec $ do
             Q.TimeSlot
               { start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
                 end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 0 0 0,
-                dayOfWeeks = Just
-                    [
-                      Q.TimeSlotDayOfWeek T.Sunday,
+                dayOfWeeks =
+                  Just
+                    [ Q.TimeSlotDayOfWeek T.Sunday,
                       Q.TimeSlotDayOfWeek T.Monday,
                       Q.TimeSlotDayOfWeek T.Tuesday,
                       Q.TimeSlotDayOfWeek T.Wednesday,

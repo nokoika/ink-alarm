@@ -25,6 +25,18 @@ type UseLanguage = {
   setLanguage: (lang: Language) => void
 }
 
+const setBrowserLanguage = (lang: Language) => {
+  history.replaceState(null, '', `/${lang}`)
+  const html = document.querySelector('html')
+  if (html) {
+    html.setAttribute('lang', lang)
+  }
+  const title = document.querySelector('title')
+  if (title) {
+    title.innerHTML = lang === Language.ja ? 'ガチアラーム' : 'Ink Alarm'
+  }
+}
+
 const getDefaultLanguage = (): Language => {
   const language = location.pathname.split('/')[1]
   if (language === Language.ja || language === Language.en) {
@@ -33,7 +45,7 @@ const getDefaultLanguage = (): Language => {
   const navigatorLanguage = navigator.language.startsWith('ja')
     ? Language.ja
     : Language.en
-  history.replaceState(null, '', `/${navigatorLanguage}`)
+  setBrowserLanguage(navigatorLanguage)
   return navigatorLanguage
 }
 
@@ -42,7 +54,7 @@ const useLanguage = (): UseLanguage => {
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)
-    history.replaceState(null, '', `/${lang}`)
+    setBrowserLanguage(lang)
   }
 
   return { language, setLanguage }
