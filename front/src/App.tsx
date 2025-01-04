@@ -853,7 +853,7 @@ const Input: FC = () => {
           <IconButton
             icon={SiGooglecalendar}
             text={t('label.add_to_google_calendar')}
-            buttonClass="bg-nord-12"
+            buttonClass="!bg-nord-12"
             onClick={() => {
               window.open(icalUrls.googleCalendar, '_blank')
             }}
@@ -861,7 +861,7 @@ const Input: FC = () => {
           <IconButton
             icon={LuCalendarArrowUp}
             text={t('label.add_to_calendar_app')}
-            buttonClass="bg-nord-15"
+            buttonClass="!bg-nord-15"
             onClick={() => {
               window.open(icalUrls.webcal, '_blank')
             }}
