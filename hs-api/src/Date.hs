@@ -58,54 +58,35 @@ timeZoneFromOffsetString offset = case offset of
 
 -- 時間帯の交差部分を求める (日またぎがあるためめっちゃ複雑)
 timeRangesIntersect :: TimeOfDayRange -> TimeOfDayRange -> [TimeOfDayRange]
-timeRangesIntersect (start1, end1) (start2, end2) =
+timeRangesIntersect tr1 tr2 =
   let
       -- (1) TimeOfDay → Int
-      s1 = todToMinutes start1
-      e1 = todToMinutes end1
-      s2 = todToMinutes start2
-      e2 = todToMinutes end2
+      mr1 = convertRangedTimeOfDayToMinutes tr1
+      mr2 = convertRangedTimeOfDayToMinutes tr2
 
-      -- (2) normalizeRangeMins
-      nr1 = normalizeRangeMins (s1, e1)
-      nr2 = normalizeRangeMins (s2, e2)
+      -- (2) 日またぎをしている区間を2つの区間に分割
+      normalizedRange1 = normalizeRangeMins mr1
+      normalizedRange2 = normalizeRangeMins mr2
 
-      -- (3) 交差
-      intr = intersectRangesMins nr1 nr2  -- [(Int, Int)] の複数区間
+      -- (3) 交差を求める
+      intersections = intersectRangesMins normalizedRange1 normalizedRange2 -- [(Int, Int)] の複数区間
 
       -- (4) マージ
-      merged = mergeOverlappingRanges intr
-
-      -- (5) Int → TimeOfDay
+      merged = mergeOverlappingRanges intersections
   in
-      map (\(st, en) -> (minutesToTod st, minutesToTod en)) merged
+      -- (5) Int → TimeOfDay
+      map convertRangedMinutesToTimeOfDayRange merged
   where
 
-  -- TimeOfDay <-> 分(Int) 変換
-  todToMinutes :: LT.TimeOfDay -> Int
-  todToMinutes t =
-    let h = LT.todHour t
-        m = LT.todMin t
-    in h * 60 + m
-
-  -- 一旦 0～1440 の範囲に納めて TimeOfDay を作る。
-  -- 「start > end」(翌日またぎ) はあくまで (Int,Int) の組で表す想定なので、
-  -- ここでは 0 <= x < 1440 にクランプして TimeOfDay を作るだけにする。
-  minutesToTod :: Int -> LT.TimeOfDay
-  minutesToTod totalMins =
-    let mClamped = totalMins `mod` 1440  -- 0～1440 のあいだ
-        (h, m)   = mClamped `divMod` 60
-    in LT.TimeOfDay h m 0
-
   -- (start, end) を日付またぎなら2分割、そうでなければ1区間にする
-  normalizeRangeMins :: (Int, Int) -> [(Int, Int)]
+  normalizeRangeMins :: MinutesRange -> [MinutesRange]
   normalizeRangeMins (start, end) = case start `compare` end of
     P.LT -> [ (start, end) ]
     P.GT -> [ (start, 1440), (0, end) ]
     P.EQ -> [ (0, 1440) ]  -- start == end → フル1日扱い
 
   -- 2つの「正規化済み区間リスト」から交差を求める (start<end のみ対象)
-  intersectRangesMins :: [(Int, Int)] -> [(Int, Int)] -> [(Int, Int)]
+  intersectRangesMins :: [MinutesRange] -> [MinutesRange] -> [MinutesRange]
   intersectRangesMins rs1 rs2 =
     [ (mxStart, mnEnd)
       | (s1, e1) <- rs1
@@ -116,7 +97,7 @@ timeRangesIntersect (start1, end1) (start2, end2) =
     ]
 
   -- 区間をマージする
-  mergeOverlappingRanges :: [(Int, Int)] -> [(Int, Int)]
+  mergeOverlappingRanges :: [MinutesRange] -> [MinutesRange]
   mergeOverlappingRanges []  = []
   mergeOverlappingRanges [x] = [x]
   mergeOverlappingRanges xs  =
@@ -129,6 +110,8 @@ timeRangesIntersect (start1, end1) (start2, end2) =
          [] -> []
          [y] -> [y]
          ys  ->
+           -- マージされているため区間に重複がなく、かつ区間の開始でソートされているため、
+           -- 最初と最後だけ確認すれば十分
            let (fs, fe) = head ys
                (ls, le)  = last' ys
            in if le == 1440 && fs == 0
@@ -179,12 +162,10 @@ intersectTimeRangesWithLocalTime todRange localRange@(sLocal, _) =
        in (startLocal, endLocal)
 
 type ZonedTimeRange = (T.ZonedTime, T.ZonedTime)
-
 type UTCTimeRange = (T.UTCTime, T.UTCTime)
-
 type LocalTimeRange = (LT.LocalTime, LT.LocalTime)
-
 type TimeOfDayRange = (LT.TimeOfDay, LT.TimeOfDay)
+type MinutesRange = (Int, Int)
 
 convertRangedLocalTimeToTimeOfDay :: LocalTimeRange -> TimeOfDayRange
 convertRangedLocalTimeToTimeOfDay (start, end) = (LT.localTimeOfDay start, LT.localTimeOfDay end)
@@ -200,3 +181,21 @@ convertRangedUTCTimeToZonedTime timeZone (start, end) = (changeTimeZone start ti
 
 convertRangedUTCTimeToLocalTime :: T.TimeZone -> UTCTimeRange -> LocalTimeRange
 convertRangedUTCTimeToLocalTime timeZone = convertRangedZonedTimeToLocalTime . convertRangedUTCTimeToZonedTime timeZone
+
+convertRangedTimeOfDayToMinutes :: TimeOfDayRange -> MinutesRange
+convertRangedTimeOfDayToMinutes (start, end) = (todToMinutes start, todToMinutes end)
+  where
+    todToMinutes :: LT.TimeOfDay -> Int
+    todToMinutes t =
+      let h = LT.todHour t
+          m = LT.todMin t
+       in h * 60 + m
+
+convertRangedMinutesToTimeOfDayRange :: MinutesRange -> TimeOfDayRange
+convertRangedMinutesToTimeOfDayRange (start, end) = (minutesToTod start, minutesToTod end)
+  where
+    minutesToTod :: Int -> LT.TimeOfDay
+    minutesToTod totalMins =
+      let mClamped = totalMins `mod` 1440
+          (h, m) = mClamped `divMod` 60
+       in LT.TimeOfDay h m 0
