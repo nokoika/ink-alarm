@@ -20,7 +20,7 @@ import Control.Monad (guard)
 import qualified Data.Time as T
 import qualified Data.Time.LocalTime as LT
 import qualified Text.Read as TR
-import Prelude (Int, Maybe (Just, Nothing), Monad (return), String, otherwise, ($), (&&), (*), (+), (.), (<), (<=), (==), max, min, map, divMod, Foldable (foldr), fst, Integral (mod), compare, head, tail, init, error)
+import Prelude (Int, Maybe (Just, Nothing), Monad (return), String, otherwise, ($), (&&), (*), (+), (.), (<), (<=), (==), max, min, map, divMod, Foldable (foldr), fst, Integral (mod), compare, head, tail, init, last)
 import qualified Prelude as P (Ordering (GT, LT, EQ))
 import Data.List (sortOn)
 
@@ -112,14 +112,16 @@ timeRangesIntersect tr1 tr2 =
          ys  ->
            -- マージされているため区間に重複がなく、かつ区間の開始でソートされているため、
            -- 最初と最後だけ確認すれば十分
+           -- ※ ys は2つ以上が保証されてるため、exception にはならない
            let (fs, fe) = head ys
-               (ls, le)  = last' ys
+               (ls, le)  = last ys
            in if le == 1440 && fs == 0
                 then 
                   -- 日付またぎとして結合: (ls, fe)
                   -- 例えば [ (0,60), ..., (1380,1440) ] => [ (1380,60), ... ]
                   let newRange = (ls, fe)
                       -- 先頭・末尾を除いた「中間」の要素だけ抜き出す
+                      -- ※ ys は2つ以上が保証されてるため、exception にはならない
                       mid = tail (init ys)
                   in newRange : mid
                 else ys
@@ -130,12 +132,6 @@ timeRangesIntersect tr1 tr2 =
         -- 通常の重複・隣接 (例: [10,20) と [20,30) → [10,30)) 
         | s2 <= e1 = (s1, max e1 e2) : rest
         | otherwise = (s1, e1) : (s2, e2) : rest
-
-      -- 自前で last を安全に取り出す補助
-      last' :: [a] -> a
-      last' [z] = z
-      last' (_:zs) = last' zs
-      last' [] = error "last': empty list" -- 起こらない前提
 
 -- TimeOfDayとLocalTimeの交差部分をMaybe LocalTimeで返す関数
 intersectTimeRangesWithLocalTime ::
