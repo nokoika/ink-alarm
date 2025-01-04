@@ -5,6 +5,8 @@ module Filter.Internal.ICal
   )
 where
 
+import Data.Function (on)
+import qualified Data.List as L
 import qualified Date
 import qualified Filter.Internal.Schedule as FS
 import qualified Hash
@@ -18,21 +20,25 @@ eventId :: Q.Language -> Q.Mode -> S.Rule -> [S.Stage] -> Date.UTCTimeRange -> S
 eventId language mode apiRule apiStages utcTimeRange =
   Hash.sha256Hash $ show utcTimeRange ++ show apiRule ++ show apiStages ++ show language ++ show mode
 
+uniqueById :: [I.ICalEvent] -> [I.ICalEvent]
+uniqueById = L.nubBy ((==) `on` I.id)
+
 createICalEventsFromDefaultSchedules :: Q.QueryRoot -> [S.DefaultSchedule] -> Q.Mode -> [I.ICalEvent]
 createICalEventsFromDefaultSchedules Q.QueryRoot {utcOffset, filters, language} defaultSchedules mode =
-  [ I.ICalEvent
-      { I.id = eventId language mode apiRule apiStages (startTime, endTime),
-        I.summary = Translation.showCalendarSummary language mode apiRule apiStages,
-        I.description = Translation.showCalendarDescription language mode apiRule apiStages timeRange,
-        I.start = intersectStart,
-        I.end = intersectEnd
-      }
-    | defaultSchedule@S.DefaultSchedule {startTime, endTime, rule = Just apiRule, stages = Just apiStages} <- defaultSchedules,
-      let Q.UtcOffsetTimeZone utcOffset' = utcOffset,
-      let timeRange = Date.convertRangedUTCTimeToZonedTime utcOffset' (startTime, endTime),
-      filter <- filters,
-      (intersectStart, intersectEnd) <- FS.getMatchedTimeRangesFromDefaultSchedule filter defaultSchedule utcOffset' mode
-  ]
+  uniqueById
+    [ I.ICalEvent
+        { I.id = eventId language mode apiRule apiStages (startTime, endTime),
+          I.summary = Translation.showCalendarSummary language mode apiRule apiStages,
+          I.description = Translation.showCalendarDescription language mode apiRule apiStages timeRange,
+          I.start = intersectStart,
+          I.end = intersectEnd
+        }
+      | defaultSchedule@S.DefaultSchedule {startTime, endTime, rule = Just apiRule, stages = Just apiStages} <- defaultSchedules,
+        let Q.UtcOffsetTimeZone utcOffset' = utcOffset,
+        let timeRange = Date.convertRangedUTCTimeToZonedTime utcOffset' (startTime, endTime),
+        filter <- filters,
+        (intersectStart, intersectEnd) <- FS.getMatchedTimeRangesFromDefaultSchedule filter defaultSchedule utcOffset' mode
+    ]
 
 createICalEventsFromEventMatches :: Q.QueryRoot -> [S.EventMatch] -> [I.ICalEvent]
 createICalEventsFromEventMatches Q.QueryRoot {utcOffset, filters, language} eventMatches =

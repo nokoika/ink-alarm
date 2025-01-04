@@ -339,6 +339,80 @@ test = hspec $ do
                        }
                    ]
 
+    it "2つのフィルターが1つのスケジュールにマッチしたとき、ICalEventは1つだけ出力する" $ do
+      let queryRoot =
+            Q.QueryRoot
+              { Q.language = Q.Japanese,
+                Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
+                -- 全く同じ条件を2つ指定
+                Q.filters =
+                  [ Q.FilterCondition
+                      { Q.modes = Just [Q.BankaraChallenge],
+                        Q.timeSlots =
+                          Just
+                            [ Q.TimeSlot
+                                { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
+                                  Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
+                                  Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
+                                }
+                            ],
+                        Q.stages =
+                          Just
+                            Q.StageFilter
+                              { Q.matchBothStages = False,
+                                Q.stageIds = [1, 4]
+                              },
+                        Q.rules = Just [Q.ClamBlitz]
+                      },
+                    Q.FilterCondition
+                      { Q.modes = Just [Q.BankaraChallenge],
+                        Q.timeSlots =
+                          Just
+                            [ Q.TimeSlot
+                                { Q.start = Q.TimeSlotTimeOfDay $ T.TimeOfDay 12 0 0,
+                                  Q.end = Q.TimeSlotTimeOfDay $ T.TimeOfDay 16 0 0,
+                                  Q.dayOfWeeks = Just [Q.TimeSlotDayOfWeek T.Friday]
+                                }
+                            ],
+                        Q.stages =
+                          Just
+                            Q.StageFilter
+                              { Q.matchBothStages = False,
+                                Q.stageIds = [1, 4]
+                              },
+                        Q.rules = Just [Q.ClamBlitz]
+                      }
+                  ]
+              }
+      let defaultSchedules =
+            [ -- マッチする
+              S.DefaultSchedule
+                { S.startTime = TU.createUTCTime 2021 1 1 4 0, -- 金曜日
+                  S.endTime = TU.createUTCTime 2021 1 1 6 0,
+                  S.rule = Just $ S.Rule {key = S.ClamBlitz, name = ""},
+                  S.stages = Just [S.Stage 1 "" "", S.Stage 2 "" ""],
+                  S.isFest = False
+                },
+              -- マッチしない
+              S.DefaultSchedule
+                { S.startTime = TU.createUTCTime 2021 1 2 4 0, -- 金曜日じゃない
+                  S.endTime = TU.createUTCTime 2021 1 2 6 0,
+                  S.rule = Just $ S.Rule {key = S.ClamBlitz, name = ""},
+                  S.stages = Just [S.Stage 1 "" "", S.Stage 2 "" ""],
+                  S.isFest = False
+                }
+            ]
+      let icalEvents = FI.createICalEventsFromDefaultSchedules queryRoot defaultSchedules Q.BankaraChallenge
+      icalEvents
+        `shouldBe` [ I.ICalEvent
+                       { I.id = "13bd55fa792ff7180be0f964ca83029891cac218359fafd756a864a8addabbda",
+                         I.summary = "【ガチアサリ】バンカラチャレンジ / ユノハナ大渓谷, ゴンズイ地区",
+                         I.description = "13:00から15:00までガチアサリの予定があります。\n・バンカラチャレンジ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区",
+                         I.start = TU.createUTCTime 2021 1 1 4 0,
+                         I.end = TU.createUTCTime 2021 1 1 6 0
+                       }
+                   ]
+
   describe "createICalEventsFromEventMatches" $ do
     it "正常系 日本語" $ do
       let queryRoot =
