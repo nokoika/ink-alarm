@@ -5,7 +5,7 @@ import { TranslationLanguageProvider } from '~/contexts/translationLanguageConte
 export const App: FC = () => {
   return (
     <TranslationLanguageProvider>
-      <div className="bg-nord-0 min-h-screen text-nord-4">
+      <div className="min-h-screen bg-nord-0 text-nord-4">
         <Input />
       </div>
     </TranslationLanguageProvider>

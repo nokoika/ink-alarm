@@ -21,6 +21,9 @@
         "useImportExtensions": "off",
         // プロジェクトルートの package.json を参照しており、front/package.json を参照できていないため off にする
         "noUndeclaredDependencies": "off"
+      },
+      "nursery": {
+        "useSortedClasses": "warn"
       }
     }
   },

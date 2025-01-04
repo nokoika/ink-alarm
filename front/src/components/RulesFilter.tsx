@@ -54,7 +54,7 @@ export const RulesFilter: FC<{
           removeRule(key)
         }
       }}
-      className="grid gap-x-2 grid-cols-2 md:grid-cols-5"
+      className="grid grid-cols-2 gap-x-2 md:grid-cols-5"
     />
   )
 }

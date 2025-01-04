@@ -25,10 +25,10 @@ export const EventList: FC<{ events: Event[]; utcOffset: string }> = ({
       {events.length === 0 ? (
         <p className="text-nord-5">{t('label.no_schedule')}</p>
       ) : (
-        <div className="grid md:grid-cols-3 gap-2">
+        <div className="grid gap-2 md:grid-cols-3">
           {events.map((event) => (
-            <div key={event.id} className="px-3 py-2 bg-nord-1 transition">
-              <div className="text-sm font-semibold text-nord-9">
+            <div key={event.id} className="bg-nord-1 px-3 py-2 transition">
+              <div className="font-semibold text-nord-9 text-sm">
                 {event.title}
               </div>
               <p className="text-nord-5 text-xs">

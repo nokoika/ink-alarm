@@ -109,7 +109,7 @@ export const TimeSlotsFilter: FC<{
       {timeSlotsWithContents.map(({ timeSlot, contents }) => {
         return (
           <div key={timeSlot.key} className="space-y-4">
-            <div className="flex gap-4 flex-col md:flex-row">
+            <div className="flex flex-col gap-4 md:flex-row">
               <TimeRangeInput
                 timeSlot={timeSlot}
                 updateStartTime={updateStartTime}
@@ -133,7 +133,7 @@ export const TimeSlotsFilter: FC<{
               updateItem={(dayOfWeek, enable) =>
                 updateDayOfWeek(timeSlot.key, dayOfWeek, enable)
               }
-              className="grid gap-x-2 grid-cols-2 md:grid-cols-5"
+              className="grid grid-cols-2 gap-x-2 md:grid-cols-5"
             />
           </div>
         )

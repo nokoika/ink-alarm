@@ -14,12 +14,12 @@ export const TimeRangeInput: FC<{
       <div className="relative">
         <input
           type="time"
-          className={`bg-transparent border-0 border-b border-nord-3 text-sm focus:outline-none focus:ring-0 focus:border-nord-10 pr-6 ${styles['calendar-picker-indicator']}`}
+          className={`border-0 border-nord-3 border-b bg-transparent pr-6 text-sm focus:border-nord-10 focus:outline-none focus:ring-0 ${styles['calendar-picker-indicator']}`}
           value={timeSlot.start}
           onChange={(e) => updateStartTime(timeSlot.key, e.target.value)}
         />
         <FiChevronDown
-          className="absolute right-0 bottom-1/2 transform translate-y-1/2 text-nord-8 pointer-events-none"
+          className="pointer-events-none absolute right-0 bottom-1/2 translate-y-1/2 transform text-nord-8"
           size={16}
         />
       </div>
@@ -28,12 +28,12 @@ export const TimeRangeInput: FC<{
       <div className="relative">
         <input
           type="time"
-          className={`bg-transparent border-0 border-b border-nord-3 text-sm focus:outline-none focus:ring-0 focus:border-nord-10 pr-6 ${styles['calendar-picker-indicator']}`}
+          className={`border-0 border-nord-3 border-b bg-transparent pr-6 text-sm focus:border-nord-10 focus:outline-none focus:ring-0 ${styles['calendar-picker-indicator']}`}
           value={timeSlot.end}
           onChange={(e) => updateEndTime(timeSlot.key, e.target.value)}
         />
         <FiChevronDown
-          className="absolute right-0 bottom-1/2 transform translate-y-1/2 text-nord-8 pointer-events-none"
+          className="pointer-events-none absolute right-0 bottom-1/2 translate-y-1/2 transform text-nord-8"
           size={16}
         />
       </div>

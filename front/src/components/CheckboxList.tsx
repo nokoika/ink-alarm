@@ -15,19 +15,19 @@ export function CheckboxList<T extends string | number>({
   return (
     <div className={className}>
       {contents.map(({ key, text, enabled }) => (
-        <label key={key} className="flex items-center cursor-pointer min-h-10">
+        <label key={key} className="flex min-h-10 cursor-pointer items-center">
           <input
             type={radio ? 'radio' : 'checkbox'}
-            className="hidden peer"
+            className="peer hidden"
             checked={enabled}
             onChange={() => {
               updateItem(key, !enabled)
             }}
           />
-          <span className="flex items-center justify-center w-5 h-5 text-nord-3 peer-checked:text-nord-8 transition-colors">
+          <span className="flex h-5 w-5 items-center justify-center text-nord-3 transition-colors peer-checked:text-nord-8">
             {enabled ? <FiCheckSquare size={20} /> : <FiSquare size={20} />}
           </span>
-          <span className="ml-2 text-sm ">{text}</span>
+          <span className="ml-2 text-sm">{text}</span>
         </label>
       ))}
     </div>

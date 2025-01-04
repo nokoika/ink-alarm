@@ -28,7 +28,7 @@ export const SwitchLanguage: FC<{
         }
       }}
       radio={true}
-      className="grid gap-x-2 grid-cols-2"
+      className="grid grid-cols-2 gap-x-2"
     />
   )
 }

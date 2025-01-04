@@ -49,18 +49,18 @@ export const UtcOffset: FC<{
   }
 
   return (
-    <div className="flex gap-4 flex-col md:items-center md:flex-row">
-      <div className="text-sm font-medium">UTC {utcOffset}</div>
-      <div className="relative border-0 border-b border-nord-3 pr-6 ">
+    <div className="flex flex-col gap-4 md:flex-row md:items-center">
+      <div className="font-medium text-sm">UTC {utcOffset}</div>
+      <div className="relative border-0 border-nord-3 border-b pr-6 ">
         <select
           onChange={onChange}
           value={selected ?? 'none'}
-          className="appearance-none bg-transparent text-sm focus:outline-none focus:ring-0 focus:border-nord-10 max-w-40"
+          className="max-w-40 appearance-none bg-transparent text-sm focus:border-nord-10 focus:outline-none focus:ring-0"
         >
           <option
             value="none"
             disabled={true}
-            className="text-sm bg-nord-2 p-1 appearance-none"
+            className="appearance-none bg-nord-2 p-1 text-sm"
           >
             -
           </option>
@@ -70,7 +70,7 @@ export const UtcOffset: FC<{
                 <option
                   key={option.value}
                   value={option.value}
-                  className="text-sm bg-nord-2 p-1 appearance-none"
+                  className="appearance-none bg-nord-2 p-1 text-sm"
                 >
                   {option.label}
                 </option>
@@ -78,7 +78,7 @@ export const UtcOffset: FC<{
           )}
         </select>
         <FiChevronDown
-          className="absolute right-0 bottom-1/2 transform translate-y-1/2 text-nord-8 pointer-events-none"
+          className="pointer-events-none absolute right-0 bottom-1/2 translate-y-1/2 transform text-nord-8"
           size={16}
         />
       </div>

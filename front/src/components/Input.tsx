@@ -42,7 +42,7 @@ export const Input: FC = () => {
   const events = useCalendar(icalUrls.https)
 
   return (
-    <div className="max-w-5xl mx-auto space-y-4 p-2">
+    <div className="mx-auto max-w-5xl space-y-4 p-2">
       <InputBlock title={t('label.schedule_filter')} icon={FiCalendar}>
         <div className="grid gap-10">
           {filters.map((filter) => (
@@ -108,7 +108,7 @@ export const Input: FC = () => {
         </div>
       </InputBlock>
       <InputBlock title={t('label.apply_setting')} icon={LuStar}>
-        <div className="flex justify-center gap-4 flex-col md:flex-row">
+        <div className="flex flex-col justify-center gap-4 md:flex-row">
           <IconButton
             icon={SiGooglecalendar}
             text={t('label.add_to_google_calendar')}
@@ -138,7 +138,7 @@ export const Input: FC = () => {
       </InputBlock>
       <InputBlock title={t('label.preview_calendar')} icon={RiImageAiLine}>
         {events.length >= 10 && (
-          <p className="text-nord-12 mb-2">{t('label.too_many_schedule')}</p>
+          <p className="mb-2 text-nord-12">{t('label.too_many_schedule')}</p>
         )}
         <EventList events={events} utcOffset={utcOffset} />
       </InputBlock>
