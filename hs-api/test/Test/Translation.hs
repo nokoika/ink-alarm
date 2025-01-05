@@ -26,7 +26,7 @@ test = hspec $ do
         (S.Rule S.TurfWar "")
         [S.Stage {S.id = 1, S.name = "", S.image = ""}, S.Stage {S.id = 2, S.name = "", S.image = ""}]
         (TU.createZonedTime (2021, 1, 1, 21, 0) (9, ""), TU.createZonedTime (2021, 1, 1, 23, 0) (9, ""))
-        `shouldBe` "21:00から23:00までナワバリバトルの予定があります。\n・レギュラーマッチ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区"
+        `shouldBe` "21:00から23:00までナワバリバトルの予定があります。\n・レギュラーマッチ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区\n\nスケジュール設定の変更はこちら: https://ink-alarm.pages.dev/ja"
 
     it "returns a description of the english calendar" $ do
       Translation.showCalendarDescription
@@ -35,4 +35,4 @@ test = hspec $ do
         (S.Rule S.TurfWar "")
         [S.Stage {S.id = 1, S.name = "", S.image = ""}, S.Stage {S.id = 2, S.name = "", S.image = ""}]
         (TU.createZonedTime (2021, 1, 1, 21, 0) (9, ""), TU.createZonedTime (2021, 1, 1, 23, 0) (9, ""))
-        `shouldBe` "There is a scheduled Turf War from 21:00 to 23:00.\n- Regular Battle\n- Stages: Scorch Gorge, Eeltail Alley"
+        `shouldBe` "There is a scheduled Turf War from 21:00 to 23:00.\n- Regular Battle\n- Stages: Scorch Gorge, Eeltail Alley\n\nClick here to change schedule settings: https://ink-alarm.pages.dev/en"

@@ -141,7 +141,7 @@ test = hspec $ do
               [ I.ICalEvent
                   { I.id = "9864650fe1bd4d9a8fba92577fd4b7cd395cdeeddf78f052f1cfec2fb65df705",
                     I.summary = "【ガチホコバトル】バンカラチャレンジ / マサバ海峡大橋, ヒラメが丘団地",
-                    I.description = "21:00から23:00までガチホコバトルの予定があります。\n・バンカラチャレンジ\n・ステージ: マサバ海峡大橋, ヒラメが丘団地",
+                    I.description = "21:00から23:00までガチホコバトルの予定があります。\n・バンカラチャレンジ\n・ステージ: マサバ海峡大橋, ヒラメが丘団地\n\nスケジュール設定の変更はこちら: https://ink-alarm.pages.dev/ja",
                     I.start = TU.createUTCTime 2024 11 17 12 0,
                     I.end = TU.createUTCTime 2024 11 17 14 0
                   }
@@ -276,7 +276,7 @@ test = hspec $ do
               [ I.ICalEvent
                   { I.id = "bb2afcd5dbc30d5027e6b196459d8eddc0e99af5108e4f87456826b77c282884",
                     I.summary = "【Rainmaker】Anarchy Battle (Series) / Hammerhead Bridge, Flounder Heights",
-                    I.description = "There is a scheduled Rainmaker from 04:00 to 06:00.\n- Anarchy Battle (Series)\n- Stages: Hammerhead Bridge, Flounder Heights",
+                    I.description = "There is a scheduled Rainmaker from 04:00 to 06:00.\n- Anarchy Battle (Series)\n- Stages: Hammerhead Bridge, Flounder Heights\n\nClick here to change schedule settings: https://ink-alarm.pages.dev/en",
                     I.start = TU.createUTCTime 2024 11 17 12 0,
                     I.end = TU.createUTCTime 2024 11 17 13 0
                   }
@@ -333,7 +333,7 @@ test = hspec $ do
         `shouldBe` [ I.ICalEvent
                        { I.id = "13bd55fa792ff7180be0f964ca83029891cac218359fafd756a864a8addabbda",
                          I.summary = "【ガチアサリ】バンカラチャレンジ / ユノハナ大渓谷, ゴンズイ地区",
-                         I.description = "13:00から15:00までガチアサリの予定があります。\n・バンカラチャレンジ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区",
+                         I.description = "13:00から15:00までガチアサリの予定があります。\n・バンカラチャレンジ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区\n\nスケジュール設定の変更はこちら: https://ink-alarm.pages.dev/ja",
                          I.start = TU.createUTCTime 2021 1 1 4 0,
                          I.end = TU.createUTCTime 2021 1 1 6 0
                        }
@@ -407,7 +407,7 @@ test = hspec $ do
         `shouldBe` [ I.ICalEvent
                        { I.id = "13bd55fa792ff7180be0f964ca83029891cac218359fafd756a864a8addabbda",
                          I.summary = "【ガチアサリ】バンカラチャレンジ / ユノハナ大渓谷, ゴンズイ地区",
-                         I.description = "13:00から15:00までガチアサリの予定があります。\n・バンカラチャレンジ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区",
+                         I.description = "13:00から15:00までガチアサリの予定があります。\n・バンカラチャレンジ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区\n\nスケジュール設定の変更はこちら: https://ink-alarm.pages.dev/ja",
                          I.start = TU.createUTCTime 2021 1 1 4 0,
                          I.end = TU.createUTCTime 2021 1 1 6 0
                        }
@@ -465,7 +465,7 @@ test = hspec $ do
         `shouldBe` [ I.ICalEvent
                        { I.id = "3cd804136689020fd443d62339a32a5ca1375daa7be1327782050d0675bca85e",
                          I.summary = "イカダッシュバトル【ガチアサリ】イベントマッチ / ユノハナ大渓谷, ゴンズイ地区",
-                         I.description = "イカダッシュ速度アップ！ イカやタコでステージを泳ぎ回れ！\n\n13:00から15:00までガチアサリの予定があります。\n・イベントマッチ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区",
+                         I.description = "イカダッシュ速度アップ！ イカやタコでステージを泳ぎ回れ！\n\n13:00から15:00までガチアサリの予定があります。\n・イベントマッチ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区\n\nスケジュール設定の変更はこちら: https://ink-alarm.pages.dev/ja",
                          I.start = TU.createUTCTime 2021 1 1 4 0,
                          I.end = TU.createUTCTime 2021 1 1 6 0
                        }
@@ -513,7 +513,7 @@ test = hspec $ do
         `shouldBe` [ I.ICalEvent
                        { I.id = "d220020d5918000e7063b463a61882defa847a9d509650d68e39228a5c36f408",
                          I.summary = "【Clam Blitz】Challenge / Scorch Gorge, Eeltail Alley / イカダッシュバトル",
-                         I.description = "There is a scheduled Clam Blitz from 13:00 to 15:00.\n- Challenge\n- Stages: Scorch Gorge, Eeltail Alley\n\nイカダッシュ速度アップ！ イカやタコでステージを泳ぎ回れ！",
+                         I.description = "There is a scheduled Clam Blitz from 13:00 to 15:00.\n- Challenge\n- Stages: Scorch Gorge, Eeltail Alley\n\nClick here to change schedule settings: https://ink-alarm.pages.dev/en\n\nイカダッシュ速度アップ！ イカやタコでステージを泳ぎ回れ！",
                          I.start = TU.createUTCTime 2021 1 1 4 0,
                          I.end = TU.createUTCTime 2021 1 1 6 0
                        }

@@ -1,4 +1,4 @@
-import { type FC, useState } from 'react'
+import { type FC, createElement, useState } from 'react'
 import { FiCalendar, FiSun } from 'react-icons/fi'
 import {
   LuCalendarArrowUp,
@@ -34,7 +34,7 @@ export const Input: FC = () => {
   const [utcOffset, setUtcOffset] = useState<string>(
     generateInitilalUtcOffset(),
   )
-  const { t } = useTranslation()
+  const { t, tc } = useTranslation()
   const { filters, addFilterAfter, updateFilter, removeFilter } =
     useFilterCondition()
 
@@ -43,7 +43,11 @@ export const Input: FC = () => {
 
   return (
     <div className="mx-auto max-w-5xl space-y-4 p-2">
-      <InputBlock title={t('label.schedule_filter')} icon={FiCalendar}>
+      <InputBlock
+        title={t('label.schedule_filter')}
+        icon={FiCalendar}
+        help={createElement(tc('help.schedule_filter'))}
+      >
         <div className="grid gap-10">
           {filters.map((filter) => (
             <div key={filter.key} className="space-y-2">
@@ -62,6 +66,7 @@ export const Input: FC = () => {
               <InputBlock
                 title={t('label.time_filter')}
                 icon={RiTimerFlashLine}
+                help={createElement(tc('help.time_filter'))}
               >
                 <TimeSlotsFilter
                   timeSlots={filter.timeSlots}
@@ -99,15 +104,27 @@ export const Input: FC = () => {
       </InputBlock>
       <InputBlock title={t('label.general_setting')} icon={PiGearBold}>
         <div className="grid gap-4 md:grid-cols-2">
-          <InputBlock title={t('label.language')} icon={LuLanguages}>
+          <InputBlock
+            title={t('label.language')}
+            icon={LuLanguages}
+            help={createElement(tc('help.language'))}
+          >
             <SwitchLanguage language={language} setLanguage={setLanguage} />
           </InputBlock>
-          <InputBlock title={t('label.time_difference')} icon={LuEarth}>
+          <InputBlock
+            title={t('label.time_difference')}
+            icon={LuEarth}
+            help={createElement(tc('help.time_difference'))}
+          >
             <UtcOffset utcOffset={utcOffset} setUtcOffset={setUtcOffset} />
           </InputBlock>
         </div>
       </InputBlock>
-      <InputBlock title={t('label.apply_setting')} icon={LuStar}>
+      <InputBlock
+        title={t('label.apply_setting')}
+        icon={LuStar}
+        help={createElement(tc('help.add_to_calendar'))}
+      >
         <div className="flex flex-col justify-center gap-4 md:flex-row">
           <IconButton
             icon={SiGooglecalendar}
@@ -136,7 +153,11 @@ export const Input: FC = () => {
           />
         </div>
       </InputBlock>
-      <InputBlock title={t('label.preview_calendar')} icon={RiImageAiLine}>
+      <InputBlock
+        title={t('label.preview_calendar')}
+        icon={RiImageAiLine}
+        help={createElement(tc('help.preview_calendar'))}
+      >
         {events.length >= 10 && (
           <p className="mb-2 text-nord-12">{t('label.too_many_schedule')}</p>
         )}

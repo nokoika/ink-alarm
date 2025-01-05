@@ -123,12 +123,16 @@ showCalendarDescription Q.Japanese mode rule stages (startTime, endTime) =
     "\n"
     [ showZonedTime startTime ++ "から" ++ showZonedTime endTime ++ "まで" ++ showRuleName Q.Japanese rule ++ "の予定があります。",
       "・" ++ showMode Q.Japanese mode,
-      "・ステージ: " ++ intercalate ", " (map (showStageName Q.Japanese) stages)
+      "・ステージ: " ++ intercalate ", " (map (showStageName Q.Japanese) stages),
+      "",
+      "スケジュール設定の変更はこちら: https://ink-alarm.pages.dev/ja"
     ]
 showCalendarDescription Q.English mode rule stages (startTime, endTime) =
   intercalate
     "\n"
     [ "There is a scheduled " ++ showRuleName Q.English rule ++ " from " ++ showZonedTime startTime ++ " to " ++ showZonedTime endTime ++ ".",
       "- " ++ showMode Q.English mode,
-      "- Stages: " ++ intercalate ", " (map (showStageName Q.English) stages)
+      "- Stages: " ++ intercalate ", " (map (showStageName Q.English) stages),
+      "",
+      "Click here to change schedule settings: https://ink-alarm.pages.dev/en"
     ]
