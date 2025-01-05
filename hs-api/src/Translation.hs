@@ -1,10 +1,13 @@
 module Translation (showCalendarSummary, showCalendarDescription, showApplicationName, showICalProdId) where
 
+import Data.Aeson (Value (String))
 import Data.List (intercalate)
+import qualified Data.Maybe as M
 import qualified Data.Time as T
+import qualified Data.Time.Calendar as C
 import qualified Query as Q
 import qualified SplaApi as S
-import Prelude (String, map, ($), (++))
+import Prelude (Maybe (Just, Nothing), Show (show), String, map, ($), (++), (.))
 
 showApplicationName :: Q.Language -> String
 showApplicationName Q.Japanese = "ガチアラーム"
@@ -83,6 +86,18 @@ showRuleName Q.English S.Rule {key} = case key of
   S.ClamBlitz -> "Clam Blitz"
   S.TurfWar -> "Turf War"
 
+showRuleName' :: Q.Language -> Q.Rule -> String
+showRuleName' Q.Japanese Q.TurfWar = "ナワバリバトル"
+showRuleName' Q.Japanese Q.SplatZones = "ガチエリア"
+showRuleName' Q.Japanese Q.TowerControl = "ガチヤグラ"
+showRuleName' Q.Japanese Q.Rainmaker = "ガチホコバトル"
+showRuleName' Q.Japanese Q.ClamBlitz = "ガチアサリ"
+showRuleName' Q.English Q.TurfWar = "Turf War"
+showRuleName' Q.English Q.SplatZones = "Splat Zones"
+showRuleName' Q.English Q.TowerControl = "Tower Control"
+showRuleName' Q.English Q.Rainmaker = "Rainmaker"
+showRuleName' Q.English Q.ClamBlitz = "Clam Blitz"
+
 showMode :: Q.Language -> Q.Mode -> String
 showMode Q.Japanese Q.BankaraOpen = "バンカラオープン"
 showMode Q.Japanese Q.BankaraChallenge = "バンカラチャレンジ"
@@ -108,6 +123,38 @@ showCalendarSummary language mode rule stages =
 
 showZonedTime :: T.ZonedTime -> String
 showZonedTime = T.formatTime T.defaultTimeLocale "%H:%M"
+
+showQueryDescription :: Q.QueryRoot -> String
+showQueryDescription Q.QueryRoot {filters, utcOffset, language} = intercalate "\n" ["時差: " ++ showUtcOffset utcOffset, "フィルター: " ++ intercalate "\n" (map showFilter filters)]
+  where
+    showUtcOffset :: Q.UtcOffsetTimeZone -> String
+    showUtcOffset (Q.UtcOffsetTimeZone timeZone) = show timeZone
+    showFilter :: Q.FilterCondition -> String
+    showFilter Q.FilterCondition {modes, stages, rules, timeSlots} = intercalate ", " ["モード: " ++ showModes modes ++ ", ステージ: " ++ showStages ++ "ルール: " ++ showRules rules ++ ", " ++ intercalate ", 時間帯: " [showTimeSlot timeSlot | timeSlot <- timeSlots]]
+    showModes :: Maybe [Q.Mode] -> String
+    showModes Nothing = "すべて"
+    showModes (Just modes) = intercalate ", " $ map (showMode Q.Japanese) modes
+    showRules :: Maybe [Q.Rule] -> String
+    showRules Nothing = "すべて"
+    showRules (Just rules) = intercalate ", " $ map (showRuleName' language) rules
+    showDayOfWeek :: C.DayOfWeek -> String
+    showDayOfWeek C.Monday = "月"
+    showDayOfWeek C.Tuesday = "火"
+    showDayOfWeek C.Wednesday = "水"
+    showDayOfWeek C.Thursday = "木"
+    showDayOfWeek C.Friday = "金"
+    showDayOfWeek C.Saturday = "土"
+    showDayOfWeek C.Sunday = "日"
+    showDayOfWeeks :: Maybe [Q.TimeSlotDayOfWeek] -> String
+    showDayOfWeeks Nothing = "すべての曜日"
+    showDayOfWeeks (Just dows) = intercalate ", " $ map (showDayOfWeek . Q.dayOfWeek) dows
+    showStages :: Maybe [S.Stage] -> String
+    showStages Nothing = "すべてのステージ"
+    showStages (Just stages) = intercalate ", " $ map (showStageName Q.Japanese) stages
+    showStageFilter :: Q.StageFilter -> String
+    showStageFilter Q.StageFilter {matchBothStages, stageIds} = "両方のステージ: " ++ show matchBothStages ++ ", ステージID: " ++ show stageIds
+    showTimeSlot :: Q.TimeSlot -> String
+    showTimeSlot Q.TimeSlot {start, end, dayOfWeeks} = show start ++ "~" ++ show end ++ "(" ++ showDayOfWeeks dayOfWeeks ++ ")"
 
 -- 例(日本語):
 -- 21:00から23:00までガチエリアの予定あります。
