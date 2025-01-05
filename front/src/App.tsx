@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { Footer } from '~/components/Footer'
 import { Header } from '~/components/Header'
 import { Input } from '~/components/Input'
 import { TranslationLanguageProvider } from '~/contexts/translationLanguageContext'
@@ -10,6 +11,7 @@ export const App: FC = () => {
         <div className="mx-auto max-w-5xl p-4">
           <Header />
           <Input />
+          <Footer />
         </div>
       </div>
     </TranslationLanguageProvider>
