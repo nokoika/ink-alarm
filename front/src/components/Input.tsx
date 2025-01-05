@@ -42,7 +42,7 @@ export const Input: FC = () => {
   const events = useCalendar(icalUrls.https)
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4 p-2">
+    <div className="space-y-4">
       <InputBlock
         title={t('label.schedule_filter')}
         icon={FiCalendar}
@@ -130,17 +130,13 @@ export const Input: FC = () => {
             icon={SiGooglecalendar}
             text={t('label.add_to_google_calendar')}
             buttonColorClass="bg-nord-12"
-            onClick={() => {
-              window.open(icalUrls.googleCalendar, '_blank')
-            }}
+            href={icalUrls.googleCalendar}
           />
           <IconButton
             icon={LuCalendarArrowUp}
             text={t('label.add_to_calendar_app')}
             buttonColorClass="bg-nord-15"
-            onClick={() => {
-              window.open(icalUrls.webcal, '_blank')
-            }}
+            href={icalUrls.webcal}
           />
           <IconButton
             icon={LuClipboardCopy}

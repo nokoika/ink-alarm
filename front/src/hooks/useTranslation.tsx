@@ -12,6 +12,7 @@ import { useTranslationLanguageContext } from '~/contexts/translationLanguageCon
 
 export type TranslationKey =
   | 'app.name'
+  | 'app.description'
   | 'language.ja'
   | 'language.en'
   | 'stage.1'
@@ -55,6 +56,8 @@ export type TranslationKey =
   | 'date.friday'
   | 'date.saturday'
   | 'date.sunday'
+  | 'label.how_to_use'
+  | 'label.how_to_use_url'
   | 'label.match_both_stages'
   | 'label.match_at_least_one_stages'
   | 'label.time_difference'
@@ -80,6 +83,8 @@ export type TranslationKey =
 
 const dictionaryJa: Record<TranslationKey, string> = {
   'app.name': 'ガチアラーム',
+  'app.description':
+    'ガチアラームはスプラトゥーン3のスケジュールをカレンダーアプリに自動転記するためのツールです。',
   'language.ja': '日本語',
   'language.en': 'English',
   'stage.1': 'ユノハナ大渓谷',
@@ -123,6 +128,9 @@ const dictionaryJa: Record<TranslationKey, string> = {
   'date.friday': '金曜日',
   'date.saturday': '土曜日',
   'date.sunday': '日曜日',
+  'label.how_to_use': '使い方',
+  'label.how_to_use_url':
+    'https://docs.google.com/presentation/d/1AOBB0h7d-2kclU9cekgac54LM2lPZQ8CJMz7hbwo_-4/edit#slide=id.p',
   'label.match_both_stages': '両方のステージがマッチする場合に限る',
   'label.match_at_least_one_stages': '片方のステージだけがマッチする場合も含む',
   'label.schedule_filter': 'スケジュールの表示条件',
@@ -150,6 +158,8 @@ const dictionaryJa: Record<TranslationKey, string> = {
 
 const dictionaryEn: Record<TranslationKey, string> = {
   'app.name': 'Ink Alarm',
+  'app.description':
+    'InkAlarm is a tool that automatically transfers the Splatoon 3 schedule to your calendar app.',
   'language.ja': '日本語',
   'language.en': 'English',
   'stage.1': 'Scorch Gorge',
@@ -193,6 +203,9 @@ const dictionaryEn: Record<TranslationKey, string> = {
   'date.friday': 'Friday',
   'date.saturday': 'Saturday',
   'date.sunday': 'Sunday',
+  'label.how_to_use': 'How to use (Japanese)',
+  'label.how_to_use_url':
+    'https://docs.google.com/presentation/d/1AOBB0h7d-2kclU9cekgac54LM2lPZQ8CJMz7hbwo_-4/edit#slide=id.p',
   'label.match_both_stages': 'Only when both stages matched',
   'label.match_at_least_one_stages': 'Including when one of the stages matched',
   'label.schedule_filter': 'Schedule display conditions',
@@ -375,7 +388,7 @@ const componentDictionaryJa: Record<TranslationComponentKey, FC> = {
       <p>
         Google カレンダーでの詳しい設定方法は
         <a
-          href="https://example.com"
+          href="https://docs.google.com/presentation/d/1AOBB0h7d-2kclU9cekgac54LM2lPZQ8CJMz7hbwo_-4/edit#slide=id.g322e2388e0f_0_32"
           target="_blank"
           rel="noreferrer"
           className="mx-1 bg-nord-6 px-1 text-nord-10 italic underline"
@@ -557,12 +570,12 @@ const componentDictionaryEn: Record<TranslationComponentKey, FC> = {
       <p className="mt-2">
         For Google Calendar setup details, check
         <a
-          href="https://example.com"
+          href="https://docs.google.com/presentation/d/1AOBB0h7d-2kclU9cekgac54LM2lPZQ8CJMz7hbwo_-4/edit#slide=id.g322e2388e0f_0_32"
           target="_blank"
           rel="noreferrer"
           className="mx-1 bg-nord-6 px-1 text-nord-10 italic underline"
         >
-          here
+          here (Japanese)
         </a>
         .
       </p>
