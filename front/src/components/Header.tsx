@@ -2,7 +2,7 @@ import type { FC } from 'react'
 import { GrDocumentText } from 'react-icons/gr'
 import { useTranslation } from '~/hooks/useTranslation'
 import { IconButton } from './IconButton'
-import { RotatingImage } from './RotateImage'
+import { RotatingImage } from './RotatingImage'
 
 export const Header: FC = () => {
   const { t } = useTranslation()
