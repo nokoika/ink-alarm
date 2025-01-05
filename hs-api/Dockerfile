@@ -6,7 +6,7 @@ ENV PORT=8080
 
 WORKDIR $APP_HOME
 
-COPY stack.yaml stack.yaml.lock package.yaml spla-ical.cabal ./
+COPY stack.yaml stack.yaml.lock package.yaml ink-alarm.cabal ./
 
 RUN stack setup --install-ghc
 RUN stack build --only-dependencies
@@ -16,7 +16,7 @@ COPY . .
 # 本番用バイナリのビルド
 RUN stack build --copy-bins
 
-# RUN strip /root/.local/bin/spla-ical-exe
+# RUN strip /root/.local/bin/ink-alarm-exe
 
 # ランタイムステージ
 FROM debian:bullseye-slim
@@ -29,8 +29,8 @@ ENV PORT=8080
 WORKDIR $APP_HOME
 
 # ビルドステージからバイナリをコピー
-COPY --from=builder /root/.local/bin/spla-ical-exe .
+COPY --from=builder /root/.local/bin/ink-alarm-exe .
 
 EXPOSE $PORT
 
-CMD ["./spla-ical-exe"]
+CMD ["./ink-alarm-exe"]

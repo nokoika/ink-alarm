@@ -3,8 +3,8 @@ cradle:
     stackYaml: "./hs-api/stack.yaml"
     components:
       - path: "./hs-api/src"
-        component: "spla-ical:lib"
+        component: "ink-alarm:lib"
       - path: "./hs-api/app"
-        component: "spla-ical:exe:spla-ical-exe"
+        component: "ink-alarm:exe:ink-alarm-exe"
       - path: "./hs-api/test"
-        component: "spla-ical:test:spla-ical-test"
+        component: "ink-alarm:test:ink-alarm-test"

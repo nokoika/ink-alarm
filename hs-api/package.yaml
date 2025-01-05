@@ -1,5 +1,5 @@
-name: spla-ical
-github: "github.com/nokoika/spla-ical"
+name: ink-alarm
+github: "github.com/nokoika/ink-alarm"
 author: "nokoika"
 
 # Metadata used when publishing your package
@@ -9,7 +9,7 @@ author: "nokoika"
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description: Please see the README on GitHub at <https://github.com/githubuser/spla-ical#readme>
+description: Please see the README on GitHub at <https://github.com/githubuser/ink-alarm#readme>
 
 dependencies:
   - base >= 4.7 && < 5
@@ -72,7 +72,7 @@ library:
   source-dirs: src
 
 executables:
-  spla-ical-exe:
+  ink-alarm-exe:
     main: Main.hs
     source-dirs: app
     ghc-options:
@@ -80,10 +80,10 @@ executables:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
-      - spla-ical
+      - ink-alarm
 
 tests:
-  spla-ical-test:
+  ink-alarm-test:
     main: Spec.hs
     source-dirs: test
     ghc-options:
@@ -91,4 +91,4 @@ tests:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
-      - spla-ical
+      - ink-alarm

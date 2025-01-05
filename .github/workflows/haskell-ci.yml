@@ -50,7 +50,7 @@ jobs:
         run: |
           set -x
 
-          stack --system-ghc exec -- spla-ical-exe &
+          stack --system-ghc exec -- ink-alarm-exe &
           API_PID=$!
           sleep 1
           ./test/e2e.sh

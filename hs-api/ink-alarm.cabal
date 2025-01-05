@@ -4,9 +4,9 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           spla-ical
+name:           ink-alarm
 version:        0.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/spla-ical#readme>
+description:    Please see the README on GitHub at <https://github.com/githubuser/ink-alarm#readme>
 homepage:       https://github.com/github.com/nokoika#readme
 bug-reports:    https://github.com/github.com/nokoika/issues
 author:         nokoika
@@ -16,7 +16,7 @@ build-type:     Simple
 source-repository head
   type: git
   location: https://github.com/github.com/nokoika
-  subdir: spla-ical
+  subdir: ink-alarm
 
 library
   exposed-modules:
@@ -32,7 +32,7 @@ library
       SplaApi.Cached
       Translation
   other-modules:
-      Paths_spla_ical
+      Paths_ink_alarm
   hs-source-dirs:
       src
   default-extensions:
@@ -81,10 +81,10 @@ library
     , time
   default-language: Haskell2010
 
-executable spla-ical-exe
+executable ink-alarm-exe
   main-is: Main.hs
   other-modules:
-      Paths_spla_ical
+      Paths_ink_alarm
   hs-source-dirs:
       app
   default-extensions:
@@ -126,15 +126,15 @@ executable spla-ical-exe
     , hspec
     , http-conduit
     , http-types
+    , ink-alarm
     , memory
     , ormolu
     , scotty
-    , spla-ical
     , text
     , time
   default-language: Haskell2010
 
-test-suite spla-ical-test
+test-suite ink-alarm-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
@@ -148,7 +148,7 @@ test-suite spla-ical-test
       Test.SplaApi
       Test.Translation
       TestUtil
-      Paths_spla_ical
+      Paths_ink_alarm
   hs-source-dirs:
       test
   default-extensions:
@@ -190,10 +190,10 @@ test-suite spla-ical-test
     , hspec
     , http-conduit
     , http-types
+    , ink-alarm
     , memory
     , ormolu
     , scotty
-    , spla-ical
     , text
     , time
   default-language: Haskell2010

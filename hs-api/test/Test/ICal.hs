@@ -38,7 +38,7 @@ test = hspec $ do
               "\n"
               [ "BEGIN:VCALENDAR",
                 "VERSION:2.0",
-                "PRODID:-//nokoika//ガチアラーム github.com/nokoika/spla-ical//JA",
+                "PRODID:-//nokoika//ガチアラーム github.com/nokoika/ink-alarm//JA",
                 "METHOD:PUBLISH",
                 "CALSCALE:GREGORIAN",
                 "X-WR-CALNAME:ガチアラーム",

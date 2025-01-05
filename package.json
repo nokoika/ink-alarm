@@ -1,14 +1,14 @@
 {
-  "name": "spla-ical",
+  "name": "ink-alarm",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nokoika/spla-ical.git"
+    "url": "git+https://github.com/nokoika/ink-alarm.git"
   },
   "author": "nokoika",
   "license": "AGPL-3.0-or-later",
-  "homepage": "https://github.com/nokoika/spla-ical#readme",
+  "homepage": "https://github.com/nokoika/ink-alarm#readme",
   "bugs": {
-    "url": "https://github.com/nokoika/spla-ical/issues"
+    "url": "https://github.com/nokoika/ink-alarm/issues"
   },
   "engines": {
     "bun": "^1.1.42"

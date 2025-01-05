@@ -15,7 +15,7 @@ export const Footer: FC = () => {
           </a>{' '}
           |{' '}
           <a
-            href="https://github.com/nokoika/spla-ical"
+            href="https://github.com/nokoika/ink-alarm"
             target="_blank"
             rel="noopener noreferrer"
             className="text-nord-10 italic underline"

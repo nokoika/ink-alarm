@@ -12,8 +12,8 @@ showApplicationName Q.English = "Ink Alarm"
 
 -- PRODID:-//組織名//製品名//言語
 showICalProdId :: Q.Language -> String
-showICalProdId Q.Japanese = "-//nokoika//" ++ showApplicationName Q.Japanese ++ " github.com/nokoika/spla-ical//JA"
-showICalProdId Q.English = "-//nokoika//" ++ showApplicationName Q.English ++ " github.com/nokoika/spla-ical//EN"
+showICalProdId Q.Japanese = "-//nokoika//" ++ showApplicationName Q.Japanese ++ " github.com/nokoika/ink-alarm//JA"
+showICalProdId Q.English = "-//nokoika//" ++ showApplicationName Q.English ++ " github.com/nokoika/ink-alarm//EN"
 
 showStageName :: Q.Language -> S.Stage -> String
 showStageName Q.Japanese S.Stage {id} = case id of
