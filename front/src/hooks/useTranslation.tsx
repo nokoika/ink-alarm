@@ -208,7 +208,7 @@ const dictionaryEn: Record<TranslationKey, string> = {
     'https://docs.google.com/presentation/d/1AOBB0h7d-2kclU9cekgac54LM2lPZQ8CJMz7hbwo_-4/edit#slide=id.p',
   'label.match_both_stages': 'Only when both stages matched',
   'label.match_at_least_one_stages': 'Including when one of the stages matched',
-  'label.schedule_filter': 'Schedule display conditions',
+  'label.schedule_filter': 'Schedule filter',
   'label.add_schedule_filter': 'Add another condition',
   'label.remove_schedule_filter': 'Remove the above condition',
   'label.rule_filter': 'Rules',
@@ -427,7 +427,7 @@ const componentDictionaryEn: Record<TranslationComponentKey, FC> = {
   'help.schedule_filter': () => {
     return (
       <div>
-        <h3 className="mb-2 text-lg">Schedule display conditions</h3>
+        <h3 className="mb-2 text-lg">Schedule filter</h3>
         <p>
           Only schedules that match all the conditions set for
           <span className="mx-1 bg-nord-6 px-1">Rules</span>,
@@ -588,12 +588,12 @@ const componentDictionaryEn: Record<TranslationComponentKey, FC> = {
       <p>Preview the schedules that will be added to your calendar.</p>
       <p>
         The content shown changes based on your settings in
-        <span className="mr-1 bg-nord-6 px-1">Schedule display conditions</span>
+        <span className="mr-1 bg-nord-6 px-1">Schedule filter</span>
         and <span className="mr-1 bg-nord-6 px-1">General Settings</span>.
       </p>
       <p className="mt-2">
         If there are too many schedules, adjust the
-        <span className="mr-1 bg-nord-6 px-1">Schedule display conditions</span>
+        <span className="mr-1 bg-nord-6 px-1">Schedule filter</span>
         to reduce clutter.
       </p>
     </div>
