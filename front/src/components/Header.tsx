@@ -2,12 +2,13 @@ import type { FC } from 'react'
 import { GrDocumentText } from 'react-icons/gr'
 import { useTranslation } from '~/hooks/useTranslation'
 import { IconButton } from './IconButton'
+import { RotatingImage } from './RotateImage'
 
 export const Header: FC = () => {
   const { t } = useTranslation()
   return (
     <header className="flex flex-col items-center gap-x-10 pb-3 md:flex-row">
-      <img src="/android-chrome-192x192.png" alt="Inkalarm" className="block" />
+      <RotatingImage src="/android-chrome-192x192.png" alt={t('app.name')} />
       <div className="space-y-3">
         <h1 className="font-bold text-2xl text-gray-800 dark:text-gray-200 ">
           {t('app.name')}
