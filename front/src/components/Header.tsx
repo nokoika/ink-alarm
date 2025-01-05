@@ -15,7 +15,7 @@ export const Header: FC = () => {
         <div className="w-full text-nord-4 text-sm">
           <p>{t('app.description')}</p>
         </div>
-        <div>
+        <div className="flex justify-center md:justify-start">
           <IconButton
             href={t('label.how_to_use_url')}
             icon={GrDocumentText}
