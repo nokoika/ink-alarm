@@ -8,7 +8,7 @@ export const Header: FC = () => {
   const { t } = useTranslation()
   return (
     <header className="flex flex-col items-center gap-x-10 pb-3 md:flex-row">
-      <RotatingImage src="/android-chrome-192x192.png" alt={t('app.name')} />
+      <RotatingImage src="/192x192.png" alt={t('app.name')} />
       <div className="space-y-3">
         <h1 className="font-bold text-2xl text-gray-800 dark:text-gray-200 ">
           {t('app.name')}
