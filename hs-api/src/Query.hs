@@ -9,11 +9,13 @@ module Query
     Language (..),
     Mode (..),
     Rule (..),
-    parseBase64Url,
+    parseBase64UrlRaw,
+    parseBase64UrlGzip,
     convertTimeSlotToTimeOfDayRange,
   )
 where
 
+import qualified Codec.Compression.GZip as GZ
 import qualified Data.Aeson as A
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Base64.URL as BU
@@ -26,7 +28,7 @@ import qualified Data.Time.Calendar as C
 import qualified Data.Time.LocalTime as LT
 import qualified Date as D
 import GHC.Generics (Generic)
-import Prelude (Applicative (pure), Bool, Bounded, Either (Left, Right), Enum, Eq, Int, Maybe (Just, Nothing), Show, String, fail, show, ($), (++))
+import Prelude (Applicative (pure), Bool, Bounded, Either (Left, Right), Enum, Eq, Int, Maybe (Just, Nothing), Show, String, fail, show, ($), (++), (.))
 
 data QueryRoot = QueryRoot
   { language :: Language,
@@ -152,17 +154,23 @@ convertTimeSlotToTimeOfDayRange :: TimeSlot -> (LT.TimeOfDay, LT.TimeOfDay)
 convertTimeSlotToTimeOfDayRange TimeSlot {start = TimeSlotTimeOfDay start', end = TimeSlotTimeOfDay end'} =
   (start', end')
 
-parseBase64Url :: Text.Text -> Either String QueryRoot
-parseBase64Url base64Url = case decodeBase64UriToJson $ TE.encodeUtf8 base64Url of
-  Left err -> Left err
-  Right decodedText -> parseJsonToQueryRoot $ BL.fromStrict $ TE.encodeUtf8 decodedText
-  where
-    decodeBase64UriToJson :: BS.ByteString -> Either String Text.Text
-    decodeBase64UriToJson base64Url' = case BU.decode base64Url' of
-      Left err -> Left $ show err
-      Right decoded -> case TE.decodeUtf8' decoded of
-        Left err -> Left $ show err
-        Right decodedText -> Right decodedText
+parseJsonToQueryRoot :: L8.ByteString -> Either String QueryRoot
+parseJsonToQueryRoot json = A.eitherDecode json :: Either String QueryRoot
 
-    parseJsonToQueryRoot :: L8.ByteString -> Either String QueryRoot
-    parseJsonToQueryRoot json = A.eitherDecode json :: Either String QueryRoot
+decodeBase64UriToJson :: BS.ByteString -> Either String BS.ByteString
+decodeBase64UriToJson base64Url' =
+  case BU.decode base64Url' of
+    Left err -> Left $ "Base64 decode error: " ++ show err
+    Right decoded -> Right decoded
+
+parseBase64UrlRaw :: Text.Text -> Either String QueryRoot
+parseBase64UrlRaw base64Url = do
+  decodedText <- decodeBase64UriToJson (TE.encodeUtf8 base64Url)
+  (parseJsonToQueryRoot . BL.fromStrict) decodedText
+
+parseBase64UrlGzip :: Text.Text -> Either String QueryRoot
+parseBase64UrlGzip base64Url = do
+  decodedText <- decodeBase64UriToJson (TE.encodeUtf8 base64Url)
+  -- 本当は gzip の解凍に失敗した場合にエラーハンドリングしたい気がするが、
+  -- zlib の関数が Either を返してくれない・・・のでぱっとできない
+  (parseJsonToQueryRoot . GZ.decompress . BL.fromStrict) decodedText

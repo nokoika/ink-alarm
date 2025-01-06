@@ -79,6 +79,7 @@ library
     , scotty
     , text
     , time
+    , zlib
   default-language: Haskell2010
 
 executable ink-alarm-exe
@@ -132,6 +133,7 @@ executable ink-alarm-exe
     , scotty
     , text
     , time
+    , zlib
   default-language: Haskell2010
 
 test-suite ink-alarm-test
@@ -196,4 +198,5 @@ test-suite ink-alarm-test
     , scotty
     , text
     , time
+    , zlib
   default-language: Haskell2010
