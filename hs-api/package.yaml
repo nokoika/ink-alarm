@@ -25,6 +25,7 @@ dependencies:
   - cache
   - memory
   - cryptonite
+  - zlib
   - hlint
   - ormolu
 

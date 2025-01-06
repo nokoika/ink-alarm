@@ -17,15 +17,24 @@ main :: IO ()
 main = do
   putStrLn "Starting server on port 8080"
   scheduleCache <- SplaApi.Cached.initScheduleCache
-  Scotty.scotty 8080 $
+  Scotty.scotty 8080 $ do
     Scotty.get "/api/ical" $
-      handleApi scheduleCache
+      handleApiV1 scheduleCache
+    Scotty.get "/api/v2/ical" $
+      handleApiV2 scheduleCache
 
 -- API を受け付けて Query をパースする
-handleApi :: SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()
-handleApi scheduleCache =
-  (Scotty.queryParam "query" :: Scotty.ActionM T.Text) >>= \base64Uri ->
-    either sendClientError (processQuery scheduleCache) (Query.parseBase64Url base64Uri)
+handleApiV1 :: SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()
+handleApiV1 scheduleCache = do
+  base64Uri <- Scotty.queryParam "query" :: Scotty.ActionM T.Text
+  liftIO $ putStrLn $ "V1 Called With Query: " ++ T.unpack base64Uri
+  either sendClientError (processQuery scheduleCache) (Query.parseBase64UrlRaw base64Uri)
+
+handleApiV2 :: SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()
+handleApiV2 scheduleCache = do
+  base64Uri <- Scotty.queryParam "query" :: Scotty.ActionM T.Text
+  liftIO $ putStrLn $ "V2 Called With Query: " ++ T.unpack base64Uri
+  either sendClientError (processQuery scheduleCache) (Query.parseBase64UrlGzip base64Uri)
 
 processQuery :: SplaApi.Cached.ScheduleCache -> Query.QueryRoot -> Scotty.ActionM ()
 processQuery scheduleCache query =

@@ -1,5 +1,6 @@
 {
-  "// 注意事項": "このファイルをbase64URLエンコードしたものがquery-base64url.txtになります。cat hs-api/test/resources/query.json | basenc --base64url -w 0 > hs-api/test/resources/query-base64url.txt",
+  "// 注意事項1": "このファイルをbase64URLエンコードしたものがquery-raw-base64url.txtになります。cat hs-api/test/resources/query.json | basenc --base64url -w 0 > hs-api/test/resources/query-raw-base64url.txt",
+  "// 注意事項2": "このファイルをgzipにしてbase64URLエンコードしたものがquery-gz-base64url.txtになります。cat hs-api/test/resources/query.json | gzip | basenc --base64url -w 0 > hs-api/test/resources/query-gz-base64url.txt",
   "$schema": "../../../query-schema.json",
   "language": "ja",
   "utcOffset": "+09:00",
