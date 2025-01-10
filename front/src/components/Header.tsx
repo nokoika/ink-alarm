@@ -10,9 +10,7 @@ export const Header: FC = () => {
     <header className="flex flex-col items-center gap-x-10 pb-3 md:flex-row">
       <RotatingImage src="/512x512.png" alt={t('app.name')} />
       <div className="space-y-3">
-        <h1 className="font-bold text-2xl text-nord-6">
-          {t('app.name')}
-        </h1>
+        <h1 className="font-bold text-2xl text-nord-6">{t('app.name')}</h1>
         <div className="w-full text-nord-4 text-sm">
           <p>{t('app.description')}</p>
         </div>
