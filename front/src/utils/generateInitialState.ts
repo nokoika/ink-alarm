@@ -9,7 +9,11 @@ export const generateDefaultFilter = (): FilterConditionWithKey => ({
   modes: [Mode.x],
   stages: {
     matchBothStages: false,
-    stageIds: Array.from({ length: 24 }, (_, index) => index + 1),
+    stageIds: [
+      // グランドバンカラアリーナ以外すべて
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+      22, 23, 24, 26,
+    ],
   },
   rules: [Rule.area],
   timeSlots: [generateDefaultTimeSlot()],

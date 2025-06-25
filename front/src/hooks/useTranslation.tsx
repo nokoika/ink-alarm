@@ -39,6 +39,8 @@ export type TranslationKey =
   | 'stage.22'
   | 'stage.23'
   | 'stage.24'
+  | 'stage.25'
+  | 'stage.26'
   | 'rule.splat_zones'
   | 'rule.tower_control'
   | 'rule.rainmaker'
@@ -111,6 +113,8 @@ const dictionaryJa: Record<TranslationKey, string> = {
   'stage.22': 'ネギトロ炭鉱',
   'stage.23': 'カジキ空港',
   'stage.24': 'リュウグウターミナル',
+  'stage.25': 'グランドバンカラアリーナ',
+  'stage.26': 'デカライン高架下',
   'rule.splat_zones': 'ガチエリア',
   'rule.tower_control': 'ガチヤグラ',
   'rule.rainmaker': 'ガチホコバトル',
@@ -186,6 +190,8 @@ const dictionaryEn: Record<TranslationKey, string> = {
   'stage.22': 'Bluefin Depot',
   'stage.23': 'Marlin Airport',
   'stage.24': 'Lemuria Hub',
+  'stage.25': 'Grand Splatlands Bowl',
+  'stage.26': 'Urchin Underpass',
   'rule.splat_zones': 'Splat Zones',
   'rule.tower_control': 'Tower Control',
   'rule.rainmaker': 'Rainmaker',
