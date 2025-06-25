@@ -170,6 +170,7 @@ instance A.FromJSON EventSummary where
 
 fetchSchedule :: IO (Either String Root)
 fetchSchedule = do
+  -- TODO: リクエストヘッダのユーザーエージェントをちゃんと設定する
   let url = "https://spla3.yuu26.com/api/schedule"
   response <- try (H.simpleHttp url) :: IO (Either SomeException L8.ByteString)
   case response of

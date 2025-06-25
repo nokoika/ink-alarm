@@ -8,14 +8,23 @@ export const StagesFilter: FC<{
   updateStages: (sf: StageFilter) => void
 }> = ({ stages, updateStages }) => {
   const { t } = useTranslation()
-  const contents = Array.from(
-    { length: 24 }, // 全ステージ数
-    (_, index) => ({
+  const contents = [
+    // ユノハナからリュウグウまで (key: 1-24)
+    ...Array.from({ length: 24 }, (_, index) => ({
       key: index + 1, // 固定長であるため index で OK
       text: t(`stage.${index + 1}` as TranslationKey),
       enabled: stages.stageIds.includes(index + 1),
-    }),
-  )
+    })),
+
+    // 25はグランドバンカラアリーナだとおもうのでUIからスキップ。2度とゲームに出現しない
+
+    // デカライン (key: 26)
+    {
+      key: 26,
+      text: t('stage.26'),
+      enabled: stages.stageIds.includes(26),
+    },
+  ]
 
   const addStage = (stageId: number) => {
     updateStages({

@@ -41,6 +41,8 @@ showStageName Q.Japanese S.Stage {id} = case id of
   22 -> "ネギトロ炭鉱"
   23 -> "カジキ空港"
   24 -> "リュウグウターミナル"
+  25 -> "グランドバンカラアリーナ"
+  26 -> "デカライン高架下"
   _ -> ""
 showStageName Q.English S.Stage {id} = case id of
   1 -> "Scorch Gorge"
@@ -67,6 +69,8 @@ showStageName Q.English S.Stage {id} = case id of
   22 -> "Bluefin Depot"
   23 -> "Marlin Airport"
   24 -> "Lemuria Hub"
+  25 -> "Grand Splatlands Bowl"
+  26 -> "Urchin Underpass"
   _ -> ""
 
 showRuleName :: Q.Language -> S.Rule -> String
