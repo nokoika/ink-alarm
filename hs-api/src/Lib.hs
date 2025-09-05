@@ -1,17 +1,15 @@
 module Lib (main) where
 
-import App.Config (Config (..), loadConfig)
+import App.Config (Config (..))
 import App.Context (AppContext (..))
 import Server (server)
 import qualified SplaApi.Cached
 import qualified Web.Scotty as Scotty
-import Prelude (IO, putStrLn, show, ($), (++))
+import Prelude (IO, putStrLn)
 
 main :: IO ()
 main = do
-  -- Load configuration from environment variables
-  config <- loadConfig
-  putStrLn $ "Starting server on port " ++ show (configPort config)
+  putStrLn "Starting server on port 8080"
 
   -- Initialize dependencies
   scheduleCache <- SplaApi.Cached.initScheduleCache
@@ -20,8 +18,8 @@ main = do
   let ctx =
         AppContext
           { acScheduleCache = scheduleCache,
-            acConfig = config
+            acConfig = Config { configPort = 8080 }
           }
 
-  -- Start the server with the configured port
-  Scotty.scotty (configPort config) (server ctx)
+  -- Start the server on port 8080
+  Scotty.scotty 8080 (server ctx)
