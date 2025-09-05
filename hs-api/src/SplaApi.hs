@@ -14,10 +14,11 @@ where
 import Control.Exception (SomeException, try)
 import Data.Aeson ((.:), (.:?))
 import qualified Data.Aeson as A
-import qualified Data.ByteString.Lazy.Char8 as L8
+import qualified Data.ByteString.Char8 as B8
 import qualified Data.Time as T
 import GHC.Generics (Generic)
-import qualified Network.HTTP.Conduit as H (simpleHttp)
+import qualified Network.HTTP.Conduit as H
+import qualified Network.HTTP.Types.Header as HT
 import Prelude (Bool, Bounded, Either (Left, Right), Enum, Eq, IO, Int, Maybe, Show, String, fail, pure, return, show, ($), (++), (<$>), (<*>))
 
 newtype Root = Root
@@ -168,11 +169,20 @@ instance A.FromJSON EventSummary where
       <*> v
         .: "desc"
 
-fetchSchedule :: IO (Either String Root)
-fetchSchedule = do
-  -- TODO: リクエストヘッダのユーザーエージェントをちゃんと設定する
+fetchSchedule :: H.Manager -> IO (Either String Root)
+fetchSchedule client = do
   let url = "https://spla3.yuu26.com/api/schedule"
-  response <- try (H.simpleHttp url) :: IO (Either SomeException L8.ByteString)
-  case response of
-    Left err -> return $ Left $ show err
-    Right body -> return $ A.eitherDecode body
+      userAgent = B8.pack "Ink Alarm (github.com/nokoika/ink-alarm)"
+
+  result <- try $ do
+    request <- H.parseRequest url
+    let requestWithUA =
+          request
+            { H.requestHeaders = (HT.hUserAgent, userAgent) : H.requestHeaders request
+            }
+    response <- H.httpLbs requestWithUA client
+    return $ H.responseBody response
+
+  return $ case result of
+    Left (err :: SomeException) -> Left $ show err
+    Right body -> A.eitherDecode body

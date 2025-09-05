@@ -6,6 +6,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import qualified Filter
 import qualified ICal
+import qualified Network.HTTP.Conduit as H
 import qualified Network.HTTP.Types.Status as Status
 import qualified Query
 import qualified SplaApi
@@ -16,29 +17,29 @@ import Prelude (IO, String, either, putStrLn, ($), (++), (>>=))
 main :: IO ()
 main = do
   putStrLn "Starting server on port 8080"
+  client <- H.newManager H.tlsManagerSettings
   scheduleCache <- SplaApi.Cached.initScheduleCache
   Scotty.scotty 8080 $ do
     Scotty.get "/api/ical" $
-      handleApiV1 scheduleCache
+      handleApiV1 client scheduleCache
     Scotty.get "/api/v2/ical" $
-      handleApiV2 scheduleCache
+      handleApiV2 client scheduleCache
 
--- API を受け付けて Query をパースする
-handleApiV1 :: SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()
-handleApiV1 scheduleCache = do
+handleApiV1 :: H.Manager -> SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()
+handleApiV1 client scheduleCache = do
   base64Uri <- Scotty.queryParam "query" :: Scotty.ActionM T.Text
   liftIO $ putStrLn $ "V1 Called With Query: " ++ T.unpack base64Uri
-  either sendClientError (processQuery scheduleCache) (Query.parseBase64UrlRaw base64Uri)
+  either sendClientError (processQuery client scheduleCache) (Query.parseBase64UrlRaw base64Uri)
 
-handleApiV2 :: SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()
-handleApiV2 scheduleCache = do
+handleApiV2 :: H.Manager -> SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()
+handleApiV2 client scheduleCache = do
   base64Uri <- Scotty.queryParam "query" :: Scotty.ActionM T.Text
   liftIO $ putStrLn $ "V2 Called With Query: " ++ T.unpack base64Uri
-  either sendClientError (processQuery scheduleCache) (Query.parseBase64UrlGzip base64Uri)
+  either sendClientError (processQuery client scheduleCache) (Query.parseBase64UrlGzip base64Uri)
 
-processQuery :: SplaApi.Cached.ScheduleCache -> Query.QueryRoot -> Scotty.ActionM ()
-processQuery scheduleCache query =
-  liftIO (SplaApi.Cached.fetchScheduleWithCache scheduleCache)
+processQuery :: H.Manager -> SplaApi.Cached.ScheduleCache -> Query.QueryRoot -> Scotty.ActionM ()
+processQuery client scheduleCache query =
+  liftIO (SplaApi.Cached.fetchScheduleWithCache client scheduleCache)
     >>= either sendInternalError (generateICal query)
 
 generateICal :: Query.QueryRoot -> SplaApi.Root -> Scotty.ActionM ()
