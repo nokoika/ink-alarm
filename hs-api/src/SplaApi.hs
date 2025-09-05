@@ -169,19 +169,18 @@ instance A.FromJSON EventSummary where
       <*> v
         .: "desc"
 
-fetchSchedule :: IO (Either String Root)
-fetchSchedule = do
+fetchSchedule :: H.Manager -> IO (Either String Root)
+fetchSchedule client = do
   let url = "https://spla3.yuu26.com/api/schedule"
       userAgent = B8.pack "Ink Alarm (github.com/nokoika/ink-alarm)"
 
   result <- try $ do
-    manager <- H.newManager H.tlsManagerSettings
     request <- H.parseRequest url
     let requestWithUA =
           request
             { H.requestHeaders = (HT.hUserAgent, userAgent) : H.requestHeaders request
             }
-    response <- H.httpLbs requestWithUA manager
+    response <- H.httpLbs requestWithUA client
     return $ H.responseBody response
 
   return $ case result of
