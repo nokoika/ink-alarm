@@ -28,6 +28,10 @@ dependencies:
   - zlib
   - hlint
   - ormolu
+  - mtl
+  - transformers
+  - envy
+  - exceptions
 
 ghc-options:
   - -Wall

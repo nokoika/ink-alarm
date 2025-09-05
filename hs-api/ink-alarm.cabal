@@ -20,6 +20,10 @@ source-repository head
 
 library
   exposed-modules:
+      App.Config
+      App.Context
+      App.Error
+      App.Monad
       Date
       Filter
       Filter.Internal.ICal
@@ -70,15 +74,19 @@ library
     , bytestring
     , cache
     , cryptonite
+    , envy
+    , exceptions
     , hlint
     , hspec
     , http-conduit
     , http-types
     , memory
+    , mtl
     , ormolu
     , scotty
     , text
     , time
+    , transformers
     , zlib
   default-language: Haskell2010
 
@@ -123,16 +131,20 @@ executable ink-alarm-exe
     , bytestring
     , cache
     , cryptonite
+    , envy
+    , exceptions
     , hlint
     , hspec
     , http-conduit
     , http-types
     , ink-alarm
     , memory
+    , mtl
     , ormolu
     , scotty
     , text
     , time
+    , transformers
     , zlib
   default-language: Haskell2010
 
@@ -188,15 +200,19 @@ test-suite ink-alarm-test
     , bytestring
     , cache
     , cryptonite
+    , envy
+    , exceptions
     , hlint
     , hspec
     , http-conduit
     , http-types
     , ink-alarm
     , memory
+    , mtl
     , ormolu
     , scotty
     , text
     , time
+    , transformers
     , zlib
   default-language: Haskell2010
