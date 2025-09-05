@@ -28,10 +28,13 @@ library
       Filter
       Filter.Internal.ICal
       Filter.Internal.Schedule
+      Handler.ICal
       Hash
       ICal
       Lib
       Query
+      Server
+      Service.ICal
       SplaApi
       SplaApi.Cached
       Translation

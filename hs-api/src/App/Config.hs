@@ -1,36 +1,36 @@
-{-# LANGUAGE DeriveGeneric #-}
-
 module App.Config
   ( Config (..),
     loadConfig,
   )
 where
 
+import Data.Maybe (fromMaybe)
 import Data.Text (Text)
-import GHC.Generics (Generic)
-import System.Envy
-import Prelude (Either (..), IO, Int, Maybe (..), Show, return)
+import qualified Data.Text as T
+import System.Environment (lookupEnv)
+import Text.Read (readMaybe)
+import Prelude (IO, Int, Maybe (..), Show, fmap, return, ($), (>>=))
 
 data Config = Config
   { configPort :: Int,
     configCacheTTL :: Int, -- in seconds
     configApiUrl :: Maybe Text
   }
-  deriving (Generic, Show)
-
--- Use generic deriving from Envy
-instance FromEnv Config
+  deriving (Show)
 
 loadConfig :: IO Config
 loadConfig = do
-  result <- decodeEnv
-  case result of
-    Left _err -> return defaultConfig
-    Right config -> return config
-  where
-    defaultConfig =
-      Config
-        { configPort = 8080,
-          configCacheTTL = 1800,
-          configApiUrl = Nothing
-        }
+  portStr <- lookupEnv "PORT"
+  cacheTTLStr <- lookupEnv "CACHE_TTL"
+  apiUrlStr <- lookupEnv "API_URL"
+
+  let port = fromMaybe 8080 (portStr >>= readMaybe)
+      cacheTTL = fromMaybe 1800 (cacheTTLStr >>= readMaybe)
+      apiUrl = fmap T.pack apiUrlStr
+
+  return $
+    Config
+      { configPort = port,
+        configCacheTTL = cacheTTL,
+        configApiUrl = apiUrl
+      }
