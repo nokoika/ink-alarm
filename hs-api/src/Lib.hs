@@ -4,6 +4,7 @@ import App.Config (Config (..))
 import App.Context (AppContext (..))
 import Server (server)
 import qualified SplaApi.Cached
+import qualified SplaApi.Client as SplaClient
 import qualified Web.Scotty as Scotty
 import Prelude (IO, putStrLn)
 
@@ -13,12 +14,14 @@ main = do
 
   -- Initialize dependencies
   scheduleCache <- SplaApi.Cached.initScheduleCache
+  splaClient <- SplaClient.newHttpClient
 
   -- Create application context
   let ctx =
         AppContext
           { acScheduleCache = scheduleCache,
-            acConfig = Config { configPort = 8080 }
+            acConfig = Config {configPort = 8080},
+            acHttpSplaApiClient = splaClient
           }
 
   -- Start the server on port 8080

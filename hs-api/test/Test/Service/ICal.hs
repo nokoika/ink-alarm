@@ -14,6 +14,7 @@ import qualified SplaApi
     Stage (..),
   )
 import qualified SplaApi.Cached as Cached
+import qualified SplaApi.Client as SplaClient
 import Test.Hspec
 import qualified TestUtil as TU
 import Prelude
@@ -25,10 +26,12 @@ test = hspec $ do
       it "should generate valid iCal text for regular battle query" $ do
         -- Setup
         cache <- Cached.initScheduleCache
+        httpClient <- SplaClient.newHttpClient
         let ctx =
               AppContext
                 { acScheduleCache = cache,
-                  acConfig = Config {configPort = 8080}
+                  acConfig = Config {configPort = 8080},
+                  acHttpSplaApiClient = httpClient
                 }
 
         -- Create test query
@@ -63,10 +66,12 @@ test = hspec $ do
       it "should handle empty schedule data gracefully" $ do
         -- Setup
         cache <- Cached.initScheduleCache
+        httpClient <- SplaClient.newHttpClient
         let ctx =
               AppContext
                 { acScheduleCache = cache,
-                  acConfig = Config {configPort = 8080}
+                  acConfig = Config {configPort = 8080},
+                  acHttpSplaApiClient = httpClient
                 }
 
         let query =
@@ -92,10 +97,12 @@ test = hspec $ do
       it "should handle multiple filter conditions" $ do
         -- Setup
         cache <- Cached.initScheduleCache
+        httpClient <- SplaClient.newHttpClient
         let ctx =
               AppContext
                 { acScheduleCache = cache,
-                  acConfig = Config {configPort = 8080}
+                  acConfig = Config {configPort = 8080},
+                  acHttpSplaApiClient = httpClient
                 }
 
         let query =
@@ -133,10 +140,12 @@ test = hspec $ do
       it "should respect timezone settings in output" $ do
         -- Setup
         cache <- Cached.initScheduleCache
+        httpClient <- SplaClient.newHttpClient
         let ctx =
               AppContext
                 { acScheduleCache = cache,
-                  acConfig = Config {configPort = 8080}
+                  acConfig = Config {configPort = 8080},
+                  acHttpSplaApiClient = httpClient
                 }
 
         -- Test with UTC timezone

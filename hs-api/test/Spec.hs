@@ -7,6 +7,7 @@ import qualified Test.Lib (test)
 import qualified Test.Query (test)
 import qualified Test.Service.ICal (test)
 import qualified Test.SplaApi (test)
+import qualified Test.SplaApi.Client (test)
 import qualified Test.Translation (test)
 import Prelude (IO)
 
@@ -15,6 +16,7 @@ main = do
   Test.Lib.test
   Test.ICal.test
   Test.SplaApi.test
+  Test.SplaApi.Client.test
   Test.Query.test
   Test.Hash.test
   Test.Date.test

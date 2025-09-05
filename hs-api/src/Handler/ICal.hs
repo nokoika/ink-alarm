@@ -15,7 +15,7 @@ import qualified Data.Text as T
 import qualified Query
 import Service.ICal (generateICalText)
 import qualified SplaApi.Cached as Cached
-import Prelude (Either (..), String, ($), (++), putStrLn)
+import Prelude (Either (..), String, putStrLn, ($), (++))
 
 -- V1 API handler (raw JSON)
 apiV1Handler :: Text -> AppM String
@@ -38,7 +38,8 @@ processQuery :: Query.QueryRoot -> AppM String
 processQuery query = do
   ctx <- ask
   let cache = acScheduleCache ctx
-  scheduleResult <- liftIO $ Cached.fetchScheduleWithCache cache
+      client = acHttpSplaApiClient ctx
+  scheduleResult <- liftIO $ Cached.fetchScheduleWithCache cache client
   case scheduleResult of
     Left err -> throwError $ ApiFetchError (T.pack err)
     Right apiData -> generateICalText query apiData

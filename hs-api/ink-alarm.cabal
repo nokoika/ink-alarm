@@ -38,6 +38,7 @@ library
       Service.ICal
       SplaApi
       SplaApi.Cached
+      SplaApi.Client
       Translation
   other-modules:
       Paths_ink_alarm
@@ -165,6 +166,7 @@ test-suite ink-alarm-test
       Test.Query
       Test.Service.ICal
       Test.SplaApi
+      Test.SplaApi.Client
       Test.Translation
       TestUtil
       Paths_ink_alarm
