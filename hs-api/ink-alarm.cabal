@@ -163,6 +163,7 @@ test-suite ink-alarm-test
       Test.ICal
       Test.Lib
       Test.Query
+      Test.Service.ICal
       Test.SplaApi
       Test.Translation
       TestUtil

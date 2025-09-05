@@ -5,6 +5,7 @@ import qualified Test.Hash (test)
 import qualified Test.ICal (test)
 import qualified Test.Lib (test)
 import qualified Test.Query (test)
+import qualified Test.Service.ICal (test)
 import qualified Test.SplaApi (test)
 import qualified Test.Translation (test)
 import Prelude (IO)
@@ -20,3 +21,4 @@ main = do
   Test.Filter.Internal.ICal.test
   Test.Filter.Internal.Schedule.test
   Test.Translation.test
+  Test.Service.ICal.test
