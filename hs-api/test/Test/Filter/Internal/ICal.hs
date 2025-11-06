@@ -1,5 +1,6 @@
 module Test.Filter.Internal.ICal (test) where
 
+import qualified Data.Text as Text
 import qualified Data.Time as T
 import qualified Filter.Internal.ICal as FI
 import qualified ICal as I
@@ -109,7 +110,7 @@ test = hspec $ do
 
       let queryRoot =
             Q.QueryRoot
-              { Q.rawQuery = "mockQuery",
+              { Q.rawQuery = Text.pack "mockQuery",
                 Q.language = Q.Japanese,
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 Q.filters =
@@ -246,7 +247,7 @@ test = hspec $ do
               }
       let queryRoot =
             Q.QueryRoot
-              { Q.rawQuery = "mockQuery",
+              { Q.rawQuery = Text.pack "mockQuery",
                 Q.language = Q.English,
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone (-8) "", -- ロサンゼルスは UTC-8
                 Q.filters =
@@ -291,7 +292,7 @@ test = hspec $ do
     it "正常系" $ do
       let queryRoot =
             Q.QueryRoot
-              { Q.rawQuery = "mockQuery",
+              { Q.rawQuery = Text.pack "mockQuery",
                 Q.language = Q.Japanese,
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 Q.filters =
@@ -347,7 +348,7 @@ test = hspec $ do
     it "2つのフィルターが1つのスケジュールにマッチしたとき、ICalEventは1つだけ出力する" $ do
       let queryRoot =
             Q.QueryRoot
-              { Q.rawQuery = "mockQuery",
+              { Q.rawQuery = Text.pack "mockQuery",
                 Q.language = Q.Japanese,
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 -- 全く同じ条件を2つ指定
@@ -423,7 +424,7 @@ test = hspec $ do
     it "正常系 日本語" $ do
       let queryRoot =
             Q.QueryRoot
-              { Q.rawQuery = "mockQuery",
+              { Q.rawQuery = Text.pack "mockQuery",
                 Q.language = Q.Japanese,
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 Q.filters =
@@ -481,7 +482,7 @@ test = hspec $ do
     it "正常系 英語" $ do
       let queryRoot =
             Q.QueryRoot
-              { Q.rawQuery = "mockQuery",
+              { Q.rawQuery = Text.pack "mockQuery",
                 Q.language = Q.English,
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 Q.filters =

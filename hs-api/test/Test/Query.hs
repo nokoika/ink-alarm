@@ -1,6 +1,5 @@
 module Test.Query (test) where
 
-import qualified Data.Text as T
 import qualified Data.Text.IO as TIO (readFile)
 import qualified Data.Time.Calendar as C
 import qualified Data.Time.LocalTime as LT
@@ -31,7 +30,7 @@ test = hspec $ do
       let expect =
             Right
               ( Query.QueryRoot
-                  { Query.rawQuery = T.unpack base64Url,
+                  { Query.rawQuery = base64Url,
                     Query.language = Query.Japanese,
                     Query.utcOffset = Query.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                     Query.filters =
@@ -65,7 +64,7 @@ test = hspec $ do
       let expect =
             Right
               ( Query.QueryRoot
-                  { Query.rawQuery = T.unpack base64Url,
+                  { Query.rawQuery = base64Url,
                     Query.language = Query.Japanese,
                     Query.utcOffset = Query.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                     Query.filters =

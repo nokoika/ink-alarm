@@ -7,6 +7,7 @@ where
 
 import Data.Function (on)
 import qualified Data.List as L
+import qualified Data.Text as Text
 import qualified Date
 import qualified Filter.Internal.Schedule as FS
 import qualified Hash
@@ -91,7 +92,7 @@ settingsUrlFromQuery Q.QueryRoot {Q.language, Q.rawQuery} =
   "https://ink-alarm.pages.dev/"
     ++ languagePath language
     ++ "?query="
-    ++ rawQuery
+    ++ Text.unpack rawQuery
 
 languagePath :: Q.Language -> String
 languagePath Q.Japanese = "ja"
