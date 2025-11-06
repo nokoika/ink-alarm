@@ -32,7 +32,7 @@ import GHC.Generics (Generic)
 import Prelude (Applicative (pure), Bool, Bounded, Either (Left, Right), Enum, Eq, Int, Maybe (Just, Nothing), Show, String, fail, show, ($), (++), (.), (<$>))
 
 data QueryRoot = QueryRoot
-  { rawQuery :: Text.Text,
+  { rawQuery :: Maybe Text.Text,
     language :: Language,
     utcOffset :: UtcOffsetTimeZone,
     filters :: [FilterCondition]
@@ -47,7 +47,7 @@ instance A.FromJSON QueryRoot where
       filters <- obj .: "filters"
       pure
         QueryRoot
-          { rawQuery = Text.empty,
+          { rawQuery = Nothing,
             language,
             utcOffset,
             filters
@@ -180,12 +180,7 @@ decodeBase64UriToJson base64Url' =
 parseBase64UrlRaw :: Text.Text -> Either String QueryRoot
 parseBase64UrlRaw base64Url = do
   decodedText <- decodeBase64UriToJson (TE.encodeUtf8 base64Url)
-  ( \query ->
-      query
-        { rawQuery = base64Url
-        }
-    )
-    <$> (parseJsonToQueryRoot . BL.fromStrict) decodedText
+  parseJsonToQueryRoot (BL.fromStrict decodedText)
 
 parseBase64UrlGzip :: Text.Text -> Either String QueryRoot
 parseBase64UrlGzip base64Url = do
@@ -194,7 +189,7 @@ parseBase64UrlGzip base64Url = do
   -- zlib の関数が Either を返してくれない・・・のでぱっとできない
   ( \query ->
       query
-        { rawQuery = base64Url
+        { rawQuery = Just base64Url
         }
     )
     <$> (parseJsonToQueryRoot . GZ.decompress . BL.fromStrict) decodedText
