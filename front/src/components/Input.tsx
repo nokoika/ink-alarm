@@ -17,9 +17,13 @@ import { useTranslationLanguageContext } from '~/contexts/translationLanguageCon
 import { useCalendar } from '~/hooks/useCalendar'
 import { useFilterCondition } from '~/hooks/useFilterCondition'
 import { useTranslation } from '~/hooks/useTranslation'
-import { decodeCalendarQuery, generateIcalUrl } from '~/utils/calendarQuery'
+import type { FilterConditionWithKey, TimeSlotWithKey } from '~/types/propTypes'
+import type { FilterCondition, TimeSlot } from '~/types/querySchema'
+import { decodeCalendarQuery } from '~/utils/decodeCalendarQuery'
+import { generateIcalUrl } from '~/utils/generateIcalUrl'
 import {
   generateDefaultFilter,
+  generateDefaultTimeSlot,
   generateInitilalUtcOffset,
 } from '~/utils/generateInitialState'
 import { EventList } from './EventList'
@@ -32,24 +36,56 @@ import { SwitchLanguage } from './SwitchLanguage'
 import { TimeSlotsFilter } from './TimeSlotsFilter'
 import { UtcOffset } from './UtcOffset'
 
+const createTimeSlotWithKey = (timeSlot?: TimeSlot): TimeSlotWithKey => {
+  const fallback = generateDefaultTimeSlot()
+  return {
+    key: fallback.key,
+    start: timeSlot?.start ?? fallback.start,
+    end: timeSlot?.end ?? fallback.end,
+    dayOfWeeks: timeSlot?.dayOfWeeks ?? fallback.dayOfWeeks,
+  }
+}
+
+const createFilterWithKey = (
+  filter?: FilterCondition,
+): FilterConditionWithKey => {
+  const fallback = generateDefaultFilter()
+  return {
+    ...fallback,
+    modes: filter?.modes ?? fallback.modes,
+    rules: filter?.rules ?? fallback.rules,
+    stages: filter?.stages ?? fallback.stages,
+    timeSlots:
+      filter?.timeSlots && filter.timeSlots.length > 0
+        ? filter.timeSlots.map((timeSlot) => createTimeSlotWithKey(timeSlot))
+        : fallback.timeSlots,
+  }
+}
+
 export const Input: FC = () => {
-  const restoredState = useMemo(
+  const restoredQuery = useMemo(
     () => decodeCalendarQuery(window.location.search),
     [],
   )
+  const initialFilters = useMemo<FilterConditionWithKey[]>(() => {
+    if (!restoredQuery || restoredQuery.filters.length === 0) {
+      return [generateDefaultFilter()]
+    }
+    return restoredQuery.filters.map((filter) => createFilterWithKey(filter))
+  }, [restoredQuery])
   const { language, setLanguage } = useTranslationLanguageContext()
   const [utcOffset, setUtcOffset] = useState<string>(
-    () => restoredState?.utcOffset ?? generateInitilalUtcOffset(),
+    () => restoredQuery?.utcOffset ?? generateInitilalUtcOffset(),
   )
-  const { t, tc } = useTranslation()
   const { filters, addFilterAfter, updateFilter, removeFilter } =
-    useFilterCondition(restoredState?.filters ?? [generateDefaultFilter()])
+    useFilterCondition(initialFilters)
+  const { t, tc } = useTranslation()
 
   useEffect(() => {
-    if (restoredState && language !== restoredState.language) {
-      setLanguage(restoredState.language)
+    if (restoredQuery && language !== restoredQuery.language) {
+      setLanguage(restoredQuery.language)
     }
-  }, [language, restoredState, setLanguage])
+  }, [language, restoredQuery, setLanguage])
 
   const icalUrls = generateIcalUrl({ filters, utcOffset, language })
   const events = useCalendar(icalUrls.https)

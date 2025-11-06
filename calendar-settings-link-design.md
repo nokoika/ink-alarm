@@ -8,7 +8,7 @@
 ## 現状整理
 - ical の説明文は `hs-api/src/Translation.hs::showCalendarDescription` で組み立てており、言語ごとに静的な設定ページ URL を埋め込んでいる。
 - API エントリポイント (`hs-api/src/Lib.hs`) は `query` パラメータを Base64URL 文字列として受け取り、V1 はそのまま JSON、V2 は gzip 展開して Query を構築している。
-- フロントエンドは `front/src/utils/calendarQuery.ts` でクエリ JSON を gzip + Base64URL し、`?query=` として各種リンクに付与している。省略可能な項目（全選択など）は JSON から除外する最適化が入っている。
+- フロントエンドは `front/src/utils/generateIcalUrl.ts` でクエリ JSON を gzip + Base64URL し、`?query=` として各種リンクに付与している。省略可能な項目（全選択など）は JSON から除外する最適化が入っている。
 - フロント側の初期状態は `generateDefaultFilter` / `generateDefaultTimeSlot`（`front/src/utils/generateInitialState.ts`）で生成し、`useFilterCondition` フックで管理している。URL クエリからの復元機構はない。
 
 ## 要件・仕様
@@ -31,15 +31,15 @@
 
 ### フロントエンド（`front`）
 1. **クエリエンコード/デコードユーティリティの追加**
-   - `utils/calendarQuery.ts` を新設し、Base64URL 変換・gzip 展開・JSON パース・UI 向け正規化をまとめて実装する。
+   - `utils/calendarQueryCodec.ts` を新設し、Base64URL 変換と gzip 展開のみを共通化する。
    - 処理手順: `URLSearchParams` で `query` を取得 → Base64URL を Base64 に変換（`-`/`_` の置換 + padding） → `atob` でバイナリ文字列 → `Uint8Array` → `pako.ungzip`（`{ to: 'string' }`）→ `JSON.parse`。
-   - 復元したオブジェクトは `Query` (`types/querySchema.ts`) として扱い、UI で扱いやすい形（`FilterConditionWithKey[]` / UTC オフセット / 言語）へ正規化する。
-   - 同ファイルで iCal リンク生成のエンコード処理も維持する。
+   - デコード結果の JSON は `decodeCalendarQuery.ts` から返し、UI 向けの整形は呼び出し側で行う。
+   - エンコードは `generateIcalUrl.ts` から利用する。
 
 2. **各種状態の初期化**
-   - `Input.tsx` でフック呼び出し前に `const restoredQuery = useMemo(() => decodeCalendarQuery(location.search), [])` を作成。
+   - `Input.tsx` で `decodeCalendarQuery` を利用し、取得した `Query` をその場で UI 用の形式へ組み立て直す。
    - `useState` 初期化を `useState(restoredQuery?.utcOffset ?? generateInitialUtcOffset())` に変更。
-   - `useFilterCondition` を `useFilterCondition(initialFilters?: FilterConditionWithKey[])` に拡張し、`useState` 初期値として利用する。
+   - `useFilterCondition` へは変換済みのフィルターを渡し、既存の挙動を維持する。
    - `TranslationLanguageProvider` 由来の `language` がパスと一致しない場合に限り `setLanguage(restoredQuery.language)` を `useEffect` で実行。`setBrowserLanguage` 内の `history.replaceState` は `history.replaceState(null, '', \`${lang}${location.search}\`)` のようにクエリ文字列を保持する形へ調整する。
 
 3. **URL 維持と UI 反映**
