@@ -29,32 +29,24 @@ handleApiV1 :: H.Manager -> SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()
 handleApiV1 client scheduleCache = do
   base64Uri <- Scotty.queryParam "query" :: Scotty.ActionM T.Text
   liftIO $ putStrLn $ "V1 Called With Query: " ++ T.unpack base64Uri
-  either
-    sendClientError
-    (processQuery client scheduleCache base64Uri)
-    (Query.parseBase64UrlRaw base64Uri)
+  either sendClientError (processQuery client scheduleCache) (Query.parseBase64UrlRaw base64Uri)
 
 handleApiV2 :: H.Manager -> SplaApi.Cached.ScheduleCache -> Scotty.ActionM ()
 handleApiV2 client scheduleCache = do
   base64Uri <- Scotty.queryParam "query" :: Scotty.ActionM T.Text
   liftIO $ putStrLn $ "V2 Called With Query: " ++ T.unpack base64Uri
-  either
-    sendClientError
-    (processQuery client scheduleCache base64Uri)
-    (Query.parseBase64UrlGzip base64Uri)
+  either sendClientError (processQuery client scheduleCache) (Query.parseBase64UrlGzip base64Uri)
 
-processQuery :: H.Manager -> SplaApi.Cached.ScheduleCache -> T.Text -> Query.QueryRoot -> Scotty.ActionM ()
-processQuery client scheduleCache base64Uri query =
+processQuery :: H.Manager -> SplaApi.Cached.ScheduleCache -> Query.QueryRoot -> Scotty.ActionM ()
+processQuery client scheduleCache query =
   liftIO (SplaApi.Cached.fetchScheduleWithCache client scheduleCache)
-    >>= either sendInternalError (generateICal base64Uri query)
+    >>= either sendInternalError (generateICal query)
 
-generateICal :: T.Text -> Query.QueryRoot -> SplaApi.Root -> Scotty.ActionM ()
-generateICal base64Uri query SplaApi.Root {result = apiResult} =
-  Filter.createICalInput settingsUrl query apiResult
+generateICal :: Query.QueryRoot -> SplaApi.Root -> Scotty.ActionM ()
+generateICal query SplaApi.Root {result = apiResult} =
+  Filter.createICalInput query apiResult
     & ICal.buildICalText
     & sendResponse
-  where
-    settingsUrl = buildSettingsUrl (Query.language query) base64Uri
 
 sendClientError :: String -> Scotty.ActionM ()
 sendClientError err = do
@@ -75,14 +67,3 @@ sendResponse text = do
   Scotty.setHeader "Access-Control-Allow-Origin" "*"
   Scotty.setHeader "Cache-Control" "no-cache"
   Scotty.text $ TL.pack text
-
-buildSettingsUrl :: Query.Language -> T.Text -> String
-buildSettingsUrl language base64Uri =
-  "https://ink-alarm.pages.dev/"
-    ++ languagePath language
-    ++ "?query="
-    ++ T.unpack base64Uri
-
-languagePath :: Query.Language -> String
-languagePath Query.Japanese = "ja"
-languagePath Query.English = "en"

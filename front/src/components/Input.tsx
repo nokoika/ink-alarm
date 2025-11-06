@@ -19,7 +19,10 @@ import { useFilterCondition } from '~/hooks/useFilterCondition'
 import { useTranslation } from '~/hooks/useTranslation'
 import { decodeCalendarQuery } from '~/utils/decodeCalendarQuery'
 import { generateIcalUrl } from '~/utils/generateIcalUrl'
-import { generateInitilalUtcOffset } from '~/utils/generateInitialState'
+import {
+  generateDefaultFilter,
+  generateInitilalUtcOffset,
+} from '~/utils/generateInitialState'
 import { normalizeQueryState } from '~/utils/normalizeQueryState'
 import { EventList } from './EventList'
 import { IconButton } from './IconButton'
@@ -33,9 +36,6 @@ import { UtcOffset } from './UtcOffset'
 
 export const Input: FC = () => {
   const restoredState = useMemo(() => {
-    if (typeof window === 'undefined') {
-      return null
-    }
     const decoded = decodeCalendarQuery(window.location.search)
     return decoded ? normalizeQueryState(decoded) : null
   }, [])
@@ -45,7 +45,7 @@ export const Input: FC = () => {
   )
   const { t, tc } = useTranslation()
   const { filters, addFilterAfter, updateFilter, removeFilter } =
-    useFilterCondition(restoredState?.filters)
+    useFilterCondition(restoredState?.filters ?? [generateDefaultFilter()])
 
   useEffect(() => {
     if (restoredState && language !== restoredState.language) {

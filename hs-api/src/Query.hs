@@ -16,6 +16,7 @@ module Query
 where
 
 import qualified Codec.Compression.GZip as GZ
+import Data.Aeson ((.:))
 import qualified Data.Aeson as A
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Base64.URL as BU
@@ -28,16 +29,29 @@ import qualified Data.Time.Calendar as C
 import qualified Data.Time.LocalTime as LT
 import qualified Date as D
 import GHC.Generics (Generic)
-import Prelude (Applicative (pure), Bool, Bounded, Either (Left, Right), Enum, Eq, Int, Maybe (Just, Nothing), Show, String, fail, show, ($), (++), (.))
+import Prelude (Applicative (pure), Bool, Bounded, Either (Left, Right), Enum, Eq, Int, Maybe (Just, Nothing), Show, String, fail, show, ($), (++), (.), (<$>))
 
 data QueryRoot = QueryRoot
-  { language :: Language,
+  { rawQuery :: String,
+    language :: Language,
     utcOffset :: UtcOffsetTimeZone,
     filters :: [FilterCondition]
   }
   deriving (Show, Eq, Generic)
 
-instance A.FromJSON QueryRoot
+instance A.FromJSON QueryRoot where
+  parseJSON =
+    A.withObject "QueryRoot" $ \obj -> do
+      language <- obj .: "language"
+      utcOffset <- obj .: "utcOffset"
+      filters <- obj .: "filters"
+      pure
+        QueryRoot
+          { rawQuery = "",
+            language,
+            utcOffset,
+            filters
+          }
 
 -- 言語
 data Language
@@ -166,11 +180,21 @@ decodeBase64UriToJson base64Url' =
 parseBase64UrlRaw :: Text.Text -> Either String QueryRoot
 parseBase64UrlRaw base64Url = do
   decodedText <- decodeBase64UriToJson (TE.encodeUtf8 base64Url)
-  (parseJsonToQueryRoot . BL.fromStrict) decodedText
+  ( \query ->
+      query
+        { rawQuery = Text.unpack base64Url
+        }
+    )
+    <$> (parseJsonToQueryRoot . BL.fromStrict) decodedText
 
 parseBase64UrlGzip :: Text.Text -> Either String QueryRoot
 parseBase64UrlGzip base64Url = do
   decodedText <- decodeBase64UriToJson (TE.encodeUtf8 base64Url)
   -- 本当は gzip の解凍に失敗した場合にエラーハンドリングしたい気がするが、
   -- zlib の関数が Either を返してくれない・・・のでぱっとできない
-  (parseJsonToQueryRoot . GZ.decompress . BL.fromStrict) decodedText
+  ( \query ->
+      query
+        { rawQuery = Text.unpack base64Url
+        }
+    )
+    <$> (parseJsonToQueryRoot . GZ.decompress . BL.fromStrict) decodedText

@@ -23,13 +23,13 @@ eventId language mode apiRule apiStages utcTimeRange =
 uniqueById :: [I.ICalEvent] -> [I.ICalEvent]
 uniqueById = L.nubBy ((==) `on` I.id)
 
-createICalEventsFromDefaultSchedules :: String -> Q.QueryRoot -> [S.DefaultSchedule] -> Q.Mode -> [I.ICalEvent]
-createICalEventsFromDefaultSchedules settingsUrl Q.QueryRoot {utcOffset, filters, language} defaultSchedules mode =
+createICalEventsFromDefaultSchedules :: Q.QueryRoot -> [S.DefaultSchedule] -> Q.Mode -> [I.ICalEvent]
+createICalEventsFromDefaultSchedules queryRoot@Q.QueryRoot {utcOffset, filters, language} defaultSchedules mode =
   uniqueById
     [ I.ICalEvent
         { I.id = eventId language mode apiRule apiStages (startTime, endTime),
           I.summary = Translation.showCalendarSummary language mode apiRule apiStages,
-          I.description = Translation.showCalendarDescription language mode apiRule apiStages timeRange settingsUrl,
+          I.description = Translation.showCalendarDescription language mode apiRule apiStages timeRange (settingsUrlFromQuery queryRoot),
           I.start = intersectStart,
           I.end = intersectEnd
         }
@@ -40,8 +40,8 @@ createICalEventsFromDefaultSchedules settingsUrl Q.QueryRoot {utcOffset, filters
         (intersectStart, intersectEnd) <- FS.getMatchedTimeRangesFromDefaultSchedule filter defaultSchedule utcOffset' mode
     ]
 
-createICalEventsFromEventMatches :: String -> Q.QueryRoot -> [S.EventMatch] -> [I.ICalEvent]
-createICalEventsFromEventMatches settingsUrl Q.QueryRoot {utcOffset, filters, language} eventMatches =
+createICalEventsFromEventMatches :: Q.QueryRoot -> [S.EventMatch] -> [I.ICalEvent]
+createICalEventsFromEventMatches queryRoot@Q.QueryRoot {utcOffset, filters, language} eventMatches =
   [ I.ICalEvent
       { -- API では日本語のイベント名しか手に入らないので、日本語以外の場合は末尾にイベント名を追加する。descも同様
         I.id = eventId language Q.Event apiRule apiStages (startTime, endTime),
@@ -67,21 +67,32 @@ createICalEventsFromEventMatches settingsUrl Q.QueryRoot {utcOffset, filters, la
       let Q.UtcOffsetTimeZone utcOffset' = utcOffset,
       let timeRange = Date.convertRangedUTCTimeToZonedTime utcOffset' (startTime, endTime),
       let baseSummary = Translation.showCalendarSummary language Q.Event apiRule apiStages,
-      let baseDescription = Translation.showCalendarDescription language Q.Event apiRule apiStages timeRange settingsUrl,
+      let baseDescription = Translation.showCalendarDescription language Q.Event apiRule apiStages timeRange (settingsUrlFromQuery queryRoot),
       filter <- filters,
       (intersectStart, intersectEnd) <- FS.getMatchedTimeRangesFromEventMatch filter eventMatch utcOffset'
   ]
 
-createICalInput :: String -> Q.QueryRoot -> S.Result -> I.ICalInput
-createICalInput settingsUrl queryRoot result =
+createICalInput :: Q.QueryRoot -> S.Result -> I.ICalInput
+createICalInput queryRoot result =
   I.ICalInput
     { I.language = Q.language queryRoot,
-      I.settingsUrl = settingsUrl,
+      I.settingsUrl = settingsUrlFromQuery queryRoot,
       I.events = regular ++ bankaraChallenge ++ bankaraOpen ++ x ++ event
     }
   where
-    regular = createICalEventsFromDefaultSchedules settingsUrl queryRoot (S.regular result) Q.Regular
-    bankaraChallenge = createICalEventsFromDefaultSchedules settingsUrl queryRoot (S.bankaraChallenge result) Q.BankaraChallenge
-    bankaraOpen = createICalEventsFromDefaultSchedules settingsUrl queryRoot (S.bankaraOpen result) Q.BankaraOpen
-    x = createICalEventsFromDefaultSchedules settingsUrl queryRoot (S.x result) Q.XMatch
-    event = createICalEventsFromEventMatches settingsUrl queryRoot (S.event result)
+    regular = createICalEventsFromDefaultSchedules queryRoot (S.regular result) Q.Regular
+    bankaraChallenge = createICalEventsFromDefaultSchedules queryRoot (S.bankaraChallenge result) Q.BankaraChallenge
+    bankaraOpen = createICalEventsFromDefaultSchedules queryRoot (S.bankaraOpen result) Q.BankaraOpen
+    x = createICalEventsFromDefaultSchedules queryRoot (S.x result) Q.XMatch
+    event = createICalEventsFromEventMatches queryRoot (S.event result)
+
+settingsUrlFromQuery :: Q.QueryRoot -> String
+settingsUrlFromQuery Q.QueryRoot {Q.language, Q.rawQuery} =
+  "https://ink-alarm.pages.dev/"
+    ++ languagePath language
+    ++ "?query="
+    ++ rawQuery
+
+languagePath :: Q.Language -> String
+languagePath Q.Japanese = "ja"
+languagePath Q.English = "en"

@@ -109,7 +109,8 @@ test = hspec $ do
 
       let queryRoot =
             Q.QueryRoot
-              { Q.language = Q.Japanese,
+              { Q.rawQuery = "mockQuery",
+                Q.language = Q.Japanese,
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 Q.filters =
                   [ Q.FilterCondition
@@ -133,12 +134,11 @@ test = hspec $ do
                   ]
               }
 
-      let settingsUrl = "https://ink-alarm.pages.dev/ja?query=mockQuery"
-      let icalInput = FI.createICalInput settingsUrl queryRoot splaApiResult
+      let icalInput = FI.createICalInput queryRoot splaApiResult
       icalInput
         `shouldBe` I.ICalInput
           { I.language = Q.Japanese,
-            I.settingsUrl = settingsUrl,
+            I.settingsUrl = "https://ink-alarm.pages.dev/ja?query=mockQuery",
             I.events =
               [ I.ICalEvent
                   { I.id = "9864650fe1bd4d9a8fba92577fd4b7cd395cdeeddf78f052f1cfec2fb65df705",
@@ -246,7 +246,8 @@ test = hspec $ do
               }
       let queryRoot =
             Q.QueryRoot
-              { Q.language = Q.English,
+              { Q.rawQuery = "mockQuery",
+                Q.language = Q.English,
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone (-8) "", -- ロサンゼルスは UTC-8
                 Q.filters =
                   [ Q.FilterCondition
@@ -270,12 +271,11 @@ test = hspec $ do
                   ]
               }
 
-      let settingsUrl = "https://ink-alarm.pages.dev/en?query=mockQuery"
-      let icalInput = FI.createICalInput settingsUrl queryRoot splaApiResult
+      let icalInput = FI.createICalInput queryRoot splaApiResult
       icalInput
         `shouldBe` I.ICalInput
           { I.language = Q.English,
-            I.settingsUrl = settingsUrl,
+            I.settingsUrl = "https://ink-alarm.pages.dev/en?query=mockQuery",
             I.events =
               [ I.ICalEvent
                   { I.id = "bb2afcd5dbc30d5027e6b196459d8eddc0e99af5108e4f87456826b77c282884",
@@ -291,7 +291,8 @@ test = hspec $ do
     it "正常系" $ do
       let queryRoot =
             Q.QueryRoot
-              { Q.language = Q.Japanese,
+              { Q.rawQuery = "mockQuery",
+                Q.language = Q.Japanese,
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 Q.filters =
                   [ Q.FilterCondition
@@ -332,8 +333,7 @@ test = hspec $ do
                   S.isFest = False
                 }
             ]
-      let settingsUrl = "https://ink-alarm.pages.dev/ja?query=mockQuery"
-      let icalEvents = FI.createICalEventsFromDefaultSchedules settingsUrl queryRoot defaultSchedules Q.BankaraChallenge
+      let icalEvents = FI.createICalEventsFromDefaultSchedules queryRoot defaultSchedules Q.BankaraChallenge
       icalEvents
         `shouldBe` [ I.ICalEvent
                        { I.id = "13bd55fa792ff7180be0f964ca83029891cac218359fafd756a864a8addabbda",
@@ -347,7 +347,8 @@ test = hspec $ do
     it "2つのフィルターが1つのスケジュールにマッチしたとき、ICalEventは1つだけ出力する" $ do
       let queryRoot =
             Q.QueryRoot
-              { Q.language = Q.Japanese,
+              { Q.rawQuery = "mockQuery",
+                Q.language = Q.Japanese,
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 -- 全く同じ条件を2つ指定
                 Q.filters =
@@ -407,8 +408,7 @@ test = hspec $ do
                   S.isFest = False
                 }
             ]
-      let settingsUrl = "https://ink-alarm.pages.dev/ja?query=mockQuery"
-      let icalEvents = FI.createICalEventsFromDefaultSchedules settingsUrl queryRoot defaultSchedules Q.BankaraChallenge
+      let icalEvents = FI.createICalEventsFromDefaultSchedules queryRoot defaultSchedules Q.BankaraChallenge
       icalEvents
         `shouldBe` [ I.ICalEvent
                        { I.id = "13bd55fa792ff7180be0f964ca83029891cac218359fafd756a864a8addabbda",
@@ -423,7 +423,8 @@ test = hspec $ do
     it "正常系 日本語" $ do
       let queryRoot =
             Q.QueryRoot
-              { Q.language = Q.Japanese,
+              { Q.rawQuery = "mockQuery",
+                Q.language = Q.Japanese,
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 Q.filters =
                   [ Q.FilterCondition
@@ -466,8 +467,7 @@ test = hspec $ do
                   S.isFest = False
                 }
             ]
-      let settingsUrl = "https://ink-alarm.pages.dev/ja?query=mockQuery"
-      let icalEvents = FI.createICalEventsFromEventMatches settingsUrl queryRoot eventMatches
+      let icalEvents = FI.createICalEventsFromEventMatches queryRoot eventMatches
       icalEvents
         `shouldBe` [ I.ICalEvent
                        { I.id = "3cd804136689020fd443d62339a32a5ca1375daa7be1327782050d0675bca85e",
@@ -481,7 +481,8 @@ test = hspec $ do
     it "正常系 英語" $ do
       let queryRoot =
             Q.QueryRoot
-              { Q.language = Q.English,
+              { Q.rawQuery = "mockQuery",
+                Q.language = Q.English,
                 Q.utcOffset = Q.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                 Q.filters =
                   [ Q.FilterCondition
@@ -515,8 +516,7 @@ test = hspec $ do
                   S.isFest = False
                 }
             ]
-      let settingsUrl = "https://ink-alarm.pages.dev/en?query=mockQuery"
-      let icalEvents = FI.createICalEventsFromEventMatches settingsUrl queryRoot eventMatches
+      let icalEvents = FI.createICalEventsFromEventMatches queryRoot eventMatches
       icalEvents
         `shouldBe` [ I.ICalEvent
                        { I.id = "d220020d5918000e7063b463a61882defa847a9d509650d68e39228a5c36f408",
