@@ -56,7 +56,7 @@ const createFilterWithKey = (
 ): FilterConditionWithKey => {
   const fallback = generateDefaultFilter()
   return {
-    ...fallback,
+    key: fallback.key,
     modes: filter.modes ?? fallback.modes,
     rules: filter.rules ?? fallback.rules,
     stages: filter.stages ?? fallback.stages,
