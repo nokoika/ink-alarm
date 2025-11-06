@@ -129,7 +129,7 @@ showCalendarDescription Q.Japanese mode rule stages (startTime, endTime) setting
       "・" ++ showMode Q.Japanese mode,
       "・ステージ: " ++ intercalate ", " (map (showStageName Q.Japanese) stages),
       "",
-      "スケジュール設定の変更はこちら: " ++ settingsUrl
+      "スケジュール設定の確認と変更はこちら: " ++ settingsUrl
     ]
 showCalendarDescription Q.English mode rule stages (startTime, endTime) settingsUrl =
   intercalate
@@ -138,5 +138,5 @@ showCalendarDescription Q.English mode rule stages (startTime, endTime) settings
       "- " ++ showMode Q.English mode,
       "- Stages: " ++ intercalate ", " (map (showStageName Q.English) stages),
       "",
-      "Click here to change schedule settings: " ++ settingsUrl
+      "Click here to check schedule settings: " ++ settingsUrl
     ]
