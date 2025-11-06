@@ -1,7 +1,8 @@
 import { format } from 'date-fns'
 import { v4 as uuidv4 } from 'uuid'
 import type { FilterConditionWithKey, TimeSlotWithKey } from '~/types/propTypes'
-import { DayOfWeek, Mode, Rule } from '~/types/querySchema'
+import type { FilterCondition, TimeSlot } from '~/types/querySchema'
+import { DayOfWeek, Mode, type Query, Rule } from '~/types/querySchema'
 
 // すべての選択肢をONにした初期値を生成
 export const generateDefaultFilter = (): FilterConditionWithKey => ({
@@ -34,6 +35,42 @@ export const generateDefaultTimeSlot = (): TimeSlotWithKey => ({
   ],
 })
 
-export const generateInitilalUtcOffset = (): string => {
-  return format(new Date(), 'xxx')
+export const generateInitilalUtcOffset = (
+  restoredQuery: Query | null,
+): string => {
+  return restoredQuery?.utcOffset ?? format(new Date(), 'xxx')
+}
+
+const createTimeSlotWithKey = (timeSlot: TimeSlot): TimeSlotWithKey => {
+  const fallback = generateDefaultTimeSlot()
+  return {
+    key: fallback.key,
+    start: timeSlot.start ?? fallback.start,
+    end: timeSlot.end ?? fallback.end,
+    dayOfWeeks: timeSlot.dayOfWeeks ?? fallback.dayOfWeeks,
+  }
+}
+
+const createFilterWithKey = (
+  filter: FilterCondition,
+): FilterConditionWithKey => {
+  const fallback = generateDefaultFilter()
+  return {
+    ...fallback,
+    modes: filter.modes ?? fallback.modes,
+    rules: filter.rules ?? fallback.rules,
+    stages: filter.stages ?? fallback.stages,
+    timeSlots:
+      filter.timeSlots?.map((timeSlot) => createTimeSlotWithKey(timeSlot)) ??
+      fallback.timeSlots,
+  }
+}
+
+export const generateInitialFilters = (
+  restoredQuery: Query | null,
+): FilterConditionWithKey[] => {
+  if (!restoredQuery) {
+    return [generateDefaultFilter()]
+  }
+  return restoredQuery.filters.map((filter) => createFilterWithKey(filter))
 }
