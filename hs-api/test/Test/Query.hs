@@ -19,7 +19,7 @@ import qualified Query
   )
 import Test.Hspec (describe, hspec, it, shouldBe)
 import qualified TestUtil as TU
-import Prelude (Bool (True), Either (Right), IO, Maybe (Just), ($))
+import Prelude (Bool (True), Either (Right), IO, Maybe (Just, Nothing), ($))
 
 test :: IO ()
 test = hspec $ do
@@ -30,7 +30,8 @@ test = hspec $ do
       let expect =
             Right
               ( Query.QueryRoot
-                  { Query.language = Query.Japanese,
+                  { Query.rawQuery = Nothing,
+                    Query.language = Query.Japanese,
                     Query.utcOffset = Query.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                     Query.filters =
                       [ Query.FilterCondition
@@ -63,7 +64,8 @@ test = hspec $ do
       let expect =
             Right
               ( Query.QueryRoot
-                  { Query.language = Query.Japanese,
+                  { Query.rawQuery = Just base64Url,
+                    Query.language = Query.Japanese,
                     Query.utcOffset = Query.UtcOffsetTimeZone $ TU.createTimeZone 9 "",
                     Query.filters =
                       [ Query.FilterCondition

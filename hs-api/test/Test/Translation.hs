@@ -20,19 +20,23 @@ test = hspec $ do
 
   describe "showCalendarDescription" $ do
     it "returns a description of the japanese calendar" $ do
+      let settingsUrl = "https://ink-alarm.pages.dev/ja?query=example"
       Translation.showCalendarDescription
         Q.Japanese
         Q.Regular
         (S.Rule S.TurfWar "")
         [S.Stage {S.id = 1, S.name = "", S.image = ""}, S.Stage {S.id = 2, S.name = "", S.image = ""}]
         (TU.createZonedTime (2021, 1, 1, 21, 0) (9, ""), TU.createZonedTime (2021, 1, 1, 23, 0) (9, ""))
-        `shouldBe` "21:00から23:00までナワバリバトルの予定があります。\n・レギュラーマッチ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区\n\nスケジュール設定の変更はこちら: https://ink-alarm.pages.dev/ja"
+        settingsUrl
+        `shouldBe` "21:00から23:00までナワバリバトルの予定があります。\n・レギュラーマッチ\n・ステージ: ユノハナ大渓谷, ゴンズイ地区\n\nスケジュール設定の確認と変更はこちら: https://ink-alarm.pages.dev/ja?query=example"
 
     it "returns a description of the english calendar" $ do
+      let settingsUrl = "https://ink-alarm.pages.dev/en?query=example"
       Translation.showCalendarDescription
         Q.English
         Q.Regular
         (S.Rule S.TurfWar "")
         [S.Stage {S.id = 1, S.name = "", S.image = ""}, S.Stage {S.id = 2, S.name = "", S.image = ""}]
         (TU.createZonedTime (2021, 1, 1, 21, 0) (9, ""), TU.createZonedTime (2021, 1, 1, 23, 0) (9, ""))
-        `shouldBe` "There is a scheduled Turf War from 21:00 to 23:00.\n- Regular Battle\n- Stages: Scorch Gorge, Eeltail Alley\n\nClick here to change schedule settings: https://ink-alarm.pages.dev/en"
+        settingsUrl
+        `shouldBe` "There is a scheduled Turf War from 21:00 to 23:00.\n- Regular Battle\n- Stages: Scorch Gorge, Eeltail Alley\n\nClick here to check schedule settings: https://ink-alarm.pages.dev/en?query=example"

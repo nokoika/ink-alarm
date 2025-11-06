@@ -1,4 +1,4 @@
-import { type FC, createElement, useState } from 'react'
+import { type FC, createElement, useEffect, useMemo, useState } from 'react'
 import { FiCalendar, FiSun } from 'react-icons/fi'
 import {
   LuCalendarArrowUp,
@@ -17,8 +17,12 @@ import { useTranslationLanguageContext } from '~/contexts/translationLanguageCon
 import { useCalendar } from '~/hooks/useCalendar'
 import { useFilterCondition } from '~/hooks/useFilterCondition'
 import { useTranslation } from '~/hooks/useTranslation'
+import { decodeCalendarQuery } from '~/utils/decodeCalendarQuery'
 import { generateIcalUrl } from '~/utils/generateIcalUrl'
-import { generateInitilalUtcOffset } from '~/utils/generateInitialState'
+import {
+  generateInitialFilters,
+  generateInitilalUtcOffset,
+} from '~/utils/generateInitialState'
 import { EventList } from './EventList'
 import { IconButton } from './IconButton'
 import { InputBlock } from './InputBlock'
@@ -30,13 +34,23 @@ import { TimeSlotsFilter } from './TimeSlotsFilter'
 import { UtcOffset } from './UtcOffset'
 
 export const Input: FC = () => {
-  const { language, setLanguage } = useTranslationLanguageContext()
-  const [utcOffset, setUtcOffset] = useState<string>(
-    generateInitilalUtcOffset(),
+  const restoredQuery = useMemo(
+    () => decodeCalendarQuery(window.location.search),
+    [],
   )
-  const { t, tc } = useTranslation()
+  const { language, setLanguage } = useTranslationLanguageContext()
+  const [utcOffset, setUtcOffset] = useState<string>(() =>
+    generateInitilalUtcOffset(restoredQuery),
+  )
   const { filters, addFilterAfter, updateFilter, removeFilter } =
-    useFilterCondition()
+    useFilterCondition(generateInitialFilters(restoredQuery))
+  const { t, tc } = useTranslation()
+
+  useEffect(() => {
+    if (restoredQuery && language !== restoredQuery.language) {
+      setLanguage(restoredQuery.language)
+    }
+  }, [language, restoredQuery, setLanguage])
 
   const icalUrls = generateIcalUrl({ filters, utcOffset, language })
   const events = useCalendar(icalUrls.https)

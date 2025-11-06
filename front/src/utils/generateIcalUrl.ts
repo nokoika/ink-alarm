@@ -1,5 +1,5 @@
-import pako from 'pako'
 import type { Query } from '~/types/querySchema'
+import { encodeJsonToBase64Url } from '~/utils/calendarQueryCodec'
 
 // 全選択な条件は省略して送信しても同じであるため、URL文字数制限の都合で詰める
 const createOptimizedQuery = (query: Query): Query => {
@@ -53,13 +53,7 @@ export const generateIcalUrl = (
   googleCalendar: string
 } => {
   const json = JSON.stringify(createOptimizedQuery(query))
-  const gzip = pako.gzip(json)
-  const base64 = btoa(String.fromCharCode(...gzip))
-  const base64url = base64
-    // biome-ignore lint/performance/useTopLevelRegex: 遅くてもいいです
-    .replace(/=+$/, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
+  const base64url = encodeJsonToBase64Url(json)
 
   return {
     https: `${import.meta.env.VITE_API_URL}?query=${base64url}`,
