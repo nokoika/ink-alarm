@@ -35,11 +35,7 @@ const encodeBytesToBase64Url = (bytes: Uint8Array): string => {
 
 export const decodeBase64UrlToJson = (value: string): string => {
   const bytes = decodeBase64Url(value)
-  try {
-    return pako.ungzip(bytes, { to: 'string' }) as string
-  } catch (_gzipError) {
-    return new TextDecoder().decode(bytes)
-  }
+  return pako.ungzip(bytes, { to: 'string' })
 }
 
 export const encodeJsonToBase64Url = (json: string): string => {
