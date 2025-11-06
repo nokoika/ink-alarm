@@ -9,6 +9,7 @@ import Prelude (Eq, Show (show), String, concatMap, filter, (++), (.), (==))
 
 data ICalInput = ICalInput
   { language :: Q.Language,
+    settingsUrl :: String,
     events :: [ICalEvent]
   }
   deriving (Show, Eq)

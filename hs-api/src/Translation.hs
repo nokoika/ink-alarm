@@ -121,22 +121,22 @@ showZonedTime = T.formatTime T.defaultTimeLocale "%H:%M"
 -- There is a Splat Zones schedule from 21:00 to 23:00.
 -- - Bankara Match
 -- - Stages: Scorch Gorge, Eeltail Alley
-showCalendarDescription :: Q.Language -> Q.Mode -> S.Rule -> [S.Stage] -> (T.ZonedTime, T.ZonedTime) -> String
-showCalendarDescription Q.Japanese mode rule stages (startTime, endTime) =
+showCalendarDescription :: Q.Language -> Q.Mode -> S.Rule -> [S.Stage] -> (T.ZonedTime, T.ZonedTime) -> String -> String
+showCalendarDescription Q.Japanese mode rule stages (startTime, endTime) settingsUrl =
   intercalate
     "\n"
     [ showZonedTime startTime ++ "から" ++ showZonedTime endTime ++ "まで" ++ showRuleName Q.Japanese rule ++ "の予定があります。",
       "・" ++ showMode Q.Japanese mode,
       "・ステージ: " ++ intercalate ", " (map (showStageName Q.Japanese) stages),
       "",
-      "スケジュール設定の変更はこちら: https://ink-alarm.pages.dev/ja"
+      "スケジュール設定の変更はこちら: " ++ settingsUrl
     ]
-showCalendarDescription Q.English mode rule stages (startTime, endTime) =
+showCalendarDescription Q.English mode rule stages (startTime, endTime) settingsUrl =
   intercalate
     "\n"
     [ "There is a scheduled " ++ showRuleName Q.English rule ++ " from " ++ showZonedTime startTime ++ " to " ++ showZonedTime endTime ++ ".",
       "- " ++ showMode Q.English mode,
       "- Stages: " ++ intercalate ", " (map (showStageName Q.English) stages),
       "",
-      "Click here to change schedule settings: https://ink-alarm.pages.dev/en"
+      "Click here to change schedule settings: " ++ settingsUrl
     ]

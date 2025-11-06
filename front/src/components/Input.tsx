@@ -1,4 +1,4 @@
-import { type FC, createElement, useState } from 'react'
+import { type FC, createElement, useEffect, useMemo, useState } from 'react'
 import { FiCalendar, FiSun } from 'react-icons/fi'
 import {
   LuCalendarArrowUp,
@@ -17,8 +17,10 @@ import { useTranslationLanguageContext } from '~/contexts/translationLanguageCon
 import { useCalendar } from '~/hooks/useCalendar'
 import { useFilterCondition } from '~/hooks/useFilterCondition'
 import { useTranslation } from '~/hooks/useTranslation'
+import { decodeCalendarQuery } from '~/utils/decodeCalendarQuery'
 import { generateIcalUrl } from '~/utils/generateIcalUrl'
 import { generateInitilalUtcOffset } from '~/utils/generateInitialState'
+import { normalizeQueryState } from '~/utils/normalizeQueryState'
 import { EventList } from './EventList'
 import { IconButton } from './IconButton'
 import { InputBlock } from './InputBlock'
@@ -30,13 +32,26 @@ import { TimeSlotsFilter } from './TimeSlotsFilter'
 import { UtcOffset } from './UtcOffset'
 
 export const Input: FC = () => {
+  const restoredState = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return null
+    }
+    const decoded = decodeCalendarQuery(window.location.search)
+    return decoded ? normalizeQueryState(decoded) : null
+  }, [])
   const { language, setLanguage } = useTranslationLanguageContext()
   const [utcOffset, setUtcOffset] = useState<string>(
-    generateInitilalUtcOffset(),
+    () => restoredState?.utcOffset ?? generateInitilalUtcOffset(),
   )
   const { t, tc } = useTranslation()
   const { filters, addFilterAfter, updateFilter, removeFilter } =
-    useFilterCondition()
+    useFilterCondition(restoredState?.filters)
+
+  useEffect(() => {
+    if (restoredState && language !== restoredState.language) {
+      setLanguage(restoredState.language)
+    }
+  }, [language, restoredState, setLanguage])
 
   const icalUrls = generateIcalUrl({ filters, utcOffset, language })
   const events = useCalendar(icalUrls.https)

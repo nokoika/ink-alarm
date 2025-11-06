@@ -26,7 +26,7 @@ type UseLanguage = {
 }
 
 const setBrowserLanguage = (lang: Language) => {
-  history.replaceState(null, '', `/${lang}`)
+  history.replaceState(null, '', `/${lang}${location.search}`)
   const html = document.querySelector('html')
   if (html) {
     html.setAttribute('lang', lang)

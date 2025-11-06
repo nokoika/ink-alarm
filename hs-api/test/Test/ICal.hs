@@ -14,6 +14,7 @@ test = hspec $ do
       let arg =
             ICal.ICalInput
               { ICal.language = Q.Japanese,
+                ICal.settingsUrl = "https://example.com/settings",
                 ICal.events =
                   [ ICal.ICalEvent
                       { id = "ID1",

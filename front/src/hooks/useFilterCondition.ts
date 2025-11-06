@@ -11,10 +11,14 @@ type UseFilterCondition = {
   ) => void
   removeFilter: (key: string) => void
 }
-export const useFilterCondition = (): UseFilterCondition => {
-  const [filters, setFilters] = useState<FilterConditionWithKey[]>([
-    generateDefaultFilter(),
-  ])
+export const useFilterCondition = (
+  initialFilters?: FilterConditionWithKey[],
+): UseFilterCondition => {
+  const [filters, setFilters] = useState<FilterConditionWithKey[]>(() =>
+    initialFilters && initialFilters.length > 0
+      ? initialFilters
+      : [generateDefaultFilter()],
+  )
 
   // 指定した要素の直後にフィルターを追加
   const addFilterAfter = (key: string) => {
